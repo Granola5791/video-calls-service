@@ -22,6 +22,7 @@ require (
 )
 
 require (
+	github.com/joho/godotenv v1.5.1
 	github.com/spf13/viper v1.21.0
 	golang.org/x/sys v0.38.0 // indirect
 )

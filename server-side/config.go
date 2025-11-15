@@ -1,19 +1,14 @@
 package main
 
 import (
-	"log"
-
 	"github.com/spf13/viper"
 )
 
-func InitConfig() {
+func InitConfig() error {
 	viper.SetConfigName("constants")
 	viper.SetConfigType("yaml")
 	viper.AddConfigPath(".")
-	err := viper.ReadInConfig()
-	if err != nil {
-		log.Fatalf("Error reading config file, %s", err)
-	}
+	return viper.ReadInConfig()
 }
 
 func GetIntFromConfig(key string) int {
