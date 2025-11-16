@@ -11,6 +11,7 @@ import (
 type User struct {
 	gorm.Model
 	Username       string `gorm:"uniqueIndex;not null"`
+	Role           string `gorm:"not null;default:user"`
 	HashedPassword string `gorm:"not null"`
 	Salt           string `gorm:"not null"`
 }
@@ -18,6 +19,11 @@ type User struct {
 type UserAuth struct {
 	HashedPassword string `gorm:"not null"`
 	Salt           string `gorm:"not null"`
+}
+
+type UserRole struct {
+	ID   uint
+	Role string `gorm:"not null"`
 }
 
 var db *gorm.DB
@@ -76,4 +82,15 @@ func GetUserAuthFromDB(username string) (string, string, error) {
 		return "", "", err
 	}
 	return userAuth.HashedPassword, userAuth.Salt, nil
+}
+
+func GetUserIDAndRoleFromDB(username string) (int, string, error) {
+	var user User
+	err := db.Model(&User{}).
+		Where("username = ?", username).
+		First(&user).Error
+	if err != nil {
+		return 0, "", err
+	}
+	return int(user.ID), user.Role, nil
 }

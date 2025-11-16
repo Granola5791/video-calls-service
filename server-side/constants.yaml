@@ -16,6 +16,10 @@ server:
     signup_path: /signup
     login_path: /login
 
+jwt:
+  token_cookie_name: "auth_token"
+  token_exp: 3600 # in seconds
+
 errors:
   invalid_input: "Invalid input"
   user_exists: "User already exists"

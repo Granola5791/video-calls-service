@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"os"
 )
 
 type UserLoginInput struct {
@@ -28,7 +29,6 @@ func HandleLogin(c *gin.Context) {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": GetStringFromConfig("errors.invalid_input")})
 		return
 	}
-
 	hashedPassword, salt, err := GetUserAuthFromDB(input.Username)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": GetStringFromConfig("errors.internal_server_error")})
@@ -40,5 +40,26 @@ func HandleLogin(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": GetStringFromConfig("success.login_successful")})
+	userID, role, err := GetUserIDAndRoleFromDB(input.Username)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": GetStringFromConfig("errors.internal_server_error")})
+		return
+	}
+	jwtKey := []byte(os.Getenv("JWT_SECRET"))
+	token, err := GenerateToken(userID, role, jwtKey)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": GetStringFromConfig("errors.internal_server_error")})
+		return
+	}
+	http.SetCookie(c.Writer, &http.Cookie{
+		Name:     GetStringFromConfig("jwt.token_cookie_name"),
+		Value:    token,
+		Path:     "/", // visible to all paths
+		HttpOnly: true,
+		Secure:   true,
+		SameSite: http.SameSiteStrictMode,
+		MaxAge:   GetIntFromConfig("jwt.token_exp"),
+	})
+
+	c.JSON(http.StatusOK, gin.H{"success": GetStringFromConfig("success.login_successful"), "role": role})
 }
