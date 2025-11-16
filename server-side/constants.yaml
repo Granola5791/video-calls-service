@@ -10,10 +10,11 @@ database:
   timezone: Asia/Jerusalem
 
 server:
-  listen_addr: "localhost:8080"
+  listen_addr: "localhost:8081"
   frontend_addr: "http://localhost:5173"
   api:
     signup_path: /signup
+    login_path: /login
 
 errors:
   invalid_input: "Invalid input"
@@ -22,6 +23,7 @@ errors:
 
 success:
   user_created: "User created successfully"
+  login_successful: "Login successful"
 
 signup:
   min_password_length: 8

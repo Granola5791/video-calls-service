@@ -16,6 +16,7 @@ func InitRouter() {
 	}))
 
 	router.POST(GetStringFromConfig("server.api.signup_path"), HandleSignup)
+	router.POST(GetStringFromConfig("server.api.login_path"), HandleLogin)
 
 	router.Run(GetStringFromConfig("server.listen_addr"))
 }

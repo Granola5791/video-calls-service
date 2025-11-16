@@ -15,6 +15,11 @@ type User struct {
 	Salt           string `gorm:"not null"`
 }
 
+type UserAuth struct {
+	HashedPassword string `gorm:"not null"`
+	Salt           string `gorm:"not null"`
+}
+
 var db *gorm.DB
 
 func InitDatabaseConnection() error {
@@ -42,12 +47,15 @@ func InitDatabaseConnection() error {
 	return nil
 }
 
-func UserExistsInDB(username string) bool {
+func UserExistsInDB(username string) (bool, error) {
 	var count int64
-	db.Model(&User{}).
+	err := db.Model(&User{}).
 		Where("username = ?", username).
-		Count(&count)
-	return count > 0
+		Count(&count).Error
+	if err != nil {
+		return false, err
+	}
+	return count > 0, nil
 }
 
 func InsertUserToDB(useranme string, hashedPassword string, salt string) error {
@@ -57,4 +65,15 @@ func InsertUserToDB(useranme string, hashedPassword string, salt string) error {
 		Salt:           salt,
 	}
 	return db.Create(&user).Error
+}
+
+func GetUserAuthFromDB(username string) (string, string, error) {
+	var userAuth UserAuth
+	err := db.Model(&User{}).
+		Where("username = ?", username).
+		First(&userAuth).Error
+	if err != nil {
+		return "", "", err
+	}
+	return userAuth.HashedPassword, userAuth.Salt, nil
 }
