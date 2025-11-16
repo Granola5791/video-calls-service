@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"os"
 
@@ -17,7 +16,6 @@ type User struct {
 }
 
 var db *gorm.DB
-var ctx context.Context
 
 func InitDatabaseConnection() error {
 	var err error
@@ -36,8 +34,6 @@ func InitDatabaseConnection() error {
 		return err
 	}
 
-	ctx = context.Background()
-
 	err = db.AutoMigrate(&User{})
 	if err != nil {
 		return err
@@ -46,12 +42,12 @@ func InitDatabaseConnection() error {
 	return nil
 }
 
-func UserExistsInDB(username string) (bool, error) {
-	result, err := gorm.G[User](db).Where("username = ?", username).Count(ctx, "*")
-	if err != nil {
-		return false, err
-	}
-	return result > 0, nil
+func UserExistsInDB(username string) bool {
+	var count int64
+	db.Model(&User{}).
+		Where("username = ?", username).
+		Count(&count)
+	return count > 0
 }
 
 func InsertUserToDB(useranme string, hashedPassword string, salt string) error {
