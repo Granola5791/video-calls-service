@@ -3,10 +3,18 @@ package main
 import (
 	"context"
 	"fmt"
+	"os"
+
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	"os"
 )
+
+type User struct {
+	gorm.Model
+	Username       string `gorm:"uniqueIndex;not null"`
+	HashedPassword string `gorm:"not null"`
+	Salt           string `gorm:"not null"`
+}
 
 var db *gorm.DB
 var ctx context.Context
@@ -30,5 +38,27 @@ func InitDatabaseConnection() error {
 
 	ctx = context.Background()
 
+	err = db.AutoMigrate(&User{})
+	if err != nil {
+		return err
+	}
+
 	return nil
+}
+
+func UserExistsInDB(username string) (bool, error) {
+	result, err := gorm.G[User](db).Where("username = ?", username).Count(ctx, "*")
+	if err != nil {
+		return false, err
+	}
+	return result > 0, nil
+}
+
+func InsertUserToDB(useranme string, hashedPassword string, salt string) error {
+	user := User{
+		Username:       useranme,
+		HashedPassword: hashedPassword,
+		Salt:           salt,
+	}
+	return db.Create(&user).Error
 }
