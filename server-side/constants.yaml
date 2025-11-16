@@ -8,3 +8,23 @@ hash:
 database:
   sslmode: disable
   timezone: Asia/Jerusalem
+
+server:
+  listen_addr: "localhost:8080"
+  frontend_addr: "http://localhost:5173"
+  api:
+    signup_path: /signup
+
+errors:
+  invalid_input: "Invalid input"
+  user_exists: "User already exists"
+  internal_server_error: "Internal server error"
+
+success:
+  user_created: "User created successfully"
+
+signup:
+  min_password_length: 8
+  max_password_length: 64
+  min_username_length: 3
+  max_username_length: 32
