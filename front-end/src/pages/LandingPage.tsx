@@ -1,8 +1,9 @@
 import React from 'react'
 import { StyledTitle } from '../styled-components/StyledText'
-import { CenteredColumn } from '../styled-components/StyledBoxes'
+import { CenteredColumn, CenteredFilledScreen } from '../styled-components/StyledBoxes'
 import { LongButton, LongButtonFilled } from '../styled-components/StyledButtons'
 import { useNavigation } from '../utils/navigation'
+import { General, LandingPageText } from '../constants/hebrew-constants'
 
 const LandingPage = () => {
 
@@ -12,14 +13,16 @@ const LandingPage = () => {
     } = useNavigation();
 
     return (
-        <>
-            <StyledTitle>Welcome to the Landing Page</StyledTitle>
-            <CenteredColumn>
-                <LongButtonFilled>Join a meeting</LongButtonFilled>
-                <LongButton onClick={GoToSignUp}>sign up</LongButton>
-                <LongButton onClick={GoToLogIn}>log in</LongButton>
+        <CenteredFilledScreen>
+            <CenteredColumn >
+                <StyledTitle>{General.appName}</StyledTitle>
+                <CenteredColumn>
+                    <LongButtonFilled>{LandingPageText.joinMeetingButton}</LongButtonFilled>
+                    <LongButton onClick={GoToSignUp}>{LandingPageText.signUpButton}</LongButton>
+                    <LongButton onClick={GoToLogIn}>{LandingPageText.logInButton}</LongButton>
+                </CenteredColumn>
             </CenteredColumn>
-        </>
+        </CenteredFilledScreen>
     )
 }
 

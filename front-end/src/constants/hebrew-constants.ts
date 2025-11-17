@@ -22,3 +22,9 @@ export const SuccessMessages = {
     userCreated: "המשתמש נוצר בהצלחה",
     userLoggedIn: "המשתמש התחבר בהצלחה",
 };
+
+export const LandingPageText = {
+    joinMeetingButton: "הצטרף לפגישה",
+    signUpButton: "הרשמה",
+    logInButton: "התחברות",
+};

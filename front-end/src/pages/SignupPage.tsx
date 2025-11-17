@@ -1,6 +1,6 @@
 import React from 'react'
 import { General, Auth, Errors, SuccessMessages } from "../constants/hebrew-constants"
-import { CenteredColumn } from "../styled-components/StyledBoxes"
+import { CenteredColumn, CenteredFilledScreen } from "../styled-components/StyledBoxes"
 import { LongButtonFilled } from "../styled-components/StyledButtons"
 import { StyledTitle } from "../styled-components/StyledText"
 import { StyledTextField } from "../styled-components/StyledTextFields"
@@ -42,32 +42,33 @@ const SignupPage = () => {
     }
 
     return (
-        <>
-            <StyledTitle>{General.appName}</StyledTitle>
+        <CenteredFilledScreen>
+            <CenteredColumn >
+                <StyledTitle>{General.appName}</StyledTitle>
 
-            <CenteredColumn>
-                <StyledTextField
-                    label={Auth.username}
-                    variant="filled"
-                    onChange={(e) => setUsername(e.target.value)}
-                />
-                <StyledTextField
-                    label={Auth.password}
-                    type="password"
-                    variant="filled"
-                    onChange={(e) => setPassword(e.target.value)}
-                />
-                <StyledTextField
-                    label={Auth.rePassword}
-                    type="password"
-                    variant="filled"
-                    onChange={(e) => setRePassword(e.target.value)}
-                />
-                <LongButtonFilled onClick={HandleLogin}>{Auth.loginButton}</LongButtonFilled>
-                <ErrorText>{response}</ErrorText>
-            </ CenteredColumn>
-
-        </>
+                <CenteredColumn>
+                    <StyledTextField
+                        label={Auth.username}
+                        variant="filled"
+                        onChange={(e) => setUsername(e.target.value)}
+                    />
+                    <StyledTextField
+                        label={Auth.password}
+                        type="password"
+                        variant="filled"
+                        onChange={(e) => setPassword(e.target.value)}
+                    />
+                    <StyledTextField
+                        label={Auth.rePassword}
+                        type="password"
+                        variant="filled"
+                        onChange={(e) => setRePassword(e.target.value)}
+                    />
+                    <LongButtonFilled onClick={HandleLogin}>{Auth.loginButton}</LongButtonFilled>
+                    <ErrorText>{response}</ErrorText>
+                </ CenteredColumn>
+            </CenteredColumn>
+        </CenteredFilledScreen>
     )
 }
 

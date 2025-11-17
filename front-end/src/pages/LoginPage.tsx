@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { General, Auth, Errors, SuccessMessages } from "../constants/hebrew-constants"
-import { CenteredColumn } from "../styled-components/StyledBoxes"
+import { CenteredColumn, CenteredFilledScreen } from "../styled-components/StyledBoxes"
 import { LongButtonFilled } from "../styled-components/StyledButtons"
 import { StyledTitle } from "../styled-components/StyledText"
 import { StyledTextField } from "../styled-components/StyledTextFields"
@@ -34,28 +34,30 @@ const LoginPage = () => {
 
 
     return (
-        <>
-            <StyledTitle>{General.appName}</StyledTitle>
 
-            <CenteredColumn>
-                <StyledTextField
-                    label={Auth.username}
-                    variant="filled"
-                    onChange={(e) => setUsername(e.target.value)}
-                />
-                <StyledTextField
-                    label={Auth.password}
-                    type="password"
-                    variant="filled"
-                    onChange={(e) => setPassword(e.target.value)}
-                />
+        <CenteredFilledScreen>
+            <CenteredColumn >
+                <StyledTitle>{General.appName}</StyledTitle>
 
-                <LongButtonFilled onClick={() => handleLogin(username, password)}>{Auth.loginButton}</LongButtonFilled>
+                <CenteredColumn>
+                    <StyledTextField
+                        label={Auth.username}
+                        variant="filled"
+                        onChange={(e) => setUsername(e.target.value)}
+                    />
+                    <StyledTextField
+                        label={Auth.password}
+                        type="password"
+                        variant="filled"
+                        onChange={(e) => setPassword(e.target.value)}
+                    />
 
-                <ErrorText>{response}</ErrorText>
-            </ CenteredColumn>
+                    <LongButtonFilled onClick={() => handleLogin(username, password)}>{Auth.loginButton}</LongButtonFilled>
 
-        </>
+                    <ErrorText>{response}</ErrorText>
+                </ CenteredColumn>
+            </CenteredColumn>
+        </CenteredFilledScreen>
     )
 }
 
