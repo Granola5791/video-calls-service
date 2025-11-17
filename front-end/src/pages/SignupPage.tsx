@@ -64,7 +64,7 @@ const SignupPage = () => {
                         variant="filled"
                         onChange={(e) => setRePassword(e.target.value)}
                     />
-                    <LongButtonFilled onClick={HandleLogin}>{Auth.loginButton}</LongButtonFilled>
+                    <LongButtonFilled onClick={HandleLogin}>{Auth.signUpButton}</LongButtonFilled>
                     <ErrorText>{response}</ErrorText>
                 </ CenteredColumn>
             </CenteredColumn>

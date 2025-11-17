@@ -8,6 +8,7 @@ export const Auth = {
     password: "סיסמה",
     rePassword: "אימות סיסמה",
     loginButton: "התחבר",
+    signUpButton: "הרשמה",
 };
 
 export const Errors = {

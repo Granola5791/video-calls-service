@@ -11,10 +11,6 @@ export const LongButton = styled(Button)({
     borderRadius: "20px",
     border: `2px solid lightgray`,
     color: "gray",
-    "&:active": {
-        // borderColor: "black",
-        // color: "black",
-    },
 });
 
 export const LongButtonFilled = styled(LongButton)({
