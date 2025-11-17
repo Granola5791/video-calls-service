@@ -1,10 +1,38 @@
-import { General, Auth } from "../constants/hebrew-constants"
+import { useState } from "react"
+import { General, Auth, Errors, SuccessMessages } from "../constants/hebrew-constants"
 import { CenteredColumn } from "../styled-components/StyledBoxes"
 import { LongButtonFilled } from "../styled-components/StyledButtons"
 import { StyledTitle } from "../styled-components/StyledText"
 import { StyledTextField } from "../styled-components/StyledTextFields"
+import { ErrorText } from "../styled-components/StyledErrors"
+import { ApiEndpoints, BackendAddress, HttpStatusCodes } from "../constants/backend-constants"
 
 const LoginPage = () => {
+
+    const [response, setResponse] = useState<string>('');
+    const [username, setUsername] = useState<string>('');
+    const [password, setPassword] = useState<string>('');
+
+    const handleLogin = async (username: string, password: string) => {
+        setResponse(Auth.wait);
+        const res = await fetch(BackendAddress + ApiEndpoints.logIn, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password })
+        })
+        switch (res.status) {
+            case HttpStatusCodes.OK:
+                setResponse(SuccessMessages.userLoggedIn);
+                break;
+            case HttpStatusCodes.Unauthorized:
+                setResponse(Errors.invalidAuthInput);
+                break;
+            default:
+                setResponse(Errors.genericError);
+        }
+    }
+
+
     return (
         <>
             <StyledTitle>{General.appName}</StyledTitle>
@@ -13,14 +41,18 @@ const LoginPage = () => {
                 <StyledTextField
                     label={Auth.username}
                     variant="filled"
+                    onChange={(e) => setUsername(e.target.value)}
                 />
                 <StyledTextField
                     label={Auth.password}
                     type="password"
                     variant="filled"
+                    onChange={(e) => setPassword(e.target.value)}
                 />
 
-                <LongButtonFilled>{Auth.loginButton}</LongButtonFilled>
+                <LongButtonFilled onClick={() => handleLogin(username, password)}>{Auth.loginButton}</LongButtonFilled>
+
+                <ErrorText>{response}</ErrorText>
             </ CenteredColumn>
 
         </>

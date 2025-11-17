@@ -15,8 +15,10 @@ export const Errors = {
     usernameAlreadyExists: "שם משתמש זה תפוס!",
     genericError: "אירעה שגיאה, אנא נסו שוב במועד מאוחר יותר",
     invalidPasswordFormat: "הסיסמה לא עומדת בדרישות!",
+    invalidAuthInput: "שם המשתמש או הסיסמה שגויים!",
 };
 
 export const SuccessMessages = {
     userCreated: "המשתמש נוצר בהצלחה",
+    userLoggedIn: "המשתמש התחבר בהצלחה",
 };
