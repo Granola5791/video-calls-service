@@ -61,5 +61,5 @@ func HandleSignup(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"success": GetStringFromConfig("success.user_created")})
+	c.JSON(http.StatusCreated, gin.H{"success": GetStringFromConfig("success.user_created")})
 }
