@@ -8,4 +8,5 @@ export const CenteredColumn = styled.div ({
     height: '100%',
     margin: 'auto',
     flexDirection: 'column',
+    gap: '10px',
 })
