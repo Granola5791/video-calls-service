@@ -1,3 +1,5 @@
+import { PasswordRequirements } from "./general-contants";
+
 export const General = {
     appName: "שו״צ (זמני)",
 };
@@ -9,6 +11,7 @@ export const Auth = {
     rePassword: "אימות סיסמה",
     loginButton: "התחבר",
     signUpButton: "הרשמה",
+    passwordRequirements: `הסיסמה חייבת להכיל בין ${PasswordRequirements.minLength} ל־${PasswordRequirements.maxLength} תווים.`,
 };
 
 export const Errors = {

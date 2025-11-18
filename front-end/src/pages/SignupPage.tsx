@@ -6,6 +6,8 @@ import { StyledTitle } from "../styled-components/StyledText"
 import { StyledTextField } from "../styled-components/StyledTextFields"
 import { BackendAddress, ApiEndpoints, HttpStatusCodes } from '../constants/backend-constants'
 import { ErrorText } from '../styled-components/StyledErrors'
+import { Typography } from '@mui/material'
+import { PasswordRequirements } from '../constants/general-contants'
 
 const SignupPage = () => {
 
@@ -18,9 +20,17 @@ const SignupPage = () => {
         return pass === rePass;
     }
 
+    const PasswordIsValid = (pass: string): boolean => {
+        return pass.length >= PasswordRequirements.minLength && pass.length <= PasswordRequirements.maxLength;
+    }
+
     const HandleLogin = async () => {
         if (!PasswordsMatch(password, rePassword)) {
             setResponse(Errors.passwordsDoNotMatch);
+            return;
+        }
+        if (!PasswordIsValid(password)) {
+            setResponse(Errors.invalidPasswordFormat);
             return;
         }
 
@@ -36,6 +46,9 @@ const SignupPage = () => {
             case HttpStatusCodes.Conflict:
                 setResponse(Errors.usernameAlreadyExists);
                 break;
+            case HttpStatusCodes.BadRequest:
+                setResponse(Errors.invalidPasswordFormat);
+                break;
             default:
                 setResponse(Errors.genericError);
         }
@@ -47,6 +60,7 @@ const SignupPage = () => {
                 <StyledTitle>{General.appName}</StyledTitle>
 
                 <CenteredColumn>
+                    <Typography>{Auth.passwordRequirements}</Typography>
                     <StyledTextField
                         label={Auth.username}
                         variant="filled"

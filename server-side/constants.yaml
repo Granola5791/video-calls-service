@@ -30,7 +30,7 @@ success:
   login_successful: "Login successful"
 
 signup:
-  min_password_length: 8
+  min_password_length: 10
   max_password_length: 64
   min_username_length: 3
   max_username_length: 32
