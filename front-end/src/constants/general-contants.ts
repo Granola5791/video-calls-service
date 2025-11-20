@@ -3,7 +3,9 @@ export const Colors = {
     primaryHover: '#ff52b4ff',
 };
 
-export const PasswordRequirements = {
-    minLength: 10,
-    maxLength: 64,
+export const AuthRequirements = {
+    passwordMinLength: 10,
+    passwordMaxLength: 64,
+    usernameMinLength: 1,
+    usernameMaxLength: 32,
 }

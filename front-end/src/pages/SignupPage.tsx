@@ -7,7 +7,7 @@ import { StyledTextField } from "../styled-components/StyledTextFields"
 import { BackendAddress, ApiEndpoints, HttpStatusCodes } from '../constants/backend-constants'
 import { ErrorText } from '../styled-components/StyledErrors'
 import { Typography } from '@mui/material'
-import { PasswordRequirements } from '../constants/general-contants'
+import { AuthRequirements } from '../constants/general-contants'
 
 const SignupPage = () => {
 
@@ -20,16 +20,27 @@ const SignupPage = () => {
         return pass === rePass;
     }
 
-    const PasswordIsValid = (pass: string): boolean => {
-        return pass.length >= PasswordRequirements.minLength && pass.length <= PasswordRequirements.maxLength;
+    const IsPasswordValid = (pass: string): boolean => {
+        return pass.length >= AuthRequirements.passwordMinLength &&
+            pass.length <= AuthRequirements.passwordMaxLength;
+    }
+
+    const IsUsernameValid = (username: string): boolean => {
+        return username.length >= AuthRequirements.usernameMinLength &&
+            username.length <= AuthRequirements.usernameMaxLength;
     }
 
     const HandleLogin = async () => {
+        setResponse(Auth.wait);
+        if (!IsUsernameValid(username)) {
+            setResponse(Errors.invalidUsername);
+            return;
+        }
         if (!PasswordsMatch(password, rePassword)) {
             setResponse(Errors.passwordsDoNotMatch);
             return;
         }
-        if (!PasswordIsValid(password)) {
+        if (!IsPasswordValid(password)) {
             setResponse(Errors.invalidPasswordFormat);
             return;
         }

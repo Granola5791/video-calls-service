@@ -32,5 +32,5 @@ success:
 signup:
   min_password_length: 10
   max_password_length: 64
-  min_username_length: 3
+  min_username_length: 1
   max_username_length: 32

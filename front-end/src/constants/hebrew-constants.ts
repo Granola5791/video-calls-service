@@ -1,4 +1,4 @@
-import { PasswordRequirements } from "./general-contants";
+import { AuthRequirements } from "./general-contants";
 
 export const General = {
     appName: "שו״צ (זמני)",
@@ -11,7 +11,7 @@ export const Auth = {
     rePassword: "אימות סיסמה",
     loginButton: "התחבר",
     signUpButton: "הרשמה",
-    passwordRequirements: `הסיסמה חייבת להכיל בין ${PasswordRequirements.minLength} ל־${PasswordRequirements.maxLength} תווים.`,
+    passwordRequirements: `הסיסמה חייבת להכיל בין ${AuthRequirements.passwordMinLength} ל־${AuthRequirements.passwordMaxLength} תווים.`,
 };
 
 export const Errors = {
@@ -19,6 +19,7 @@ export const Errors = {
     usernameAlreadyExists: "שם משתמש זה תפוס!",
     genericError: "אירעה שגיאה, אנא נסו שוב במועד מאוחר יותר",
     invalidPasswordFormat: "הסיסמה לא עומדת בדרישות!",
+    invalidUsername: "יש להכניס שם משתמש תקין!",
     invalidAuthInput: "שם המשתמש או הסיסמה שגויים!",
 };
 

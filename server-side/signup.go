@@ -11,11 +11,13 @@ type UserSignupInput struct {
 }
 
 func IsValidPassword(password string) bool {
-	return len(password) >= GetIntFromConfig("signup.min_password_length")
+	return len(password) >= GetIntFromConfig("signup.min_password_length") &&
+		len(password) <= GetIntFromConfig("signup.max_password_length")
 }
 
 func IsValidUsername(username string) bool {
-	return len(username) >= GetIntFromConfig("signup.min_username_length")
+	return len(username) >= GetIntFromConfig("signup.min_username_length") &&
+		len(username) <= GetIntFromConfig("signup.max_username_length")
 }
 
 func SignupUser(username string, password string) error {
