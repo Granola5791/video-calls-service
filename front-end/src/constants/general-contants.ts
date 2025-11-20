@@ -9,3 +9,8 @@ export const AuthRequirements = {
     usernameMinLength: 1,
     usernameMaxLength: 32,
 }
+
+export const WebCamConfig = {
+    defaultWidth: '640px',
+    defaultHeight: '480px',
+}
