@@ -6,12 +6,15 @@ import { StyledTitle } from "../styled-components/StyledText"
 import { StyledTextField } from "../styled-components/StyledTextFields"
 import { ErrorText } from "../styled-components/StyledErrors"
 import { ApiEndpoints, BackendAddress, HttpStatusCodes } from "../constants/backend-constants"
+import { useNavigation } from "../utils/navigation"
 
 const LoginPage = () => {
 
     const [response, setResponse] = useState<string>('');
     const [username, setUsername] = useState<string>('');
     const [password, setPassword] = useState<string>('');
+
+    const { goToHome: GoToHome } = useNavigation();
 
     const handleLogin = async (username: string, password: string) => {
         setResponse(Auth.wait);
@@ -23,7 +26,7 @@ const LoginPage = () => {
         })
         switch (res.status) {
             case HttpStatusCodes.OK:
-                setResponse(SuccessMessages.userLoggedIn);
+                GoToHome();
                 break;
             case HttpStatusCodes.Unauthorized:
                 setResponse(Errors.invalidAuthInput);

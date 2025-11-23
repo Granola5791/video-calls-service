@@ -7,5 +7,6 @@ export function useNavigation() {
         goToSignUp: () => navigate("/signup"),
         goToLogIn: () => navigate("/login"),
         goToJoinMeeting: () => navigate("/join-meeting"),
+        goToHome: () => navigate("/home"),
     };
 }
