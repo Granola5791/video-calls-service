@@ -13,6 +13,8 @@ server:
   listen_addr: "localhost:8081"
   frontend_addr: "http://localhost:5173"
   api:
+    check_login_path: /check-login
+    check_admin_path: /check-admin
     signup_path: /signup
     login_path: /login
 

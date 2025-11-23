@@ -15,6 +15,9 @@ func InitRouter() {
 		AllowCredentials: true,
 	}))
 
+	router.GET(GetStringFromConfig("server.api.check_login_path"), RequireAuthentication)
+	router.GET(GetStringFromConfig("server.api.check_admin_path"), RequireAuthentication, RequireAdmin)
+
 	router.POST(GetStringFromConfig("server.api.signup_path"), HandleSignup)
 	router.POST(GetStringFromConfig("server.api.login_path"), HandleLogin)
 
