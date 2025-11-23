@@ -35,7 +35,8 @@ func ParseToken(tokenString string, jwtKey []byte) (*jwt.Token, error) {
 func RequireAuthentication(c *gin.Context) {
 
 	// get cookie
-	tokenString, err := c.Cookie(GetStringFromConfig("server.auth_cookie_name"))
+	tokenName := GetStringFromConfig("jwt.token_cookie_name")
+	tokenString, err := c.Cookie(tokenName)
 	if err != nil {
 		c.AbortWithStatus(http.StatusUnauthorized)
 		return
