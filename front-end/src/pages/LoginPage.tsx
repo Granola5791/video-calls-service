@@ -18,7 +18,8 @@ const LoginPage = () => {
         const res = await fetch(BackendAddress + ApiEndpoints.logIn, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username, password })
+            body: JSON.stringify({ username, password }),
+            credentials: 'include'
         })
         switch (res.status) {
             case HttpStatusCodes.OK:
