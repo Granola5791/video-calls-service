@@ -1,14 +1,15 @@
 import { BackendAddress, ApiEndpoints, HttpStatuses, HttpStatusCodes } from "../constants/backend-constants";
 
 async function fetchWithCredentials(apiPath: string) {
-    return fetch(apiPath, {
+    const res = await fetch(apiPath, {
         method: 'GET',
-        credentials: 'include'
+        credentials: 'include',
     });
+    return res;
 }
 
 export async function CheckLoginLoader() {
-    const res = await fetchWithCredentials(BackendAddress + ApiEndpoints.checkAdminApi);
+    const res = await fetchWithCredentials(BackendAddress + ApiEndpoints.checkLoginApi);
     if (!res.ok) {
         throw new Response(HttpStatuses.unauthorized, {
             status: HttpStatusCodes.found,
