@@ -12,6 +12,14 @@ export const Auth = {
     loginButton: "התחבר",
     signUpButton: "הרשמה",
     passwordRequirements: `הסיסמה חייבת להכיל בין ${AuthRequirements.passwordMinLength} ל־${AuthRequirements.passwordMaxLength} תווים.`,
+    alreadyHaveAccount: {
+        text: "כבר יש לכם חשבון? ",
+        linkText: "להתחברות!",
+    },
+    noAccountYet: {
+        text: "עוד אין לכם חשבון? ",
+        linkText: "להרשמה!",
+    }
 };
 
 export const Errors = {

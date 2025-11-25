@@ -2,12 +2,13 @@ import React from 'react'
 import { General, Auth, Errors, SuccessMessages } from "../constants/hebrew-constants"
 import { CenteredColumn, CenteredFilledScreen } from "../styled-components/StyledBoxes"
 import { LongButtonFilled } from "../styled-components/StyledButtons"
-import { StyledTitle } from "../styled-components/StyledText"
+import { BoldText, StyledTitle } from "../styled-components/StyledText"
 import { StyledTextField } from "../styled-components/StyledTextFields"
 import { BackendAddress, ApiEndpoints, HttpStatusCodes } from '../constants/backend-constants'
 import { ErrorText } from '../styled-components/StyledErrors'
 import { Typography } from '@mui/material'
 import { AuthRequirements } from '../constants/general-contants'
+import { Link } from 'react-router-dom'
 
 const SignupPage = () => {
 
@@ -30,7 +31,7 @@ const SignupPage = () => {
             username.length <= AuthRequirements.usernameMaxLength;
     }
 
-    const HandleLogin = async () => {
+    const HandleSignup = async () => {
         setResponse(Auth.wait);
         if (!IsUsernameValid(username)) {
             setResponse(Errors.invalidUsername);
@@ -71,7 +72,11 @@ const SignupPage = () => {
                 <StyledTitle>{General.appName}</StyledTitle>
 
                 <CenteredColumn>
-                    <Typography>{Auth.passwordRequirements}</Typography>
+                    <Typography>
+                        {Auth.alreadyHaveAccount.text}
+                        <Link to="/login">{Auth.alreadyHaveAccount.linkText}</Link>
+                    </Typography>
+                    <BoldText>{Auth.passwordRequirements}</BoldText>
                     <StyledTextField
                         label={Auth.username}
                         variant="filled"
@@ -89,7 +94,7 @@ const SignupPage = () => {
                         variant="filled"
                         onChange={(e) => setRePassword(e.target.value)}
                     />
-                    <LongButtonFilled onClick={HandleLogin}>{Auth.signUpButton}</LongButtonFilled>
+                    <LongButtonFilled onClick={HandleSignup}>{Auth.signUpButton}</LongButtonFilled>
                     <ErrorText>{response}</ErrorText>
                 </ CenteredColumn>
             </CenteredColumn>

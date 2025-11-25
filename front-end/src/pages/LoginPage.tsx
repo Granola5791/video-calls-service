@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { General, Auth, Errors, SuccessMessages } from "../constants/hebrew-constants"
+import { General, Auth, Errors } from "../constants/hebrew-constants"
 import { CenteredColumn, CenteredFilledScreen } from "../styled-components/StyledBoxes"
 import { LongButtonFilled } from "../styled-components/StyledButtons"
 import { StyledTitle } from "../styled-components/StyledText"
@@ -7,6 +7,8 @@ import { StyledTextField } from "../styled-components/StyledTextFields"
 import { ErrorText } from "../styled-components/StyledErrors"
 import { ApiEndpoints, BackendAddress, HttpStatusCodes } from "../constants/backend-constants"
 import { useNavigation } from "../utils/navigation"
+import { Typography } from "@mui/material"
+import { Link } from "react-router-dom"
 
 const LoginPage = () => {
 
@@ -44,6 +46,10 @@ const LoginPage = () => {
                 <StyledTitle>{General.appName}</StyledTitle>
 
                 <CenteredColumn>
+                    <Typography>
+                        {Auth.noAccountYet.text}
+                        <Link to="/signup">{Auth.noAccountYet.linkText}</Link>
+                    </Typography>
                     <StyledTextField
                         label={Auth.username}
                         variant="filled"
