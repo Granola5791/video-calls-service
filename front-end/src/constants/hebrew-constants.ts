@@ -19,7 +19,8 @@ export const Auth = {
     noAccountYet: {
         text: "עוד אין לכם חשבון? ",
         linkText: "להרשמה!",
-    }
+    },
+    goToLogin: "להתחברות!",
 };
 
 export const Errors = {

@@ -9,6 +9,8 @@ import { ErrorText } from '../styled-components/StyledErrors'
 import { Typography } from '@mui/material'
 import { AuthRequirements } from '../constants/general-contants'
 import { Link } from 'react-router-dom'
+import OneButtonPopUp from '../components/OneButtonPopUp'
+import { useNavigation } from '../utils/navigation'
 
 const SignupPage = () => {
 
@@ -16,6 +18,9 @@ const SignupPage = () => {
     const [password, setPassword] = React.useState<string>('');
     const [rePassword, setRePassword] = React.useState<string>('');
     const [response, setResponse] = React.useState<string>('');
+    const [openSuccessPopUp, setOpenSuccessPopUp] = React.useState<boolean>(false);
+
+    const { goToLogIn: GoToLogin } = useNavigation();
 
     const PasswordsMatch = (pass: string, rePass: string): boolean => {
         return pass === rePass;
@@ -53,7 +58,8 @@ const SignupPage = () => {
         })
         switch (res.status) {
             case HttpStatusCodes.Created:
-                setResponse(SuccessMessages.userCreated);
+                setResponse('');
+                setOpenSuccessPopUp(true);
                 break;
             case HttpStatusCodes.Conflict:
                 setResponse(Errors.usernameAlreadyExists);
@@ -98,6 +104,15 @@ const SignupPage = () => {
                     <ErrorText>{response}</ErrorText>
                 </ CenteredColumn>
             </CenteredColumn>
+
+            <OneButtonPopUp
+                open={openSuccessPopUp}
+                theme='success'
+                title={SuccessMessages.userCreated}
+                buttonText={Auth.goToLogin}
+                onButtonClick={() => { GoToLogin() }}
+            />
+
         </CenteredFilledScreen>
     )
 }
