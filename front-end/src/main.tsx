@@ -7,6 +7,7 @@ import LoginPage from './pages/LoginPage.tsx'
 import SignupPage from './pages/SignupPage.tsx'
 import HomePage from './pages/HomePage.tsx'
 import { CheckLoginLoader } from './utils/check-login.ts'
+import WebCamChunks from './components/WebCamChunks.tsx'
 
 
 const router = createBrowserRouter([
@@ -27,6 +28,10 @@ const router = createBrowserRouter([
         element: <HomePage />,
         loader: CheckLoginLoader,
     },
+    {
+        path: "/test",
+        element: <WebCamChunks />
+    }
 ])
 
 createRoot(document.getElementById('root')!).render(
