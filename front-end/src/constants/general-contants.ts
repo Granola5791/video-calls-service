@@ -14,3 +14,7 @@ export const WebCamConfig = {
     defaultWidth: '640px',
     defaultHeight: '480px',
 }
+
+export const StreamConfig = {
+    chunkIntervalMs: 100,
+}
