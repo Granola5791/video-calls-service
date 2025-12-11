@@ -1,0 +1,3 @@
+server:
+  listen_addr: "localhost:8082"
+  frontend_addr: "http://localhost:5173"
