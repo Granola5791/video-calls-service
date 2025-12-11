@@ -11,9 +11,11 @@ func InitRouter() {
 	router.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{GetStringFromConfig("server.frontend_addr")},
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization"},
+		AllowHeaders:     []string{"Content-Type"},
 		AllowCredentials: true,
 	}))
 
+	router.GET(GetStringFromConfig("stream_from_client_path"), HandleStream)
 
+	router.Run(GetStringFromConfig("server.listen_addr"))
 }
