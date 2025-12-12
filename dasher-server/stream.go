@@ -8,16 +8,8 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-var upgrader = websocket.Upgrader{
-	ReadBufferSize:  GetIntFromConfig("stream.read_buffer_size"),
-	WriteBufferSize: GetIntFromConfig("stream.write_buffer_size"),
-	CheckOrigin: func(r *http.Request) bool {
-		return r.Header.Get("Origin") == GetStringFromConfig("server.frontend_addr")
-	},
-}
-
 func HandleStream(c *gin.Context) {
-	ws, err := upgrader.Upgrade(c.Writer, c.Request, nil)
+	ws, err := wsUpgrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
 		log.Println(err)
 		c.String(http.StatusForbidden, GetStringFromConfig("error.forbidden"))

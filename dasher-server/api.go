@@ -1,9 +1,23 @@
 package main
 
 import (
+	"net/http"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"github.com/gorilla/websocket"
 )
+
+var wsUpgrader websocket.Upgrader
+
+func InitWsUpgrader() {
+	wsUpgrader = websocket.Upgrader{
+		ReadBufferSize:  GetIntFromConfig("stream.read_buffer_size"),
+		WriteBufferSize: GetIntFromConfig("stream.write_buffer_size"),
+		CheckOrigin: func(r *http.Request) bool {
+			return r.Header.Get("Origin") == GetStringFromConfig("server.frontend_addr")
+		},
+	}
+}
 
 func InitRouter() {
 	router := gin.Default()
@@ -15,7 +29,7 @@ func InitRouter() {
 		AllowCredentials: true,
 	}))
 
-	router.GET(GetStringFromConfig("stream_from_client_path"), HandleStream)
+	router.GET(GetStringFromConfig("server.api.stream_from_client_path"), HandleStream)
 
 	router.Run(GetStringFromConfig("server.listen_addr"))
 }
