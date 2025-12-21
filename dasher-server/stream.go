@@ -17,6 +17,12 @@ func HandleStream(c *gin.Context) {
 	}
 	defer ws.Close()
 
+	cmd, stdin, err := InitMpegDash()
+	if err != nil {
+		c.String(http.StatusInternalServerError, GetStringFromConfig("error.internal"))
+	}
+	
+
 	for {
 		messageType, data, err := ws.ReadMessage()
 		if err != nil {
@@ -26,6 +32,11 @@ func HandleStream(c *gin.Context) {
 
 		if messageType == websocket.BinaryMessage {
 			// Here we do the fun stuff with the received video data
+			log.Printf(GetStringFromConfig("stream.got_chunk_msg"), len(data))
+			PrepareForMpegDash(stdin, data)
 		}
 	}
+
+	err = stdin.Close()
+	cmd.Wait()
 }
