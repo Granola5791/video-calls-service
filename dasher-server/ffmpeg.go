@@ -22,6 +22,10 @@ func InitMpegDash() (*exec.Cmd, io.WriteCloser, error) {
 		"-map", "[v2out]",
 		"-map", "[v3out]",
 
+		"-map", "0:a",
+		"-c:a", "aac",
+		"-b:a", "128k",
+
 		"-c:v", "libx264",
 		"-preset", "veryfast",
 		"-tune", "zerolatency",
@@ -46,7 +50,7 @@ func InitMpegDash() (*exec.Cmd, io.WriteCloser, error) {
 		"-use_timeline", "1",
 		"-window_size", "5",
 		"-extra_window_size", "5",
-		"-adaptation_sets", "id=0,streams=0,1,2",
+		"-adaptation_sets", "id=0,streams=0,1,2 id=1,streams=3",
 		"data/stream.mpd",
 	)
 

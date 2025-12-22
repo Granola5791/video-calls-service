@@ -25,7 +25,7 @@ const WebSocketWebCam = ({ wsUrl, width, height }: WebSocketWebCamProps) => {
         wsRef.current = ws;
 
         // Ask for camera access
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
 
         // Show preview
         if (videoRef.current) {
@@ -34,7 +34,7 @@ const WebSocketWebCam = ({ wsUrl, width, height }: WebSocketWebCamProps) => {
         }
 
         // Start MediaRecorder
-        const mimeType = 'video/webm; codecs=vp8';
+        const mimeType = 'video/webm; codecs=vp8,opus';
         const recorder = new MediaRecorder(stream, { mimeType });
         recorderRef.current = recorder;
 
@@ -76,6 +76,7 @@ const WebSocketWebCam = ({ wsUrl, width, height }: WebSocketWebCamProps) => {
                 autoPlay
                 width={width}
                 height={height}
+                muted
             />
             <button onClick={StopStream}>Stop</button>
             <button onClick={StartStream}>Start</button>
