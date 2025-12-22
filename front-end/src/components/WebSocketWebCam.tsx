@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import { CenteredColumn } from '../styled-components/StyledBoxes';
 import { StreamConfig } from '../constants/general-contants';
 
@@ -12,6 +12,12 @@ const WebSocketWebCam = ({ wsUrl, width, height }: WebSocketWebCamProps) => {
     const videoRef = useRef<HTMLVideoElement>(null);
     const wsRef = useRef<WebSocket | null>(null);
     const recorderRef = useRef<MediaRecorder | null>(null);
+
+    useEffect(() => {
+        return () => {
+            StopStream(); // Cleanup on unmount
+        };
+    }, []);
 
     const StartStream = async () => {
         // Connect to WebSocket
@@ -37,12 +43,17 @@ const WebSocketWebCam = ({ wsUrl, width, height }: WebSocketWebCamProps) => {
                 event.data.arrayBuffer().then((buffer) => {
                     if (ws.readyState === WebSocket.OPEN) {
                         ws.send(buffer);
+                        console.log('Sent video chunk of size:', buffer.byteLength, "at", new Date().toISOString());
                     }
                 });
             }
         };
 
-        recorder.start(StreamConfig.chunkIntervalMs); // Send data every second
+        ws.onmessage = (event) => {
+            if (event.data === StreamConfig.serverReadyMsg) {
+                recorder.start(StreamConfig.chunkIntervalMs); // Send data every second
+            }
+        }
     }
 
     const StopStream = () => {
@@ -51,6 +62,10 @@ const WebSocketWebCam = ({ wsUrl, width, height }: WebSocketWebCamProps) => {
         }
         if (wsRef.current) {
             wsRef.current.close();
+        }
+        if (videoRef.current && videoRef.current.srcObject) {
+            const stream = videoRef.current.srcObject as MediaStream;
+            stream.getTracks().forEach(track => track.stop());
         }
     }
 

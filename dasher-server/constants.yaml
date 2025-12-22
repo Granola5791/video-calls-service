@@ -5,9 +5,10 @@ server:
     stream_from_client_path: "stream"
 
 stream:
-  read_buffer_size: 8192
+  read_buffer_size: 4096
   write_buffer_size: 4096
   got_chunk_msg: "Received binary data of length: %d\n"
+  ready_msg: "READY"
 
 errors:
   forbidden: "We don't allow your kind in here."

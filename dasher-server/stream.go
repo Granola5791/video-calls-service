@@ -20,6 +20,13 @@ func HandleStream(c *gin.Context) {
 	cmd, stdin, err := InitMpegDash()
 	if err != nil {
 		c.String(http.StatusInternalServerError, GetStringFromConfig("error.internal"))
+		return
+	}
+	err = ws.WriteMessage(websocket.TextMessage, []byte(GetStringFromConfig("stream.ready_msg")))
+	if err != nil {
+		log.Println(err)
+		c.String(http.StatusInternalServerError, GetStringFromConfig("error.internal"))
+		return
 	}
 	
 

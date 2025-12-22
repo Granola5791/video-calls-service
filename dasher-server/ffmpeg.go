@@ -14,9 +14,9 @@ func InitMpegDash() (*exec.Cmd, io.WriteCloser, error) {
 
 		"-filter_complex",
 		"[0:v]split=3[v1][v2][v3];"+
-			"[v1]scale=1920:1080[v1out];"+
-			"[v2]scale=1280:720[v2out];"+
-			"[v3]scale=854:480[v3out]",
+			"[v1]scale=854:480[v1out];"+
+			"[v2]scale=640:360[v2out];"+
+			"[v3]scale=426:240[v3out]",
 
 		"-map", "[v1out]",
 		"-map", "[v2out]",
@@ -32,17 +32,21 @@ func InitMpegDash() (*exec.Cmd, io.WriteCloser, error) {
 
 		"-profile:v", "main",
 
-		"-b:v:0", "5000k",
-		"-b:v:1", "3000k",
-		"-b:v:2", "1500k",
+		"-b:v:0", "3000k",
+		"-b:v:1", "1500k",
+		"-b:v:2", "800k",
 
 		"-f", "dash",
+		"-ldash", "1",
+		"-streaming", "1",
+		"-frag_type", "duration",
+		"-frag_duration", "0.2",
 		"-seg_duration", "1",
 		"-use_template", "1",
 		"-use_timeline", "1",
 		"-window_size", "5",
 		"-extra_window_size", "5",
-		"-adaptation_sets", "id=0,streams=0 id=1,streams=1 id=2,streams=2",
+		"-adaptation_sets", "id=0,streams=0,1,2",
 		"data/stream.mpd",
 	)
 
