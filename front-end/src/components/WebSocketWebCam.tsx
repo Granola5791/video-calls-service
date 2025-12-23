@@ -1,6 +1,8 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { CenteredColumn } from '../styled-components/StyledBoxes';
 import { StreamConfig } from '../constants/general-contants';
+import { Stream } from '../constants/hebrew-constants';
+import { LongButton, LongButtonFilled } from '../styled-components/StyledButtons';
 
 interface WebSocketWebCamProps {
     wsUrl: string
@@ -12,6 +14,7 @@ const WebSocketWebCam = ({ wsUrl, width, height }: WebSocketWebCamProps) => {
     const videoRef = useRef<HTMLVideoElement>(null);
     const wsRef = useRef<WebSocket | null>(null);
     const recorderRef = useRef<MediaRecorder | null>(null);
+    const [isStreaming, setIsStreaming] = useState<boolean>(false);
 
     useEffect(() => {
         return () => {
@@ -43,7 +46,7 @@ const WebSocketWebCam = ({ wsUrl, width, height }: WebSocketWebCamProps) => {
                 event.data.arrayBuffer().then((buffer) => {
                     if (ws.readyState === WebSocket.OPEN) {
                         ws.send(buffer);
-                        console.log('Sent video chunk of size:', buffer.byteLength, "at", new Date().toISOString());
+                        console.log(StreamConfig.sentChunkMsg, new Date().toISOString());
                     }
                 });
             }
@@ -78,8 +81,8 @@ const WebSocketWebCam = ({ wsUrl, width, height }: WebSocketWebCamProps) => {
                 height={height}
                 muted
             />
-            <button onClick={StopStream}>Stop</button>
-            <button onClick={StartStream}>Start</button>
+            <LongButtonFilled onClick={() => {setIsStreaming(true); StartStream()}} disabled={isStreaming}>{Stream.startButton}</LongButtonFilled>
+            <LongButton onClick={() => {setIsStreaming(false); StopStream()}} disabled={!isStreaming}>{Stream.stopButton}</LongButton>
         </CenteredColumn>
     )
 }

@@ -42,3 +42,8 @@ export const LandingPageText = {
     signUpButton: "הרשמה",
     logInButton: "התחברות",
 };
+
+export const Stream = {
+    startButton: "התחל שידור",
+    stopButton: "עצור שידור",
+}
