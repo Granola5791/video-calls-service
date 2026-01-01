@@ -27,11 +27,11 @@ func InitMpegDash() (*exec.Cmd, io.WriteCloser, error) {
 		"-b:a", "128k",
 
 		"-c:v", "libx264",
-		"-preset", "veryfast",
+		"-preset", "ultrafast",
 		"-tune", "zerolatency",
 
-		"-g", "30",
-		"-keyint_min", "30",
+		"-g", "15",
+		"-keyint_min", "15",
 		"-sc_threshold", "0",
 
 		"-profile:v", "main",
@@ -41,16 +41,18 @@ func InitMpegDash() (*exec.Cmd, io.WriteCloser, error) {
 		"-b:v:2", "800k",
 
 		"-f", "dash",
+		"-use_wallclock_as_timestamps", "1",
 		"-ldash", "1",
 		"-streaming", "1",
 		"-frag_type", "duration",
-		"-frag_duration", "0.2",
-		"-seg_duration", "1",
+		"-frag_duration", "0.1",
+		"-seg_duration", "0.5",
 		"-use_template", "1",
 		"-use_timeline", "1",
 		"-window_size", "5",
 		"-extra_window_size", "5",
 		"-adaptation_sets", "id=0,streams=0,1,2 id=1,streams=3",
+		"-remove_at_exit", "0",
 		"data/stream.mpd",
 	)
 

@@ -30,6 +30,7 @@ func InitRouter() {
 	}))
 
 	router.GET(GetStringFromConfig("server.api.stream_from_client_path"), HandleStream)
+	router.StaticFS(GetStringFromConfig("server.api.stream_to_client_path"), gin.Dir("./data", true))
 
 	router.Run(GetStringFromConfig("server.listen_addr"))
 }

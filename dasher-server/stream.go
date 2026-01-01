@@ -28,7 +28,6 @@ func HandleStream(c *gin.Context) {
 		c.String(http.StatusInternalServerError, GetStringFromConfig("error.internal"))
 		return
 	}
-	
 
 	for {
 		messageType, data, err := ws.ReadMessage()

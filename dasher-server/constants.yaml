@@ -3,6 +3,7 @@ server:
   frontend_addr: "http://localhost:5173"
   api:
     stream_from_client_path: "stream"
+    stream_to_client_path: "get_stream"
 
 stream:
   read_buffer_size: 4096

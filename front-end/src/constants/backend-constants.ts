@@ -1,5 +1,6 @@
 export const BackendAddress = "http://localhost:8081";
-export const DasherServerAddress = "ws://localhost:8082";
+export const DasherServerAddressWS = "ws://localhost:8082";
+export const DasherServerAddressHttp = "http://localhost:8082";
 
 export const ApiEndpoints = {
     signUp: "/signup",
@@ -7,6 +8,7 @@ export const ApiEndpoints = {
     checkLoginApi: "/check-login",
     checkAdminApi: "/check-admin",
     startStream: "/stream",
+    getStream: "/get_stream/stream.mpd",
 };
 
 export const HttpStatusCodes = {
