@@ -16,6 +16,20 @@ type User struct {
 	Salt           string `gorm:"not null"`
 }
 
+type Meeting struct {
+	gorm.Model
+	HostID uint `gorm:"not null"`
+	Host   User `gorm:"foreignKey:HostID"`
+}
+
+type MeetingParticipant struct {
+	gorm.Model
+	UserID    uint `gorm:"not null"`
+	User      User `gorm:"foreignKey:UserID"`
+	MeetingID uint `gorm:"not null"`
+	Meeting   Meeting `gorm:"foreignKey:MeetingID"`
+}
+
 type UserAuth struct {
 	HashedPassword string `gorm:"not null"`
 	Salt           string `gorm:"not null"`
@@ -93,4 +107,23 @@ func GetUserIDAndRoleFromDB(username string) (int, string, error) {
 		return 0, "", err
 	}
 	return int(user.ID), user.Role, nil
+}
+
+func CreateMeetingInDB(hostID int) (int, error) {
+	meeting := Meeting{
+		HostID: uint(hostID),
+	}
+	err := db.Create(&meeting).Error
+	if err != nil {
+		return 0, err
+	}
+	meetingParticipant := MeetingParticipant{
+		UserID:    uint(hostID),
+		MeetingID: meeting.ID,
+	}
+	err = db.Create(&meetingParticipant).Error
+	if err != nil {
+		return 0, err
+	}
+	return int(meeting.ID), nil
 }

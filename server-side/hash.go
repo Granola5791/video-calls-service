@@ -8,7 +8,14 @@ import (
 )
 
 func HashPassword(password string, salt string) string {
-	hash := argon2.IDKey([]byte(password), []byte(salt), GetUint32FromConfig("hash.time"), GetUint32FromConfig("hash.memory"), GetUint8FromConfig("hash.threads"), GetUint32FromConfig("hash.keyLen"))
+	hash := argon2.IDKey(
+		[]byte(password),
+		[]byte(salt),
+		GetUint32FromConfig("hash.time"),
+		GetUint32FromConfig("hash.memory"),
+		GetUint8FromConfig("hash.threads"),
+		GetUint32FromConfig("hash.keyLen"),
+	)
 	return base64.RawStdEncoding.EncodeToString(hash)
 }
 

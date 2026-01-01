@@ -20,6 +20,7 @@ func InitRouter() {
 
 	router.POST(GetStringFromConfig("server.api.signup_path"), HandleSignup)
 	router.POST(GetStringFromConfig("server.api.login_path"), HandleLogin)
+	router.POST(GetStringFromConfig("server.api.create_meeting_path"), RequireAuthentication, HandleCreateMeeting)
 
 	router.Run(GetStringFromConfig("server.listen_addr"))
 }

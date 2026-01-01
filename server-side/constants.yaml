@@ -17,6 +17,7 @@ server:
     check_admin_path: /check-admin
     signup_path: /signup
     login_path: /login
+    create_meeting_path: /create-meeting
 
 jwt:
   token_cookie_name: "auth_token"
@@ -36,3 +37,6 @@ signup:
   max_password_length: 64
   min_username_length: 1
   max_username_length: 32
+
+meeting:
+  meeting_id_name: "meeting_id"
