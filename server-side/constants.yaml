@@ -40,3 +40,5 @@ signup:
 
 meeting:
   meeting_id_name: "meeting_id"
+  token_name: "meeting_token"
+  token_exp: 3600 # in seconds

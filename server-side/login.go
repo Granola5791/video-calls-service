@@ -1,9 +1,10 @@
 package main
 
 import (
-	"github.com/gin-gonic/gin"
 	"net/http"
 	"os"
+
+	"github.com/gin-gonic/gin"
 )
 
 type UserLoginInput struct {
@@ -46,7 +47,7 @@ func HandleLogin(c *gin.Context) {
 		return
 	}
 	jwtKey := []byte(os.Getenv("JWT_SECRET"))
-	token, err := GenerateToken(userID, role, jwtKey)
+	token, err := GenerateLoginToken(userID, role, jwtKey, GetIntFromConfig("jwt.token_exp"))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": GetStringFromConfig("errors.internal_server_error")})
 		return

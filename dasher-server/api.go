@@ -30,6 +30,7 @@ func InitRouter() {
 	}))
 
 	router.GET(GetStringFromConfig("server.api.stream_from_client_path"), HandleStream)
+	router.POST(GetStringFromConfig("server.api.create_meeting_path"), RequireAuthorizedMeeting, HandleCreateMeeting)
 	router.StaticFS(GetStringFromConfig("server.api.stream_to_client_path"), gin.Dir("./data", true))
 
 	router.Run(GetStringFromConfig("server.listen_addr"))

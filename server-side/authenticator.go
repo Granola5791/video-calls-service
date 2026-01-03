@@ -10,15 +10,26 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-func GenerateToken(userID int, role string, jwtKey []byte) (string, error) {
-	expTimeSec := GetIntFromConfig("jwt.token_exp")
+func GenerateJwtToken(claims jwt.MapClaims, jwtKey []byte) (string, error) {
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	return token.SignedString(jwtKey)
+}
+
+func GenerateMeetingToken(meetingID int, jwtKey []byte, expTimeSec int) (string, error) {
+	claims := jwt.MapClaims{
+		GetStringFromConfig("meeting.meeting_id_name"): meetingID,
+		"exp":       time.Now().Add(time.Second * time.Duration(expTimeSec)).Unix(),
+	}
+	return GenerateJwtToken(claims, jwtKey)
+}
+
+func GenerateLoginToken(userID int, role string, jwtKey []byte, expTimeSec int) (string, error) {
 	claims := jwt.MapClaims{
 		"userID": userID,
 		"role":   role,
 		"exp":    time.Now().Add(time.Second * time.Duration(expTimeSec)).Unix(),
 	}
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	return token.SignedString(jwtKey)
+	return GenerateJwtToken(claims, jwtKey)
 }
 
 func ParseToken(tokenString string, jwtKey []byte) (*jwt.Token, error) {

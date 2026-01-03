@@ -59,7 +59,7 @@ func InitDatabaseConnection() error {
 		return err
 	}
 
-	err = db.AutoMigrate(&User{})
+	err = db.AutoMigrate(&User{}, &Meeting{}, &MeetingParticipant{})
 	if err != nil {
 		return err
 	}

@@ -3,7 +3,8 @@ server:
   frontend_addr: "http://localhost:5173"
   api:
     stream_from_client_path: "stream"
-    stream_to_client_path: "get_stream"
+    stream_to_client_path: "get-stream"
+    create_meeting_path: "create-meeting"
 
 stream:
   read_buffer_size: 4096
@@ -14,3 +15,9 @@ stream:
 errors:
   forbidden: "We don't allow your kind in here."
   internal: "Something went wrong on our side."
+
+meeting:
+  meeting_id_name: "meeting_id"
+  dir_path: "./meetings"
+  dir_perms: 0755
+  token_name: "meeting_token"

@@ -1,8 +1,10 @@
 package main
 
 import (
-	"github.com/gin-gonic/gin"
 	"net/http"
+	"os"
+
+	"github.com/gin-gonic/gin"
 )
 
 func HandleCreateMeeting(c *gin.Context) {
@@ -11,6 +13,22 @@ func HandleCreateMeeting(c *gin.Context) {
 		c.AbortWithStatus(http.StatusInternalServerError)
 		return
 	}
+
+	jwtKey := []byte(os.Getenv("MEETING_JWT_SECRET"))
+	token, err := GenerateMeetingToken(meetingID, jwtKey, GetIntFromConfig("meeting.token_exp"))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": GetStringFromConfig("errors.internal_server_error")})
+		return
+	}
+	http.SetCookie(c.Writer, &http.Cookie{
+		Name:     GetStringFromConfig("meeting.token_name"),
+		Value:    token,
+		Path:     "/", // visible to all paths
+		HttpOnly: true,
+		Secure:   true,
+		SameSite: http.SameSiteStrictMode,
+		MaxAge:   GetIntFromConfig("meeting.token_exp"),
+	})
 
 	c.JSON(http.StatusOK, gin.H{GetStringFromConfig("meeting.meeting_id_name"): meetingID})
 }
