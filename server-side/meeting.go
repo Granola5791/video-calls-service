@@ -30,5 +30,5 @@ func HandleCreateMeeting(c *gin.Context) {
 		MaxAge:   GetIntFromConfig("meeting.token_exp"),
 	})
 
-	c.JSON(http.StatusOK, gin.H{GetStringFromConfig("meeting.meeting_id_name"): meetingID})
+	c.String(http.StatusOK, meetingID.String())
 }

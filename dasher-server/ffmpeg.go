@@ -6,7 +6,7 @@ import (
 	"os/exec"
 )
 
-func InitMpegDash() (*exec.Cmd, io.WriteCloser, error) {
+func InitMpegDash(meetingID string) (*exec.Cmd, io.WriteCloser, error) {
 	cmd := exec.Command(
 		"ffmpeg",
 		"-f", "webm",
@@ -53,7 +53,7 @@ func InitMpegDash() (*exec.Cmd, io.WriteCloser, error) {
 		"-extra_window_size", "5",
 		"-adaptation_sets", "id=0,streams=0,1,2 id=1,streams=3",
 		"-remove_at_exit", "0",
-		"data/stream.mpd",
+		"meetings/" + meetingID + "/stream.mpd",
 	)
 
 	stdin, err := cmd.StdinPipe()

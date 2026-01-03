@@ -9,6 +9,7 @@ import (
 )
 
 func HandleStream(c *gin.Context) {
+	meetingID, _ := c.Get(GetStringFromConfig("meeting.meeting_id_name"))
 	ws, err := wsUpgrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
 		log.Println(err)
@@ -17,7 +18,7 @@ func HandleStream(c *gin.Context) {
 	}
 	defer ws.Close()
 
-	cmd, stdin, err := InitMpegDash()
+	cmd, stdin, err := InitMpegDash(meetingID.(string))
 	if err != nil {
 		c.String(http.StatusInternalServerError, GetStringFromConfig("error.internal"))
 		return

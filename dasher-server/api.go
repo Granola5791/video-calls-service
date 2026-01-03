@@ -29,9 +29,9 @@ func InitRouter() {
 		AllowCredentials: true,
 	}))
 
-	router.GET(GetStringFromConfig("server.api.stream_from_client_path"), HandleStream)
+	router.GET(GetStringFromConfig("server.api.stream_from_client_path"), RequireAuthorizedMeeting, HandleStream)
 	router.POST(GetStringFromConfig("server.api.create_meeting_path"), RequireAuthorizedMeeting, HandleCreateMeeting)
-	router.StaticFS(GetStringFromConfig("server.api.stream_to_client_path"), gin.Dir("./data", true))
+	router.StaticFS(GetStringFromConfig("server.api.stream_to_client_path"), gin.Dir("./meetings", true))
 
 	router.Run(GetStringFromConfig("server.listen_addr"))
 }
