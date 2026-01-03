@@ -8,6 +8,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/google/uuid"
 )
 
 func GenerateJwtToken(claims jwt.MapClaims, jwtKey []byte) (string, error) {
@@ -15,7 +16,7 @@ func GenerateJwtToken(claims jwt.MapClaims, jwtKey []byte) (string, error) {
 	return token.SignedString(jwtKey)
 }
 
-func GenerateMeetingToken(meetingID int, jwtKey []byte, expTimeSec int) (string, error) {
+func GenerateMeetingToken(meetingID uuid.UUID, jwtKey []byte, expTimeSec int) (string, error) {
 	claims := jwt.MapClaims{
 		GetStringFromConfig("meeting.meeting_id_name"): meetingID,
 		"exp":       time.Now().Add(time.Second * time.Duration(expTimeSec)).Unix(),

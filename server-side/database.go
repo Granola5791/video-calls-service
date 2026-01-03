@@ -3,10 +3,19 @@ package main
 import (
 	"fmt"
 	"os"
+	"time"
 
+	"github.com/google/uuid"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
+
+type UuidModel struct {
+	ID        uuid.UUID `gorm:"type:uuid;default:gen_random_uuid();primaryKey"`
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	DeletedAt gorm.DeletedAt `gorm:"index"`
+}
 
 type User struct {
 	gorm.Model
@@ -17,16 +26,16 @@ type User struct {
 }
 
 type Meeting struct {
-	gorm.Model
-	HostID uint `gorm:"not null"`
-	Host   User `gorm:"foreignKey:HostID"`
+	UuidModel
+	HostID uint      `gorm:"not null"`
+	Host   User      `gorm:"foreignKey:HostID"`
 }
 
 type MeetingParticipant struct {
 	gorm.Model
-	UserID    uint `gorm:"not null"`
-	User      User `gorm:"foreignKey:UserID"`
-	MeetingID uint `gorm:"not null"`
+	UserID    uint    `gorm:"not null"`
+	User      User    `gorm:"foreignKey:UserID"`
+	MeetingID uuid.UUID    `gorm:"not null"`
 	Meeting   Meeting `gorm:"foreignKey:MeetingID"`
 }
 
@@ -109,13 +118,13 @@ func GetUserIDAndRoleFromDB(username string) (int, string, error) {
 	return int(user.ID), user.Role, nil
 }
 
-func CreateMeetingInDB(hostID int) (int, error) {
+func CreateMeetingInDB(hostID int) (uuid.UUID, error) {
 	meeting := Meeting{
 		HostID: uint(hostID),
 	}
 	err := db.Create(&meeting).Error
 	if err != nil {
-		return 0, err
+		return uuid.Nil, err
 	}
 	meetingParticipant := MeetingParticipant{
 		UserID:    uint(hostID),
@@ -123,7 +132,7 @@ func CreateMeetingInDB(hostID int) (int, error) {
 	}
 	err = db.Create(&meetingParticipant).Error
 	if err != nil {
-		return 0, err
+		return uuid.Nil, err
 	}
-	return int(meeting.ID), nil
+	return meeting.ID, nil
 }

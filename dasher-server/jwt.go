@@ -49,7 +49,7 @@ func RequireAuthorizedMeeting(c *gin.Context) {
 		return
 	}
 
-	c.Set(GetStringFromConfig("meeting.meeting_id_name"), int(claims[GetStringFromConfig("meeting.meeting_id_name")].(float64)))
+	c.Set(GetStringFromConfig("meeting.meeting_id_name"), claims[GetStringFromConfig("meeting.meeting_id_name")])
 
 	c.Next()
 }
