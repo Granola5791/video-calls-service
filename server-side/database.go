@@ -27,16 +27,14 @@ type User struct {
 
 type Meeting struct {
 	UuidModel
-	HostID uint      `gorm:"not null"`
-	Host   User      `gorm:"foreignKey:HostID"`
 }
 
 type MeetingParticipant struct {
 	gorm.Model
-	UserID    uint    `gorm:"not null"`
-	User      User    `gorm:"foreignKey:UserID"`
-	MeetingID uuid.UUID    `gorm:"not null"`
-	Meeting   Meeting `gorm:"foreignKey:MeetingID"`
+	UserID    uint      `gorm:"not null"`
+	User      User      `gorm:"foreignKey:UserID"`
+	MeetingID uuid.UUID `gorm:"not null"`
+	Meeting   Meeting   `gorm:"foreignKey:MeetingID"`
 }
 
 type UserAuth struct {
@@ -119,20 +117,33 @@ func GetUserIDAndRoleFromDB(username string) (int, string, error) {
 }
 
 func CreateMeetingInDB(hostID int) (uuid.UUID, error) {
-	meeting := Meeting{
-		HostID: uint(hostID),
-	}
+	meeting := Meeting{}
 	err := db.Create(&meeting).Error
 	if err != nil {
 		return uuid.Nil, err
 	}
-	meetingParticipant := MeetingParticipant{
-		UserID:    uint(hostID),
-		MeetingID: meeting.ID,
-	}
-	err = db.Create(&meetingParticipant).Error
-	if err != nil {
-		return uuid.Nil, err
-	}
 	return meeting.ID, nil
+}
+
+func AddParticipantToMeetingInDB(meetingID uuid.UUID, userID int) error {
+	meetingParticipant := MeetingParticipant{
+		UserID:    uint(userID),
+		MeetingID: meetingID,
+	}
+	return db.Create(&meetingParticipant).Error
+}
+
+func GetMeetingParticipantIDsFromDB(meetingID uuid.UUID) ([]uint, error) {
+	var ids []uint
+
+	err := db.
+		Model(&MeetingParticipant{}).
+		Select("user_id").
+		Where("meeting_id = ?", meetingID).
+		Scan(&ids).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return ids, nil
 }

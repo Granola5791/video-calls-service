@@ -26,7 +26,7 @@ func GenerateMeetingToken(meetingID uuid.UUID, jwtKey []byte, expTimeSec int) (s
 
 func GenerateLoginToken(userID int, role string, jwtKey []byte, expTimeSec int) (string, error) {
 	claims := jwt.MapClaims{
-		"userID": userID,
+		GetStringFromConfig("jwt.user_id_name"): userID,
 		"role":   role,
 		"exp":    time.Now().Add(time.Second * time.Duration(expTimeSec)).Unix(),
 	}
@@ -75,7 +75,7 @@ func RequireAuthentication(c *gin.Context) {
 		return
 	}
 
-	c.Set("userID", int(claims["userID"].(float64)))
+	c.Set(GetStringFromConfig("jwt.user_id_name"), int(claims[GetStringFromConfig("jwt.user_id_name")].(float64)))
 	c.Set("role", claims["role"].(string))
 
 	c.Next()

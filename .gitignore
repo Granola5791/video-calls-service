@@ -43,3 +43,5 @@ sketch
 # End of https://www.toptal.com/developers/gitignore/api/go,react
 
 *.env
+*.m4s
+*.mpd
