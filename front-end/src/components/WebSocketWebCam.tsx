@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { CenteredColumn } from '../styled-components/StyledBoxes';
 import { StreamConfig } from '../constants/general-contants';
 import { Stream } from '../constants/hebrew-constants';
-import { LongButton, LongButtonFilled } from '../styled-components/StyledButtons';
+import { LongButton } from '../styled-components/StyledButtons';
 
 interface WebSocketWebCamProps {
     wsUrl: string
@@ -17,16 +17,14 @@ const WebSocketWebCam = ({ wsUrl, width, height }: WebSocketWebCamProps) => {
     const [isStreaming, setIsStreaming] = useState<boolean>(false);
 
     useEffect(() => {
+        StartStream();
+
         return () => {
             StopStream(); // Cleanup on unmount
         };
     }, []);
 
     const StartStream = async () => {
-        // Connect to WebSocket
-        const ws = new WebSocket(wsUrl);
-        wsRef.current = ws;
-
         // Ask for camera access
         const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
 
@@ -35,6 +33,10 @@ const WebSocketWebCam = ({ wsUrl, width, height }: WebSocketWebCamProps) => {
             videoRef.current.srcObject = stream;
             await videoRef.current.play();
         }
+
+        // Connect to WebSocket
+        const ws = new WebSocket(wsUrl);
+        wsRef.current = ws;
 
         // Start MediaRecorder
         const mimeType = 'video/webm; codecs=vp8,opus';
@@ -57,7 +59,7 @@ const WebSocketWebCam = ({ wsUrl, width, height }: WebSocketWebCamProps) => {
                 recorder.start(StreamConfig.chunkIntervalMs); // Send data every second
             }
         }
-    }
+    };
 
     const StopStream = () => {
         if (recorderRef.current) {
@@ -70,7 +72,7 @@ const WebSocketWebCam = ({ wsUrl, width, height }: WebSocketWebCamProps) => {
             const stream = videoRef.current.srcObject as MediaStream;
             stream.getTracks().forEach(track => track.stop());
         }
-    }
+    };
 
     return (
         <CenteredColumn>
@@ -81,8 +83,7 @@ const WebSocketWebCam = ({ wsUrl, width, height }: WebSocketWebCamProps) => {
                 height={height}
                 muted
             />
-            <LongButtonFilled onClick={() => {setIsStreaming(true); StartStream()}} disabled={isStreaming}>{Stream.startButton}</LongButtonFilled>
-            <LongButton onClick={() => {setIsStreaming(false); StopStream()}} disabled={!isStreaming}>{Stream.stopButton}</LongButton>
+            <LongButton onClick={() => { setIsStreaming(false); StopStream() }} disabled={!isStreaming}>{Stream.stopButton}</LongButton>
         </CenteredColumn>
     )
 }
