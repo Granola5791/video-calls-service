@@ -5,7 +5,7 @@ import { LongButtonFilled } from "../styled-components/StyledButtons"
 import { StyledTitle } from "../styled-components/StyledText"
 import { StyledTextField } from "../styled-components/StyledTextFields"
 import { ErrorText } from "../styled-components/StyledErrors"
-import { ApiEndpoints, BackendAddress, HttpStatusCodes } from "../constants/backend-constants"
+import { ApiEndpoints, BackendAddressHttp, HttpStatusCodes } from "../constants/backend-constants"
 import { useNavigation } from "../utils/navigation"
 import { Typography } from "@mui/material"
 import { Link } from "react-router-dom"
@@ -20,7 +20,7 @@ const LoginPage = () => {
 
     const handleLogin = async (username: string, password: string) => {
         setResponse(Auth.wait);
-        const res = await fetch(BackendAddress + ApiEndpoints.logIn, {
+        const res = await fetch(BackendAddressHttp + ApiEndpoints.logIn, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ username, password }),

@@ -4,7 +4,7 @@ import { CenteredColumn, CenteredFilledScreen } from "../styled-components/Style
 import { LongButtonFilled } from "../styled-components/StyledButtons"
 import { BoldText, StyledTitle } from "../styled-components/StyledText"
 import { StyledTextField } from "../styled-components/StyledTextFields"
-import { BackendAddress, ApiEndpoints, HttpStatusCodes } from '../constants/backend-constants'
+import { BackendAddressHttp, ApiEndpoints, HttpStatusCodes } from '../constants/backend-constants'
 import { ErrorText } from '../styled-components/StyledErrors'
 import { Typography } from '@mui/material'
 import { AuthRequirements } from '../constants/general-contants'
@@ -51,7 +51,7 @@ const SignupPage = () => {
             return;
         }
 
-        const res = await fetch(BackendAddress + ApiEndpoints.signUp, {
+        const res = await fetch(BackendAddressHttp + ApiEndpoints.signUp, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ username, password })

@@ -7,8 +7,9 @@ import LoginPage from './pages/LoginPage.tsx'
 import SignupPage from './pages/SignupPage.tsx'
 import HomePage from './pages/HomePage.tsx'
 import { CheckLoginLoader } from './utils/check-login.ts'
-import WebCamChunks from './components/WebCamChunks.tsx'
-
+import TestPage from './pages/TestPage.tsx'
+import WebSocketWebCam from './components/WebSocketWebCam.tsx'
+import { DasherServerAddressWS, ApiEndpoints } from './constants/backend-constants.ts'
 
 const router = createBrowserRouter([
     {
@@ -30,8 +31,12 @@ const router = createBrowserRouter([
     },
     {
         path: "/test",
-        element: <WebCamChunks />
-    }
+        element: <TestPage />
+    },
+    {
+        path: "/test2",
+        element: <WebSocketWebCam wsUrl={DasherServerAddressWS + ApiEndpoints.startStream} />
+    },
 ])
 
 createRoot(document.getElementById('root')!).render(

@@ -23,3 +23,10 @@ export const CenteredFilledScreen = styled.div ({
     margin: 'auto',
     backgroundColor: Colors.primary,
 })
+
+export const StyledGrid = styled.div ({
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+    gap: '20px',
+    width: '100%',
+});

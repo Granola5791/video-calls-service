@@ -1,4 +1,5 @@
-export const BackendAddress = "http://localhost:8081";
+export const BackendAddressHttp = "http://localhost:8081";
+export const BackendAddressWS = "ws://localhost:8081";
 export const DasherServerAddressWS = "ws://localhost:8082";
 export const DasherServerAddressHttp = "http://localhost:8082";
 
@@ -7,8 +8,15 @@ export const ApiEndpoints = {
     logIn: "/login",
     checkLoginApi: "/check-login",
     checkAdminApi: "/check-admin",
-    startStream: "/stream",
-    getStream: "/get_stream/stream.mpd",
+    startStream: "/stream/{meeting_id}",
+    getStream: {
+        prefix: "/get-stream/",
+        suffix: "/stream.mpd",
+    },
+    createMeeting: "/create-meeting",
+    getCallParticipants: "/get-call-participants",
+    joinMeeting: "/join-meeting/{meeting_id}",
+    getCallNotifications: "/get-call-notifications/{meeting_id}",
 };
 
 export const HttpStatusCodes = {
@@ -33,3 +41,22 @@ export const HttpStatuses = {
     conflict: "Conflict",
     internalServerError: "Internal Server Error",
 };
+
+export const CallEventTypes = {
+    participantJoined: 0,
+    participantLeft: 1,
+}
+
+export const SetUrlParams = (url: string, ...params: any[]): string => {
+    let result = url;
+    let paramIndex = 0;
+    
+    result = result.replace(/\{[^}]+\}/g, () => {
+        if (paramIndex < params.length) {
+            return String(params[paramIndex++]);
+        }
+        return '';
+    });
+    
+    return result;
+}

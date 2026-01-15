@@ -1,15 +1,50 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import shaka from 'shaka-player/dist/shaka-player.ui';
 import 'shaka-player/dist/controls.css';
-import { DasherServerAddressHttp, ApiEndpoints } from '../constants/backend-constants';
+import { StyledVideo } from '../styled-components/StyledVideos';
+import { StreamConfig } from '../constants/general-contants';
+import { Sleep } from '../utils/sleep';
 
-const ShakaPlayer = () => {
+interface DashPlayerProps {
+    url: string;
+}
+
+const DashPlayer = ({ url }: DashPlayerProps) => {
     const videoRef = useRef<HTMLVideoElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
     const playerRef = useRef<shaka.Player | null>(null);
     const [isPlaying, setIsPlaying] = useState(false);
 
+    useEffect(() => {
+        try {
+            startStream();
+        } catch (error) {
+            console.error('Error starting stream:', error);
+        }
+
+        return () => {
+            stopStream();
+        };
+    }, []);
+
+    const WaitUntilAvailable = async (url: string): Promise<void> => {
+        let res, available = false;
+        while (!available) {
+            try {
+                res = await fetch(url, { method: 'HEAD' });
+                if (res.ok) {
+                    available = true;
+                }
+            } catch (error) {
+                console.error(error);
+            }
+            await Sleep(StreamConfig.checkStreamAvailabilityIntervalMs);
+        }
+    };
+
     const startStream = async () => {
+        await WaitUntilAvailable(url);
+        
         if (!videoRef.current || !containerRef.current) return;
 
         const player = new shaka.Player(videoRef.current);
@@ -18,30 +53,36 @@ const ShakaPlayer = () => {
         player.configure({
             streaming: {
                 lowLatencyMode: true,
-                bufferingGoal: 1,
-                rebufferingGoal: 0.5,
-                startupBufferingGoal: 0.1,
-                stallEnabled: false,
-                liveSync: {
-                    enabled: true,
-                    targetLatency: 1.0,
-                    maxLatency: 2.0,
-                },
+                bufferingGoal: 2,       // seconds to buffer normally
+                rebufferingGoal: 1,     // seconds to buffer after a stall
             },
         });
 
-        await player.load(DasherServerAddressHttp + ApiEndpoints.getStream);
+
+        await player.load(url);
 
         videoRef.current.play();
         setIsPlaying(true);
     };
 
     const stopStream = () => {
+        if (videoRef.current?.srcObject) {
+            const stream = videoRef.current.srcObject as MediaStream;
+            stream.getTracks().forEach(track => track.stop());
+            videoRef.current.srcObject = null;
+        }
+
         if (playerRef.current) {
             playerRef.current.destroy();
             playerRef.current = null;
-            setIsPlaying(false);
         }
+
+        if (videoRef.current) {
+            videoRef.current.pause();
+            videoRef.current.src = '';
+        }
+
+        setIsPlaying(false);
     };
 
     return (
@@ -65,12 +106,12 @@ const ShakaPlayer = () => {
                     </button>
                 )}
 
-                <div ref={containerRef} className="w-full">
-                    <video ref={videoRef} className="w-full" />
+                <div ref={containerRef}>
+                    <StyledVideo ref={videoRef} />
                 </div>
             </div>
         </div>
     );
 };
 
-export default ShakaPlayer;
+export default DashPlayer;
