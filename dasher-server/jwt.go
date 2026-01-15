@@ -20,6 +20,43 @@ func ParseToken(tokenString string, jwtKey []byte) (*jwt.Token, error) {
 	return token, nil
 }
 
+func RequireAuthentication(c *gin.Context) {
+
+	// get cookie
+	tokenName := GetStringFromConfig("auth_jwt.token_cookie_name")
+	tokenString, err := c.Cookie(tokenName)
+	if err != nil {
+		c.AbortWithStatus(http.StatusUnauthorized)
+		return
+	}
+
+	// validate token
+	jwtKey := []byte(os.Getenv("JWT_SECRET"))
+	token, err := ParseToken(tokenString, jwtKey)
+	if err != nil {
+		c.AbortWithStatus(http.StatusUnauthorized)
+		return
+	}
+
+	// validate token claims
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok {
+		c.AbortWithStatus(http.StatusUnauthorized)
+		return
+	}
+
+	// check if token is expired
+	if claims["exp"].(float64) < float64(time.Now().Unix()) {
+		c.AbortWithStatus(http.StatusUnauthorized)
+		return
+	}
+
+	c.Set(GetStringFromConfig("auth_jwt.user_id_name"), int(claims[GetStringFromConfig("auth_jwt.user_id_name")].(float64)))
+	c.Set("role", claims["role"].(string))
+
+	c.Next()
+}
+
 func RequireAuthorizedMeeting(c *gin.Context) {
 	// get cookie
 	tokenName := GetStringFromConfig("meeting.token_name")

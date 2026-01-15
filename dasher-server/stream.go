@@ -9,7 +9,9 @@ import (
 )
 
 func HandleStream(c *gin.Context) {
-	meetingID, _ := c.Get(GetStringFromConfig("meeting.meeting_id_name"))
+	meetingID := c.Param(GetStringFromConfig("meeting.meeting_id_name"))
+	userID, _ := c.Get(GetStringFromConfig("auth_jwt.user_id_name"))
+
 	ws, err := wsUpgrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
 		log.Println(err)
@@ -18,7 +20,7 @@ func HandleStream(c *gin.Context) {
 	}
 	defer ws.Close()
 
-	cmd, stdin, err := InitMpegDash(meetingID.(string))
+	cmd, stdin, err := InitMpegDash(meetingID, userID.(int))
 	if err != nil {
 		c.String(http.StatusInternalServerError, GetStringFromConfig("error.internal"))
 		return
@@ -45,5 +47,11 @@ func HandleStream(c *gin.Context) {
 	}
 
 	err = stdin.Close()
-	cmd.Wait()
+	if err != nil {
+		log.Println(err)
+	}
+	err = cmd.Wait()
+	if err != nil {
+		log.Println(err)
+	}
 }

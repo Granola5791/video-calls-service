@@ -2,6 +2,7 @@ package main
 
 import (
 	"net/http"
+
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
@@ -29,9 +30,12 @@ func InitRouter() {
 		AllowCredentials: true,
 	}))
 
-	router.GET(GetStringFromConfig("server.api.stream_from_client_path"), RequireAuthorizedMeeting, HandleStream)
-	router.POST(GetStringFromConfig("server.api.create_meeting_path"), RequireAuthorizedMeeting, HandleCreateMeeting)
-	router.StaticFS(GetStringFromConfig("server.api.stream_to_client_path"), gin.Dir("./meetings", true))
+	router.GET(GetStringFromConfig("server.api.stream_from_client_path"), RequireAuthentication, HandleStream)
+
+	router.POST(GetStringFromConfig("server.api.create_meeting_path"), RequireAuthentication, RequireAuthorizedMeeting, HandleCreateMeeting)
+	router.POST(GetStringFromConfig("server.api.join_meeting_path"), RequireAuthentication, HandleJoinMeeting)
+
+	router.StaticFS(GetStringFromConfig("server.api.stream_to_client_path"), gin.Dir("./meetings", false))
 
 	router.Run(GetStringFromConfig("server.listen_addr"))
 }

@@ -2,9 +2,10 @@ server:
   listen_addr: "localhost:8082"
   frontend_addr: "http://localhost:5173"
   api:
-    stream_from_client_path: "stream"
+    stream_from_client_path: "stream/:meeting_id"
     stream_to_client_path: "get-stream"
     create_meeting_path: "create-meeting"
+    join_meeting_path: "join-meeting/:meeting_id"
 
 stream:
   read_buffer_size: 4096
@@ -21,3 +22,10 @@ meeting:
   dir_path: "./meetings"
   dir_perms: 0755
   token_name: "meeting_token"
+
+auth_jwt:
+  token_cookie_name: "auth_token"
+  user_id_name: "user_id"
+
+logger:
+  ffmpeg_log_file: "./ffmpeg.log"

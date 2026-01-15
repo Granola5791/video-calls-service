@@ -1,14 +1,16 @@
 package main
 
 import (
+	"fmt"
 	"io"
 	"log"
 	"os/exec"
 )
 
-func InitMpegDash(meetingID string) (*exec.Cmd, io.WriteCloser, error) {
+func InitMpegDash(meetingID string, userID int) (*exec.Cmd, io.WriteCloser, error) {
 	cmd := exec.Command(
 		"ffmpeg",
+		"-re",
 		"-f", "webm",
 		"-i", "pipe:0",
 
@@ -30,8 +32,10 @@ func InitMpegDash(meetingID string) (*exec.Cmd, io.WriteCloser, error) {
 		"-preset", "ultrafast",
 		"-tune", "zerolatency",
 
-		"-g", "15",
-		"-keyint_min", "15",
+		"-r", "30",
+
+		"-g", "30",
+		"-keyint_min", "30",
 		"-sc_threshold", "0",
 
 		"-profile:v", "main",
@@ -41,19 +45,15 @@ func InitMpegDash(meetingID string) (*exec.Cmd, io.WriteCloser, error) {
 		"-b:v:2", "800k",
 
 		"-f", "dash",
-		"-use_wallclock_as_timestamps", "1",
-		"-ldash", "1",
 		"-streaming", "1",
-		"-frag_type", "duration",
-		"-frag_duration", "0.1",
-		"-seg_duration", "0.5",
+		"-seg_duration", "1",
 		"-use_template", "1",
-		"-use_timeline", "1",
+		"-use_timeline", "0",
 		"-window_size", "5",
 		"-extra_window_size", "5",
 		"-adaptation_sets", "id=0,streams=0,1,2 id=1,streams=3",
 		"-remove_at_exit", "0",
-		"meetings/" + meetingID + "/stream.mpd",
+		fmt.Sprintf("%s/%s/%d/stream.mpd", GetStringFromConfig("meeting.dir_path"), meetingID, userID),
 	)
 
 	stdin, err := cmd.StdinPipe()
@@ -61,6 +61,8 @@ func InitMpegDash(meetingID string) (*exec.Cmd, io.WriteCloser, error) {
 		log.Println(err)
 		return nil, nil, err
 	}
+
+	LogFfmpeg(cmd)
 
 	err = cmd.Start()
 	if err != nil {
