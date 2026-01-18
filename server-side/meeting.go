@@ -92,7 +92,7 @@ func HandleJoinMeeting(c *gin.Context) {
 		return
 	}
 
-	meetingParticipants, err := GetMeetingParticipantIDsFromDB(meetingID)
+	meetingParticipants, err := GetMeetingParticipantIDsFromDB(meetingID, uint(userID))
 	if err != nil {
 		c.AbortWithStatus(http.StatusInternalServerError)
 		return

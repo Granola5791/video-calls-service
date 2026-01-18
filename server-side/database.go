@@ -133,14 +133,18 @@ func AddParticipantToMeetingInDB(meetingID uuid.UUID, userID int) error {
 	return db.Create(&meetingParticipant).Error
 }
 
-func GetMeetingParticipantIDsFromDB(meetingID uuid.UUID) ([]uint, error) {
+func GetMeetingParticipantIDsFromDB(meetingID uuid.UUID, usersToIgnore ...uint) ([]uint, error) {
 	var ids []uint
 
-	err := db.
+	query := db.
 		Model(&MeetingParticipant{}).
-		Select("user_id").
-		Where("meeting_id = ?", meetingID).
-		Scan(&ids).Error
+		Where("meeting_id = ?", meetingID)
+
+	if len(usersToIgnore) > 0 {
+		query = query.Where("user_id NOT IN ?", usersToIgnore)
+	}
+
+	err := query.Pluck("user_id", &ids).Error
 	if err != nil {
 		return nil, err
 	}
