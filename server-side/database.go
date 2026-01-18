@@ -31,9 +31,9 @@ type Meeting struct {
 
 type MeetingParticipant struct {
 	gorm.Model
-	UserID    uint      `gorm:"not null"`
+	UserID    uint      `gorm:"not null; uniqueIndex:idx_user_meeting"`
 	User      User      `gorm:"foreignKey:UserID"`
-	MeetingID uuid.UUID `gorm:"not null"`
+	MeetingID uuid.UUID `gorm:"not null; uniqueIndex:idx_user_meeting"`
 	Meeting   Meeting   `gorm:"foreignKey:MeetingID"`
 }
 
@@ -131,6 +131,18 @@ func AddParticipantToMeetingInDB(meetingID uuid.UUID, userID int) error {
 		MeetingID: meetingID,
 	}
 	return db.Create(&meetingParticipant).Error
+}
+
+func IsParticipantInMeetingInDB(meetingID uuid.UUID, userID int) (bool, error) {
+	var count int64
+	err := db.Model(&MeetingParticipant{}).
+		Where("meeting_id = ?", meetingID).
+		Where("user_id = ?", userID).
+		Count(&count).Error
+	if err != nil {
+		return false, err
+	}
+	return count > 0, nil
 }
 
 func GetMeetingParticipantIDsFromDB(meetingID uuid.UUID, usersToIgnore ...uint) ([]uint, error) {

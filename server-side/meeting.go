@@ -25,19 +25,19 @@ type ParticipantNotification struct {
 
 type MeetingNotifierStruct struct {
 	ID                 uuid.UUID
-	participants       map[uint]*chan ParticipantNotification
+	participants       map[uint]chan ParticipantNotification
 	notificationChanIn chan ParticipantNotification
 }
 
 func (m *MeetingNotifierStruct) Init(id uuid.UUID) {
 	m.ID = id
-	m.participants = make(map[uint]*chan ParticipantNotification, 16)
-	m.notificationChanIn = make(chan ParticipantNotification, 16)
+	m.participants = make(map[uint]chan ParticipantNotification)
+	m.notificationChanIn = make(chan ParticipantNotification, GetIntFromConfig("notifications.channel_buffer_size"))
 }
 
 func (m *MeetingNotifierStruct) NotifyParticipants(notification ParticipantNotification) {
 	for _, participant := range m.participants {
-		*participant <- notification
+		participant <- notification
 	}
 }
 
@@ -100,10 +100,17 @@ func HandleJoinMeeting(c *gin.Context) {
 
 	log.Println("participants:", meetingParticipants)
 
-	err = AddParticipantToMeetingInDB(meetingID, userID)
+	exists, err := IsParticipantInMeetingInDB(meetingID, userID)
 	if err != nil {
 		c.AbortWithStatus(http.StatusInternalServerError)
 		return
+	}
+	if !exists {
+		err = AddParticipantToMeetingInDB(meetingID, userID)
+		if err != nil {
+			c.AbortWithStatus(http.StatusInternalServerError)
+			return
+		}
 	}
 
 	c.JSON(http.StatusOK, meetingParticipants)
@@ -126,8 +133,8 @@ func HandleGetCallNotifications(c *gin.Context) {
 		return
 	}
 
-	notificationChannel := make(chan ParticipantNotification)
-	meeting.participants[uint(userID)] = &notificationChannel
+	notificationChannel := make(chan ParticipantNotification, GetIntFromConfig("notifications.channel_buffer_size"))
+	meeting.participants[uint(userID)] = notificationChannel
 	meeting.notificationChanIn <- ParticipantNotification{ParticipantID: uint(userID), Event: ParticipantJoined}
 
 	for notification := range notificationChannel {

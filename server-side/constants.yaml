@@ -49,6 +49,9 @@ meeting:
   token_name: "meeting_token"
   token_exp: 3600 # in seconds
 
+notifications:
+  channel_buffer_size: 16
+
 websocket:
   port: 8082
   read_buffer_size: 1024
