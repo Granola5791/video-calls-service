@@ -9,10 +9,7 @@ export const ApiEndpoints = {
     checkLoginApi: "/check-login",
     checkAdminApi: "/check-admin",
     startStream: "/stream/{meeting_id}",
-    getStream: {
-        prefix: "/get-stream/",
-        suffix: "/stream.mpd",
-    },
+    getStream: "/get-stream/{meeting_id}/{user_id}/stream.mpd",
     createMeeting: "/create-meeting",
     getCallParticipants: "/get-call-participants",
     joinMeeting: "/join-meeting/{meeting_id}",

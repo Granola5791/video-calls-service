@@ -10,6 +10,7 @@ import { CheckLoginLoader } from './utils/check-login.ts'
 import TestPage from './pages/TestPage.tsx'
 import WebSocketWebCam from './components/WebSocketWebCam.tsx'
 import { DasherServerAddressWS, ApiEndpoints } from './constants/backend-constants.ts'
+import MeetingPage from './pages/MeetingPage.tsx'
 
 const router = createBrowserRouter([
     {
@@ -27,6 +28,11 @@ const router = createBrowserRouter([
     {
         path: "/home",
         element: <HomePage />,
+        loader: CheckLoginLoader,
+    },
+    {
+        path: "/meeting/:meetingID",
+        element: <MeetingPage />,
         loader: CheckLoginLoader,
     },
     {
