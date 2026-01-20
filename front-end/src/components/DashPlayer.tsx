@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import shaka from 'shaka-player/dist/shaka-player.ui';
 import 'shaka-player/dist/controls.css';
 import { StyledVideo } from '../styled-components/StyledVideos';
@@ -13,7 +13,6 @@ const DashPlayer = ({ url }: DashPlayerProps) => {
     const videoRef = useRef<HTMLVideoElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
     const playerRef = useRef<shaka.Player | null>(null);
-    const [isPlaying, setIsPlaying] = useState(false);
 
     useEffect(() => {
         try {
@@ -44,7 +43,7 @@ const DashPlayer = ({ url }: DashPlayerProps) => {
 
     const startStream = async () => {
         await WaitUntilAvailable(url);
-        
+
         if (!videoRef.current || !containerRef.current) return;
 
         const player = new shaka.Player(videoRef.current);
@@ -62,7 +61,6 @@ const DashPlayer = ({ url }: DashPlayerProps) => {
         await player.load(url);
 
         videoRef.current.play();
-        setIsPlaying(true);
     };
 
     const stopStream = () => {
@@ -81,35 +79,11 @@ const DashPlayer = ({ url }: DashPlayerProps) => {
             videoRef.current.pause();
             videoRef.current.src = '';
         }
-
-        setIsPlaying(false);
     };
 
     return (
-        <div className="p-8 bg-gray-900 min-h-screen">
-            <div className="w-full max-w-4xl mx-auto">
-                {!isPlaying && (
-                    <button
-                        onClick={startStream}
-                        className="mb-4 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition"
-                    >
-                        Start Stream
-                    </button>
-                )}
-
-                {isPlaying && (
-                    <button
-                        onClick={stopStream}
-                        className="mb-4 px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition"
-                    >
-                        Stop Stream
-                    </button>
-                )}
-
-                <div ref={containerRef}>
-                    <StyledVideo ref={videoRef} />
-                </div>
-            </div>
+        <div ref={containerRef}>
+            <StyledVideo ref={videoRef} />
         </div>
     );
 };

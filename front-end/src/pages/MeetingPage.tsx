@@ -3,6 +3,8 @@ import { useParams } from 'react-router-dom';
 import { ApiEndpoints, BackendAddressHttp, BackendAddressWS, CallEventTypes, DasherServerAddressHttp, DasherServerAddressWS, SetUrlParams } from '../constants/backend-constants';
 import WebSocketWebCam from '../components/WebSocketWebCam';
 import DashPlayer from '../components/DashPlayer';
+import { StyledMeetingGrid } from '../styled-components/StyledBoxes';
+import { StyledMeetingGridTile } from '../styled-components/StyledVideos';
 
 
 const NormalizeMeetingIDs = (meetingIDs: unknown): string[] => {
@@ -76,18 +78,23 @@ const MeetingPage = () => {
     }
 
     return (
-        <div>
+        <StyledMeetingGrid>
             {
-                isStreaming && <WebSocketWebCam
-                    wsUrl={DasherServerAddressWS + SetUrlParams(ApiEndpoints.startStream, meetingID!)}
-                />
+                <StyledMeetingGridTile>
+                    {isStreaming && <WebSocketWebCam
+                        wsUrl={DasherServerAddressWS + SetUrlParams(ApiEndpoints.startStream, meetingID!)}
+                    />
+                    }
+                </StyledMeetingGridTile>
             }
             {
                 participantsIDs.map((id) => (
-                    <DashPlayer key={id} url={SetUrlParams(DasherServerAddressHttp + ApiEndpoints.getStream, meetingID, id)} />
+                    <StyledMeetingGridTile key={id}>
+                        <DashPlayer url={SetUrlParams(DasherServerAddressHttp + ApiEndpoints.getStream, meetingID, id)} />
+                    </StyledMeetingGridTile>
                 ))
             }
-        </div>
+        </StyledMeetingGrid>
     )
 }
 

@@ -2,7 +2,7 @@ import styled from "@emotion/styled";
 import { Colors } from "../constants/general-contants";
 
 
-export const CenteredColumn = styled.div ({
+export const CenteredColumn = styled.div({
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
@@ -14,7 +14,7 @@ export const CenteredColumn = styled.div ({
     borderRadius: '10px',
 })
 
-export const CenteredFilledScreen = styled.div ({
+export const CenteredFilledScreen = styled.div({
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
@@ -24,9 +24,13 @@ export const CenteredFilledScreen = styled.div ({
     backgroundColor: Colors.primary,
 })
 
-export const StyledGrid = styled.div ({
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-    gap: '20px',
-    width: '100%',
+export const StyledMeetingGrid = styled.div({
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
+    gap: "8px",
+    width: "100%",
+    height: "100%",
+    padding: "8px",
+    boxSizing: "border-box",
+    backgroundColor: Colors.meetingBackground,
 });

@@ -1,20 +1,15 @@
-import { useEffect, useRef, useState } from 'react'
-import { CenteredColumn } from '../styled-components/StyledBoxes';
+import { useEffect, useRef } from 'react'
 import { StreamConfig } from '../constants/general-contants';
-import { Stream } from '../constants/hebrew-constants';
-import { LongButton } from '../styled-components/StyledButtons';
+import { StyledVideo } from '../styled-components/StyledVideos';
 
 interface WebSocketWebCamProps {
     wsUrl: string
-    width?: string
-    height?: string
 }
 
-const WebSocketWebCam = ({ wsUrl, width, height }: WebSocketWebCamProps) => {
+const WebSocketWebCam = ({ wsUrl}: WebSocketWebCamProps) => {
     const videoRef = useRef<HTMLVideoElement>(null);
     const wsRef = useRef<WebSocket | null>(null);
     const recorderRef = useRef<MediaRecorder | null>(null);
-    const [isStreaming, setIsStreaming] = useState<boolean>(false);
 
     useEffect(() => {
         StartStream();
@@ -75,16 +70,14 @@ const WebSocketWebCam = ({ wsUrl, width, height }: WebSocketWebCamProps) => {
     };
 
     return (
-        <CenteredColumn>
-            <video
+        <div>
+            <StyledVideo
                 ref={videoRef}
                 autoPlay
-                width={width}
-                height={height}
+                playsInline
                 muted
             />
-            <LongButton onClick={() => { setIsStreaming(false); StopStream() }} disabled={!isStreaming}>{Stream.stopButton}</LongButton>
-        </CenteredColumn>
+        </div>
     )
 }
 
