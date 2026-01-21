@@ -4,12 +4,16 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"sync"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 )
 
-var meetingNotifiers = make(map[uuid.UUID]*MeetingNotifierStruct)
+var (
+	meetingNotifiers      = make(map[uuid.UUID]*MeetingNotifierStruct)
+	meetingNotifiersMutex sync.Mutex
+)
 
 type Event int
 
@@ -27,6 +31,7 @@ type MeetingNotifierStruct struct {
 	ID                 uuid.UUID
 	participants       map[uint]chan ParticipantNotification
 	notificationChanIn chan ParticipantNotification
+	mutex              sync.Mutex
 }
 
 func (m *MeetingNotifierStruct) Init(id uuid.UUID) {
@@ -35,10 +40,36 @@ func (m *MeetingNotifierStruct) Init(id uuid.UUID) {
 	m.notificationChanIn = make(chan ParticipantNotification, GetIntFromConfig("notifications.channel_buffer_size"))
 }
 
+func (m *MeetingNotifierStruct) lock() {
+	m.mutex.Lock()
+}
+
+func (m *MeetingNotifierStruct) unlock() {
+	m.mutex.Unlock()
+}
+
+func (m *MeetingNotifierStruct) AddParticipant(participantID uint) chan ParticipantNotification {
+	notificationChannel := make(chan ParticipantNotification, GetIntFromConfig("notifications.channel_buffer_size"))
+	m.lock()
+	defer m.unlock()
+	m.participants[participantID] = notificationChannel
+	m.notificationChanIn <- ParticipantNotification{ParticipantID: participantID, Event: ParticipantJoined}
+	return notificationChannel
+}
+
 func (m *MeetingNotifierStruct) NotifyParticipants(notification ParticipantNotification) {
 	for _, participant := range m.participants {
 		participant <- notification
 	}
+}
+
+func AddMeetingNotifier(meetingID uuid.UUID) *MeetingNotifierStruct {
+	var meeting MeetingNotifierStruct
+	meeting.Init(meetingID)
+	meetingNotifiersMutex.Lock()
+	meetingNotifiers[meetingID] = &meeting
+	meetingNotifiersMutex.Unlock()
+	return &meeting
 }
 
 func HandleCreateMeeting(c *gin.Context) {
@@ -72,9 +103,7 @@ func HandleCreateMeeting(c *gin.Context) {
 }
 
 func MeetingNotifier(meetingID uuid.UUID) {
-	var meeting MeetingNotifierStruct
-	meeting.Init(meetingID)
-	meetingNotifiers[meetingID] = &meeting
+	meeting := AddMeetingNotifier(meetingID)
 
 	log.Println("waiting for notifications")
 	for notification := range meeting.notificationChanIn {
@@ -133,9 +162,7 @@ func HandleGetCallNotifications(c *gin.Context) {
 		return
 	}
 
-	notificationChannel := make(chan ParticipantNotification, GetIntFromConfig("notifications.channel_buffer_size"))
-	meeting.participants[uint(userID)] = notificationChannel
-	meeting.notificationChanIn <- ParticipantNotification{ParticipantID: uint(userID), Event: ParticipantJoined}
+	notificationChannel := meeting.AddParticipant(uint(userID))
 
 	for notification := range notificationChannel {
 		log.Println("notification:", notification)
