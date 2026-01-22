@@ -47,3 +47,10 @@ export const Stream = {
     startButton: "התחל שידור",
     stopButton: "עצור שידור",
 }
+
+export const HomePageText = {
+    createMeetingButton: "צור פגישה חדשה",
+    JoinMeetingButton: "הצטרף לפגישה",
+    SubmitMeetingIDButton: "המשך",
+    MeetingIDInputPlaceholder: "הכנס מזהה פגישה",
+};

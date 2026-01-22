@@ -5,6 +5,7 @@ import { LongButton, LongButtonFilled } from '../styled-components/StyledButtons
 import { StyledTextField } from '../styled-components/StyledTextFields'
 import OneButtonPopUp from '../components/OneButtonPopUp'
 import { useNavigation } from '../utils/navigation'
+import { HomePageText } from '../constants/hebrew-constants'
 
 const HomePage = () => {
     const [meetingID, setMeetingID] = useState('');
@@ -42,14 +43,15 @@ const HomePage = () => {
     return (
         <div>
             <CenteredColumn>
-                <LongButtonFilled onClick={() => setOpenJoinMeetingPopUp(true)}>Join Meeting</LongButtonFilled>
-                <LongButton onClick={CreateMeeting}>Create Meeting</LongButton>
+                <LongButtonFilled onClick={() => setOpenJoinMeetingPopUp(true)}>{HomePageText.JoinMeetingButton}</LongButtonFilled>
+                <LongButton onClick={CreateMeeting}>{HomePageText.createMeetingButton}</LongButton>
 
                 <OneButtonPopUp
                     open={openJoinMeetingPopUp}
                     onButtonClick={() => goToMeeting(meetingID)}
+                    buttonText={HomePageText.SubmitMeetingIDButton}
                 >
-                    <StyledTextField value={meetingID} onChange={(e) => setMeetingID(e.target.value)} placeholder="Meeting ID" />
+                    <StyledTextField value={meetingID} onChange={(e) => setMeetingID(e.target.value)} placeholder={HomePageText.MeetingIDInputPlaceholder} />
                 </OneButtonPopUp>
 
             </CenteredColumn>
