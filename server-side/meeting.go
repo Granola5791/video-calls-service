@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"log"
 	"net/http"
 	"os"
@@ -15,53 +16,6 @@ var (
 	meetingNotifiersMutex sync.Mutex
 )
 
-type Event int
-
-const (
-	ParticipantJoined Event = iota
-	ParticipantLeft
-)
-
-type ParticipantNotification struct {
-	ParticipantID uint  `json:"participant_id"`
-	Event         Event `json:"event"`
-}
-
-type MeetingNotifierStruct struct {
-	ID                 uuid.UUID
-	participants       map[uint]chan ParticipantNotification
-	notificationChanIn chan ParticipantNotification
-	mutex              sync.Mutex
-}
-
-func (m *MeetingNotifierStruct) Init(id uuid.UUID) {
-	m.ID = id
-	m.participants = make(map[uint]chan ParticipantNotification)
-	m.notificationChanIn = make(chan ParticipantNotification, GetIntFromConfig("notifications.channel_buffer_size"))
-}
-
-func (m *MeetingNotifierStruct) lock() {
-	m.mutex.Lock()
-}
-
-func (m *MeetingNotifierStruct) unlock() {
-	m.mutex.Unlock()
-}
-
-func (m *MeetingNotifierStruct) AddParticipant(participantID uint) chan ParticipantNotification {
-	notificationChannel := make(chan ParticipantNotification, GetIntFromConfig("notifications.channel_buffer_size"))
-	m.lock()
-	defer m.unlock()
-	m.participants[participantID] = notificationChannel
-	m.notificationChanIn <- ParticipantNotification{ParticipantID: participantID, Event: ParticipantJoined}
-	return notificationChannel
-}
-
-func (m *MeetingNotifierStruct) NotifyParticipants(notification ParticipantNotification) {
-	for _, participant := range m.participants {
-		participant <- notification
-	}
-}
 
 func AddMeetingNotifier(meetingID uuid.UUID) *MeetingNotifierStruct {
 	var meeting MeetingNotifierStruct
@@ -70,6 +24,13 @@ func AddMeetingNotifier(meetingID uuid.UUID) *MeetingNotifierStruct {
 	meetingNotifiers[meetingID] = &meeting
 	meetingNotifiersMutex.Unlock()
 	return &meeting
+}
+
+func RemoveMeetingNotifier(meetingID uuid.UUID) {
+	meetingNotifiersMutex.Lock()
+	defer meetingNotifiersMutex.Unlock()
+	meetingNotifiers[meetingID].Close()
+	delete(meetingNotifiers, meetingID)
 }
 
 func HandleCreateMeeting(c *gin.Context) {
@@ -97,19 +58,10 @@ func HandleCreateMeeting(c *gin.Context) {
 		MaxAge:   GetIntFromConfig("meeting.token_exp"),
 	})
 
-	go MeetingNotifier(meetingID)
+	meeting := AddMeetingNotifier(meetingID)
+	go meeting.Run()
 
 	c.String(http.StatusOK, meetingID.String())
-}
-
-func MeetingNotifier(meetingID uuid.UUID) {
-	meeting := AddMeetingNotifier(meetingID)
-
-	log.Println("waiting for notifications")
-	for notification := range meeting.notificationChanIn {
-		log.Println("got notification")
-		meeting.NotifyParticipants(notification)
-	}
 }
 
 func HandleJoinMeeting(c *gin.Context) {
@@ -121,6 +73,16 @@ func HandleJoinMeeting(c *gin.Context) {
 		return
 	}
 
+	meeting_exists, err := MeetingExistsInDB(meetingID)
+	if err != nil {
+		c.AbortWithStatus(http.StatusInternalServerError)
+		return
+	}
+	if !meeting_exists {
+		c.AbortWithStatus(http.StatusNotFound)
+		return
+	}
+
 	meetingParticipants, err := GetMeetingParticipantIDsFromDB(meetingID, uint(userID))
 	if err != nil {
 		c.AbortWithStatus(http.StatusInternalServerError)
@@ -129,6 +91,7 @@ func HandleJoinMeeting(c *gin.Context) {
 
 	log.Println("participants:", meetingParticipants)
 
+	// Add participant to meeting if not already in
 	exists, err := IsParticipantInMeetingInDB(meetingID, userID)
 	if err != nil {
 		c.AbortWithStatus(http.StatusInternalServerError)
@@ -162,16 +125,60 @@ func HandleGetCallNotifications(c *gin.Context) {
 		return
 	}
 
-	notificationChannel := meeting.AddParticipant(uint(userID))
+	participantNotifier := meeting.AddParticipant(uint(userID))
+	go participantNotifier.Run(ws)
+}
 
-	for notification := range notificationChannel {
-		log.Println("notification:", notification)
-		if notification.ParticipantID != uint(userID) {
-			err := ws.WriteJSON(notification)
-			if err != nil {
-				log.Println(err)
-			}
+func HandleLeaveMeeting(c *gin.Context) {
+	userID := c.GetInt(GetStringFromConfig("jwt.user_id_name"))
+	meetingID := uuid.MustParse(c.Param(GetStringFromConfig("server.api.params.meeting_id_name")))
+	err := LeaveMeeting(meetingID, uint(userID))
+	if err != nil {
+		c.AbortWithStatus(http.StatusBadRequest)
+		return
+	}
+
+	c.Status(http.StatusOK)
+}
+
+func LeaveMeeting(meetingID uuid.UUID, participantID uint) error {
+	err := RemoveParticipantNotifier(meetingID, participantID)
+	if err != nil {
+		return err
+	}
+
+	err = RemoveParticipantFromMeetingInDB(meetingID, int(participantID))
+	if err != nil {
+		return err
+	}
+
+	isEmpty, _ := IsMeetingEmptyInDB(meetingID)
+	if isEmpty {
+		err = RemoveMeeting(meetingID)
+		if err != nil {
+			return err
 		}
 	}
 
+	return nil
+}
+
+func RemoveParticipantNotifier(meetingID uuid.UUID, participantID uint) error {
+	meeting, ok := meetingNotifiers[meetingID]
+	if !ok {
+		return errors.New(GetStringFromConfig("errors.meeting_not_found"))
+	}
+	meeting.RemoveParticipant(participantID)
+	return nil
+}
+
+func RemoveMeeting(meetingID uuid.UUID) error {
+	RemoveMeetingNotifier(meetingID)
+
+	err := DeleteMeetingFromDB(meetingID)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

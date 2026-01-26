@@ -33,6 +33,7 @@ errors:
   invalid_input: "Invalid input"
   user_exists: "User already exists"
   internal_server_error: "Internal server error"
+  meeting_not_found: "Meeting not found"
 
 success:
   user_created: "User created successfully"

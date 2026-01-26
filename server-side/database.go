@@ -133,6 +133,11 @@ func AddParticipantToMeetingInDB(meetingID uuid.UUID, userID int) error {
 	return db.Create(&meetingParticipant).Error
 }
 
+func RemoveParticipantFromMeetingInDB(meetingID uuid.UUID, userID int) error {
+	return db.Where("meeting_id = ? AND user_id = ?", meetingID, userID).
+		Delete(&MeetingParticipant{}).Error
+}
+
 func IsParticipantInMeetingInDB(meetingID uuid.UUID, userID int) (bool, error) {
 	var count int64
 	err := db.Model(&MeetingParticipant{}).
@@ -162,4 +167,39 @@ func GetMeetingParticipantIDsFromDB(meetingID uuid.UUID, usersToIgnore ...uint) 
 	}
 
 	return ids, nil
+}
+
+func MeetingExistsInDB(meetingID uuid.UUID) (bool, error) {
+	var count int64
+	err := db.Model(&Meeting{}).
+		Where("id = ?", meetingID).
+		Count(&count).Error
+	if err != nil {
+		return false, err
+	}
+	return count > 0, nil
+}
+
+func GetParticipantCountInMeetingInDB(meetingID uuid.UUID) (int64, error) {
+	var count int64
+	err := db.Model(&MeetingParticipant{}).
+		Where("meeting_id = ?", meetingID).
+		Count(&count).Error
+	if err != nil {
+		return 0, err
+	}
+	return count, nil
+}
+
+func IsMeetingEmptyInDB(meetingID uuid.UUID) (bool, error) {
+	participantCount, err := GetParticipantCountInMeetingInDB(meetingID)
+	if err != nil {
+		return false, err
+	}
+	return participantCount == 0, nil
+}
+
+func DeleteMeetingFromDB(meetingID uuid.UUID) error {
+	return db.Where("id = ?", meetingID).
+		Delete(&Meeting{}).Error
 }
