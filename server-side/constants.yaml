@@ -28,6 +28,10 @@ jwt:
   token_cookie_name: "auth_token"
   token_exp: 3600 # in seconds
   user_id_name: "user_id"
+  role_name: "role"
+  in_meeting_name: "in_meeting"
+  exp_name: "exp"
+  admin_role: "admin"
 
 errors:
   invalid_input: "Invalid input"

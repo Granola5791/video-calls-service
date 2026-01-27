@@ -19,7 +19,7 @@ func GenerateJwtToken(claims jwt.MapClaims, jwtKey []byte) (string, error) {
 func GenerateMeetingToken(meetingID uuid.UUID, jwtKey []byte, expTimeSec int) (string, error) {
 	claims := jwt.MapClaims{
 		GetStringFromConfig("meeting.meeting_id_name"): meetingID,
-		"exp":       time.Now().Add(time.Second * time.Duration(expTimeSec)).Unix(),
+		GetStringFromConfig("jwt.exp_name"):       time.Now().Add(time.Second * time.Duration(expTimeSec)).Unix(),
 	}
 	return GenerateJwtToken(claims, jwtKey)
 }
@@ -27,8 +27,8 @@ func GenerateMeetingToken(meetingID uuid.UUID, jwtKey []byte, expTimeSec int) (s
 func GenerateLoginToken(userID int, role string, jwtKey []byte, expTimeSec int) (string, error) {
 	claims := jwt.MapClaims{
 		GetStringFromConfig("jwt.user_id_name"): userID,
-		"role":   role,
-		"exp":    time.Now().Add(time.Second * time.Duration(expTimeSec)).Unix(),
+		GetStringFromConfig("jwt.role_name"):   role,
+		GetStringFromConfig("jwt.exp_name"):    time.Now().Add(time.Second * time.Duration(expTimeSec)).Unix(),
 	}
 	return GenerateJwtToken(claims, jwtKey)
 }
@@ -70,26 +70,26 @@ func RequireAuthentication(c *gin.Context) {
 	}
 
 	// check if token is expired
-	if claims["exp"].(float64) < float64(time.Now().Unix()) {
+	if claims[GetStringFromConfig("jwt.exp_name")].(float64) < float64(time.Now().Unix()) {
 		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
 
 	c.Set(GetStringFromConfig("jwt.user_id_name"), int(claims[GetStringFromConfig("jwt.user_id_name")].(float64)))
-	c.Set("role", claims["role"].(string))
+	c.Set(GetStringFromConfig("jwt.role_name"), claims[GetStringFromConfig("jwt.role_name")].(string))
 
 	c.Next()
 }
 
 // can only be called after RequireAuthentication
 func RequireAdmin(c *gin.Context) {
-	role, _ := c.Get("role")
+	role, _ := c.Get(GetStringFromConfig("jwt.role_name"))
 	roleString, ok := role.(string)
 	if !ok {
 		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
-	if !strings.Contains(roleString, "admin") {
+	if !strings.Contains(roleString, GetStringFromConfig("jwt.admin_role")) {
 		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
