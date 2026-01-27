@@ -14,6 +14,7 @@ export const ApiEndpoints = {
     getCallParticipants: "/get-call-participants",
     joinMeeting: "/join-meeting/{meeting_id}",
     getCallNotifications: "/get-call-notifications/{meeting_id}",
+    leaveMeeting: "/leave-meeting/{meeting_id}",
 };
 
 export const HttpStatusCodes = {

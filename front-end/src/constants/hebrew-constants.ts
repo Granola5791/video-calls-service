@@ -54,3 +54,14 @@ export const HomePageText = {
     SubmitMeetingIDButton: "המשך",
     MeetingIDInputPlaceholder: "הכנס מזהה פגישה",
 };
+
+export const MeetingExitText = {
+    popUpTitles: {
+        left: "יצאת מהפגישה",
+        kicked: "הוסרת מהפגישה",
+        ended: "הפגישה נגמרה",
+        default: "יצאת מהפגישה",
+    },
+    popUpSubtitle: "מיד תועבר לדף הבית",
+    popUpButton: "חזרה לדף הבית",
+};

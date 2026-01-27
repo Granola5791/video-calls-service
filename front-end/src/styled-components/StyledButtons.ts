@@ -21,3 +21,20 @@ export const LongButtonFilled = styled(LongButton)({
     },
 });
 
+export const MediumButton = styled(Button)({
+    width: "200px",
+    height: "40px",
+    fontSize: "16px",
+    fontWeight: "bold",
+    borderRadius: "20px",
+    border: `2px solid lightgray`,
+    color: "gray",
+});
+
+export const LeaveMeetingButton = styled(MediumButton)({
+    color: "white",
+    backgroundColor: Colors.danger,
+    "&:hover": {
+        backgroundColor: Colors.dangerHover,
+    },
+});

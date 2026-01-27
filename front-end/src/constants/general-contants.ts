@@ -2,6 +2,8 @@ export const Colors = {
     primary: '#ff1a8dff',
     primaryHover: '#ff52b4ff',
     meetingBackground: '#111',
+    danger: 'rgb(255, 0, 0)',
+    dangerHover: 'rgb(255, 60, 60)',
 };
 
 export const AuthRequirements = {
@@ -21,4 +23,15 @@ export const StreamConfig = {
     chunkIntervalMs: 2000, // 2 seconds
     sentChunkMsg: 'Sent chunk at',
     checkStreamAvailabilityIntervalMs: 2000, // 2 seconds
+}
+
+export const MeetingConfig = {
+    exitWaitTimeMs: 5000,
+    meetingState: {
+        none: 0,
+        active: 1,
+        ended: 2,
+        left: 3,
+        kicked: 4,
+    }
 }

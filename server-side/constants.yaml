@@ -23,6 +23,7 @@ server:
     create_meeting_path: /create-meeting
     get_call_notifications_path: /get-call-notifications/:meeting_id
     join_meeting_path: /join-meeting/:meeting_id
+    leave_meeting_path: /leave-meeting/:meeting_id
 
 jwt:
   token_cookie_name: "auth_token"
