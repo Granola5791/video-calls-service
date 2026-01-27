@@ -25,6 +25,7 @@ func (m *ParticipantNotifierStruct) Close() {
 }
 
 func (m *ParticipantNotifierStruct) Run(ws *websocket.Conn) {
+	defer ws.Close()
 	for {
 		select {
 		case <-m.ctx.Done():

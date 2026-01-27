@@ -117,7 +117,6 @@ func HandleGetCallNotifications(c *gin.Context) {
 		c.AbortWithStatus(http.StatusForbidden)
 		return
 	}
-	defer ws.Close()
 
 	meeting, ok := meetingNotifiers[meetingID]
 	if !ok {
