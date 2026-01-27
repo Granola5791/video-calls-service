@@ -24,7 +24,7 @@ func HandleCreateMeeting(c *gin.Context) {
 
 func JoinMeeting(meetingID string, userID int) error {
 	path := fmt.Sprintf("%s/%s/%d", GetStringFromConfig("meeting.dir_path"), meetingID, userID)
-	err := os.MkdirAll(path, os.FileMode(GetIntFromConfig("meeting.dir_perms")))
+	err := os.Mkdir(path, os.FileMode(GetIntFromConfig("meeting.dir_perms")))
 	if err != nil {
 		return err
 	}
