@@ -19,7 +19,7 @@ func GenerateJwtToken(claims jwt.MapClaims, jwtKey []byte) (string, error) {
 func GenerateMeetingToken(meetingID uuid.UUID, jwtKey []byte, expTimeSec int) (string, error) {
 	claims := jwt.MapClaims{
 		GetStringFromConfig("meeting.meeting_id_name"): meetingID,
-		GetStringFromConfig("jwt.exp_name"):       time.Now().Add(time.Second * time.Duration(expTimeSec)).Unix(),
+		GetStringFromConfig("jwt.exp_name"):            time.Now().Add(time.Second * time.Duration(expTimeSec)).Unix(),
 	}
 	return GenerateJwtToken(claims, jwtKey)
 }
@@ -27,8 +27,16 @@ func GenerateMeetingToken(meetingID uuid.UUID, jwtKey []byte, expTimeSec int) (s
 func GenerateLoginToken(userID int, role string, jwtKey []byte, expTimeSec int) (string, error) {
 	claims := jwt.MapClaims{
 		GetStringFromConfig("jwt.user_id_name"): userID,
-		GetStringFromConfig("jwt.role_name"):   role,
-		GetStringFromConfig("jwt.exp_name"):    time.Now().Add(time.Second * time.Duration(expTimeSec)).Unix(),
+		GetStringFromConfig("jwt.role_name"):    role,
+		GetStringFromConfig("jwt.exp_name"):     time.Now().Add(time.Second * time.Duration(expTimeSec)).Unix(),
+	}
+	return GenerateJwtToken(claims, jwtKey)
+}
+
+func GenerateKeepAliveToken(jwtKey []byte, meetingID uuid.UUID, expTimeSec int) (string, error) {
+	claims := jwt.MapClaims{
+		GetStringFromConfig("jwt.meeting_id_name"): meetingID,
+		GetStringFromConfig("jwt.exp_name"):        time.Now().Add(time.Second * time.Duration(expTimeSec)).Unix(),
 	}
 	return GenerateJwtToken(claims, jwtKey)
 }
@@ -42,6 +50,40 @@ func ParseToken(tokenString string, jwtKey []byte) (*jwt.Token, error) {
 	}
 
 	return token, nil
+}
+
+func RequireKeepAliveToken(c *gin.Context) {
+
+	// get cookie
+	tokenName := GetStringFromConfig("keep_alive.token_cookie_name")
+	tokenString, err := c.Cookie(tokenName)
+	if err != nil {
+		c.AbortWithStatus(http.StatusUnauthorized)
+		return
+	}
+
+	// validate token
+	jwtKey := []byte(os.Getenv("KEEP_ALIVE_JWT_SECRET"))
+	token, err := ParseToken(tokenString, jwtKey)
+	if err != nil {
+		c.AbortWithStatus(http.StatusUnauthorized)
+		return
+	}
+
+	// validate token claims
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok {
+		c.AbortWithStatus(http.StatusUnauthorized)
+		return
+	}
+
+	// check if token is expired
+	if claims[GetStringFromConfig("jwt.exp_name")].(float64) < float64(time.Now().Unix()) {
+		c.AbortWithStatus(http.StatusUnauthorized)
+		return
+	}
+
+	c.Next()
 }
 
 func RequireAuthentication(c *gin.Context) {

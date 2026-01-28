@@ -59,6 +59,7 @@ export const HomePageText = {
 export const MeetingExitText = {
     popUpTitles: {
         wrongID: "מזהה פגישה שגוי",
+        error: "אירעה שגיאה",
         left: "יצאת מהפגישה",
         kicked: "הוסרת מהפגישה",
         ended: "הפגישה נגמרה",

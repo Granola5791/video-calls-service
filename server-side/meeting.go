@@ -16,7 +16,6 @@ var (
 	meetingNotifiersMutex sync.Mutex
 )
 
-
 func AddMeetingNotifier(meetingID uuid.UUID) *MeetingNotifierStruct {
 	var meeting MeetingNotifierStruct
 	meeting.Init(meetingID)
@@ -60,6 +59,8 @@ func HandleCreateMeeting(c *gin.Context) {
 
 	meeting := AddMeetingNotifier(meetingID)
 	go meeting.Run()
+
+	AddMeetingKeepAlive(meetingID)
 
 	c.String(http.StatusOK, meetingID.String())
 }
@@ -105,6 +106,18 @@ func HandleJoinMeeting(c *gin.Context) {
 		}
 	}
 
+	// Set cookie
+	token := meetingKeepAliveMap[meetingID].GetToken()
+	http.SetCookie(c.Writer, &http.Cookie{
+		Name:     GetStringFromConfig("keep_alive.token_cookie_name"),
+		Value:    token,
+		Path:     "/",
+		HttpOnly: true,
+		Secure:   true,
+		SameSite: http.SameSiteStrictMode,
+		MaxAge:   GetIntFromConfig("keep_alive.token_exp"),
+	})
+
 	c.JSON(http.StatusOK, meetingParticipants)
 }
 
@@ -133,6 +146,7 @@ func HandleLeaveMeeting(c *gin.Context) {
 	meetingID := uuid.MustParse(c.Param(GetStringFromConfig("server.api.params.meeting_id_name")))
 	err := LeaveMeeting(meetingID, uint(userID))
 	if err != nil {
+		log.Println(err)
 		c.AbortWithStatus(http.StatusBadRequest)
 		return
 	}
@@ -147,6 +161,11 @@ func LeaveMeeting(meetingID uuid.UUID, participantID uint) error {
 	}
 
 	err = RemoveParticipantFromMeetingInDB(meetingID, int(participantID))
+	if err != nil {
+		return err
+	}
+
+	err = RemoveParticipantKeepAlive(meetingID, participantID)
 	if err != nil {
 		return err
 	}
@@ -171,8 +190,19 @@ func RemoveParticipantNotifier(meetingID uuid.UUID, participantID uint) error {
 	return nil
 }
 
+func RemoveParticipantKeepAlive(meetingID uuid.UUID, participantID uint) error {
+	meeting, ok := meetingKeepAliveMap[meetingID]
+	if !ok {
+		return errors.New(GetStringFromConfig("errors.meeting_not_found"))
+	}
+	meeting.RemoveParticipant(participantID)
+	return nil
+}
+
 func RemoveMeeting(meetingID uuid.UUID) error {
 	RemoveMeetingNotifier(meetingID)
+
+	RemoveMeetingKeepAlive(meetingID)
 
 	err := DeleteMeetingFromDB(meetingID)
 	if err != nil {
@@ -180,4 +210,30 @@ func RemoveMeeting(meetingID uuid.UUID) error {
 	}
 
 	return nil
+}
+
+func HandleKeepAlive(c *gin.Context) {
+	userID := c.GetInt(GetStringFromConfig("jwt.user_id_name"))
+	meetingID := uuid.MustParse(c.Param(GetStringFromConfig("server.api.params.meeting_id_name")))
+
+	meeting, ok := meetingKeepAliveMap[meetingID]
+	if !ok {
+		c.AbortWithStatus(http.StatusBadRequest)
+		return
+	}
+	meeting.RefreshParticipantTimer(uint(userID))
+
+	// Set cookie
+	token := meeting.GetToken()
+	http.SetCookie(c.Writer, &http.Cookie{
+		Name:     GetStringFromConfig("keep_alive.token_cookie_name"),
+		Value:    token,
+		Path:     "/",
+		HttpOnly: true,
+		Secure:   true,
+		SameSite: http.SameSiteStrictMode,
+		MaxAge:   GetIntFromConfig("keep_alive.token_exp"),
+	})
+
+	c.Status(http.StatusOK)
 }

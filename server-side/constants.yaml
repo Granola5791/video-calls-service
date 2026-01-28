@@ -24,6 +24,7 @@ server:
     get_call_notifications_path: /get-call-notifications/:meeting_id
     join_meeting_path: /join-meeting/:meeting_id
     leave_meeting_path: /leave-meeting/:meeting_id
+    keep_alive_path: /keep-alive/:meeting_id
 
 jwt:
   token_cookie_name: "auth_token"
@@ -33,6 +34,7 @@ jwt:
   in_meeting_name: "in_meeting"
   exp_name: "exp"
   admin_role: "admin"
+  meeting_id_name: "meeting_id"
 
 errors:
   invalid_input: "Invalid input"
@@ -62,3 +64,8 @@ websocket:
   port: 8082
   read_buffer_size: 1024
   write_buffer_size: 1024
+
+keep_alive:
+  token_exp: 30 # in seconds
+  token_cookie_name: "keep_alive_token"
+  token_regen_interval: 10

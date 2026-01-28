@@ -27,12 +27,14 @@ export const StreamConfig = {
 
 export const MeetingConfig = {
     exitWaitTimeMs: 5000,
+    keepAliveIntervalMs: 10000,
     meetingState: {
         none: 0,
         wrongID: 1,
-        active: 2,
-        ended: 3,
-        left: 4,
-        kicked: 5,
+        error: 2,
+        active: 3,
+        ended: 4,
+        left: 5,
+        kicked: 6,
     }
 }

@@ -24,6 +24,7 @@ const MeetingPage = () => {
     const [participantsIDs, setParticipantsIDs] = React.useState<string[]>([]);
     const [isStreaming, setIsStreaming] = React.useState(false);
     const [meetingState, setMeetingState] = React.useState(MeetingConfig.meetingState.none);
+    const [keepAliveIntervalID, setKeepAliveIntervalID] = React.useState<number>(0);
     const {
         goToHome,
     } = useNavigation();
@@ -40,6 +41,27 @@ const MeetingPage = () => {
             CloseWebCam();
         };
     }, []);
+
+    useEffect(() => {
+        if (keepAliveIntervalID !== 0 && (!(meetingState === MeetingConfig.meetingState.active) || !(meetingState === MeetingConfig.meetingState.none))) {
+            clearInterval(keepAliveIntervalID);
+        }
+    }, [meetingState]);
+
+    const SendKeepAlive = async () => {
+        const res = await fetch(BackendAddressHttp + SetUrlParams(ApiEndpoints.keepAlive, meetingID), {
+            method: 'POST',
+            credentials: 'include',
+        })
+        if (!res.ok) {
+            throw new Error(res.statusText);
+        }
+    }
+
+    const ContinuouslySendKeepAlive = () => {
+        const intervalID = setInterval(SendKeepAlive, MeetingConfig.keepAliveIntervalMs);
+        setKeepAliveIntervalID(intervalID);
+    }
 
     const StartStreaming = () => {
         setIsStreaming(true);
@@ -103,6 +125,7 @@ const MeetingPage = () => {
             StartStreaming();
             await JoinMeetingBackend(meetingID);
             await SubscribeToMeetingUpdates(meetingID);
+            ContinuouslySendKeepAlive();
             setMeetingState(MeetingConfig.meetingState.active);
         } catch (error) {
             console.error(error);
@@ -152,6 +175,9 @@ const MeetingPage = () => {
             case MeetingConfig.meetingState.wrongID:
                 title = MeetingExitText.popUpTitles.wrongID;
                 break;
+            case MeetingConfig.meetingState.error:
+                title = MeetingExitText.popUpTitles.error;
+                break;
             default:
                 title = MeetingExitText.popUpTitles.default;
                 break;
@@ -160,6 +186,7 @@ const MeetingPage = () => {
     }
 
     if (meetingState !== MeetingConfig.meetingState.active && meetingState !== MeetingConfig.meetingState.none) {
+
         const title = GetExitText();
         return (
             <OneButtonPopUp
