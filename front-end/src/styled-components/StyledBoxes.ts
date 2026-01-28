@@ -26,13 +26,16 @@ export const CenteredRow = styled.div({
     borderRadius: '10px',
 })
 
-export const CenteredFilledScreen = styled.div({
+export const CenteredScreen = styled.div({
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
     height: '100vh',
     width: '100vw',
     margin: 'auto',
+})
+
+export const CenteredFilledScreen = styled(CenteredScreen)({
     backgroundColor: Colors.primary,
 })
 

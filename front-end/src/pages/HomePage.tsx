@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { CenteredColumn } from '../styled-components/StyledBoxes'
+import { CenteredColumn, CenteredScreen } from '../styled-components/StyledBoxes'
 import { ApiEndpoints, DasherServerAddressHttp, BackendAddressHttp } from '../constants/backend-constants'
 import { LongButton, LongButtonFilled } from '../styled-components/StyledButtons'
 import { StyledTextField } from '../styled-components/StyledTextFields'
@@ -41,10 +41,10 @@ const HomePage = () => {
 
 
     return (
-        <div>
+        <CenteredScreen>
             <CenteredColumn>
-                <LongButtonFilled onClick={() => setOpenJoinMeetingPopUp(true)}>{HomePageText.joinMeetingButton}</LongButtonFilled>
-                <LongButton onClick={CreateMeeting}>{HomePageText.createMeetingButton}</LongButton>
+                <LongButtonFilled onClick={CreateMeeting}>{HomePageText.createMeetingButton}</LongButtonFilled>
+                <LongButton onClick={() => setOpenJoinMeetingPopUp(true)}>{HomePageText.joinMeetingButton}</LongButton>
 
                 <TwoButtonPopUp
                     open={openJoinMeetingPopUp}
@@ -59,7 +59,7 @@ const HomePage = () => {
                 </TwoButtonPopUp>
 
             </CenteredColumn>
-        </div>
+        </CenteredScreen>
     )
 }
 
