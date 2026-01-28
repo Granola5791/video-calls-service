@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 import { useParams } from 'react-router-dom';
-import { ApiEndpoints, BackendAddressHttp, BackendAddressWS, CallEventTypes, DasherServerAddressHttp, DasherServerAddressWS, SetUrlParams } from '../constants/backend-constants';
+import { ApiEndpoints, BackendAddressHttp, BackendAddressWS, CallEventTypes, DasherServerAddressHttp, DasherServerAddressWS, HttpStatusCodes, SetUrlParams } from '../constants/backend-constants';
 import WebSocketWebCam from '../components/WebSocketWebCam';
 import DashPlayer from '../components/DashPlayer';
 import { StyledMeetingGrid } from '../styled-components/StyledBoxes';
@@ -53,6 +53,11 @@ const MeetingPage = () => {
         if (res.ok) {
             const data = await res.json();
             setParticipantsIDs(NormalizeMeetingIDs(data));
+        } else if (res.status === HttpStatusCodes.BadRequest) {
+            setMeetingState(MeetingConfig.meetingState.wrongID);
+        }
+        if (!res.ok) {
+            throw new Error(res.statusText);
         }
     }
 
@@ -91,13 +96,17 @@ const MeetingPage = () => {
     }
 
     const JoinMeeting = async (meetingID: string) => {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-        streamRef.current = stream;
-        await JoinMeetingDasher(meetingID);
-        StartStreaming();
-        await JoinMeetingBackend(meetingID);
-        await SubscribeToMeetingUpdates(meetingID);
-        setMeetingState(MeetingConfig.meetingState.active);
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+            streamRef.current = stream;
+            await JoinMeetingDasher(meetingID);
+            StartStreaming();
+            await JoinMeetingBackend(meetingID);
+            await SubscribeToMeetingUpdates(meetingID);
+            setMeetingState(MeetingConfig.meetingState.active);
+        } catch (error) {
+            console.error(error);
+        }
     }
 
     const CloseWebCam = () => {
@@ -139,6 +148,9 @@ const MeetingPage = () => {
                 break;
             case MeetingConfig.meetingState.ended:
                 title = MeetingExitText.popUpTitles.ended;
+                break;
+            case MeetingConfig.meetingState.wrongID:
+                title = MeetingExitText.popUpTitles.wrongID;
                 break;
             default:
                 title = MeetingExitText.popUpTitles.default;

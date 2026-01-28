@@ -29,9 +29,10 @@ export const MeetingConfig = {
     exitWaitTimeMs: 5000,
     meetingState: {
         none: 0,
-        active: 1,
-        ended: 2,
-        left: 3,
-        kicked: 4,
+        wrongID: 1,
+        active: 2,
+        ended: 3,
+        left: 4,
+        kicked: 5,
     }
 }
