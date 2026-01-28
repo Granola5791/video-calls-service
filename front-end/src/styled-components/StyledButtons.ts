@@ -31,6 +31,51 @@ export const MediumButton = styled(Button)({
     color: "gray",
 });
 
+export const SmallButton = styled(Button)({
+    width: "100px",
+    height: "35px",
+    fontSize: "12px",
+    fontWeight: "bold",
+    borderRadius: "20px",
+    border: `2px solid lightgray`,
+    color: "gray",
+});
+
+export const AdaptiveButton = styled(Button)({
+    width: 'fit-content',
+    height: '35px',
+    fontSize: '15px',
+    fontWeight: 'bold',
+    borderRadius: '20px',
+    border: `2px solid lightgray`,
+    color: 'gray',
+    padding: '15px 20px',
+})
+
+export const AdaptiveButtonFilled = styled(AdaptiveButton)({
+    color: "white",
+    backgroundColor: Colors.primary,
+    "&:hover": {
+        backgroundColor: Colors.primaryHover,
+    },
+})
+
+export const SmallButtonFilled = styled(SmallButton)({
+    color: "white",
+    backgroundColor: Colors.primary,
+    "&:hover": {
+        backgroundColor: Colors.primaryHover,
+    },
+});
+
+export const MediumButtonFilled = styled(MediumButton)({
+    color: "white",
+    backgroundColor: Colors.primary,
+    "&:hover": {
+        backgroundColor: Colors.primaryHover,
+    },
+});
+
 export const LeaveMeetingButton = styled(MediumButton)({
     color: "white",
     backgroundColor: Colors.danger,

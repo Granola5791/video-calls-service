@@ -3,9 +3,10 @@ import { CenteredColumn } from '../styled-components/StyledBoxes'
 import { ApiEndpoints, DasherServerAddressHttp, BackendAddressHttp } from '../constants/backend-constants'
 import { LongButton, LongButtonFilled } from '../styled-components/StyledButtons'
 import { StyledTextField } from '../styled-components/StyledTextFields'
-import OneButtonPopUp from '../components/OneButtonPopUp'
 import { useNavigation } from '../utils/navigation'
 import { HomePageText } from '../constants/hebrew-constants'
+import TwoButtonPopUp from '../components/TwoButtonPopUp'
+import { Colors } from '../constants/general-contants'
 
 const HomePage = () => {
     const [meetingID, setMeetingID] = useState('');
@@ -39,20 +40,23 @@ const HomePage = () => {
     }
 
 
-
     return (
         <div>
             <CenteredColumn>
-                <LongButtonFilled onClick={() => setOpenJoinMeetingPopUp(true)}>{HomePageText.JoinMeetingButton}</LongButtonFilled>
+                <LongButtonFilled onClick={() => setOpenJoinMeetingPopUp(true)}>{HomePageText.joinMeetingButton}</LongButtonFilled>
                 <LongButton onClick={CreateMeeting}>{HomePageText.createMeetingButton}</LongButton>
 
-                <OneButtonPopUp
+                <TwoButtonPopUp
                     open={openJoinMeetingPopUp}
-                    onButtonClick={() => goToMeeting(meetingID)}
-                    buttonText={HomePageText.SubmitMeetingIDButton}
+                    onButtonClick1={() => { goToMeeting(meetingID) }}
+                    onButtonClick2={() => { setOpenJoinMeetingPopUp(false) }}
+                    buttonText1={HomePageText.submitMeetingIDButton}
+                    buttonText2={HomePageText.cancelMeetingIDButton}
+                    buttonColor1={Colors.primary}
+                    button1Disabled={!meetingID}
                 >
-                    <StyledTextField value={meetingID} onChange={(e) => setMeetingID(e.target.value)} placeholder={HomePageText.MeetingIDInputPlaceholder} />
-                </OneButtonPopUp>
+                    <StyledTextField value={meetingID} onChange={(e) => setMeetingID(e.target.value)} placeholder={HomePageText.meetingIDInputPlaceholder} />
+                </TwoButtonPopUp>
 
             </CenteredColumn>
         </div>

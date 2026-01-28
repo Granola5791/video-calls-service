@@ -14,6 +14,18 @@ export const CenteredColumn = styled.div({
     borderRadius: '10px',
 })
 
+export const CenteredRow = styled.div({
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    margin: 'auto',
+    flexDirection: 'row',
+    gap: '10px',
+    backgroundColor: 'white',
+    padding: '20px',
+    borderRadius: '10px',
+})
+
 export const CenteredFilledScreen = styled.div({
     display: 'flex',
     justifyContent: 'center',

@@ -1,33 +1,33 @@
 import React from 'react'
 import Dialog from '@mui/material/Dialog';
-import Button from '@mui/material/Button';
 import DialogTitle from '@mui/material/DialogTitle';
 import { CenteredColumn } from '../styled-components/StyledBoxes';
+import { AdaptiveButtonFilled } from '../styled-components/StyledButtons';
 
 interface OneButtonPopUpProps {
     open: boolean
-    theme?: 'error' | 'info' | 'success' | 'warning'
+    theme?: string
     title?: string
     buttonText?: string
     onButtonClick?: () => void
+    disabled?: boolean
     children?: React.ReactNode
 }
 
-const OneButtonPopUp = ({ open, theme = 'success', title = '', buttonText = 'OK', onButtonClick, children }: OneButtonPopUpProps) => {
+const OneButtonPopUp = ({ open, theme = '', title = '', buttonText = 'OK', onButtonClick, disabled = false, children }: OneButtonPopUpProps) => {
 
     return (
-        <Dialog color='error' open={open} onClose={() => { }}>
+        <Dialog open={open} onClose={() => { }}>
             <CenteredColumn>
                 {title && <DialogTitle>{title}</DialogTitle>}
                 {children}
-                <Button
-                    size='small'
-                    variant="contained"
-                    color={theme}
+                <AdaptiveButtonFilled
+                    sx={{ color: theme }}
                     onClick={onButtonClick}
+                    disabled={disabled}
                 >
                     {buttonText}
-                </Button>
+                </AdaptiveButtonFilled>
             </CenteredColumn>
         </Dialog>
     )

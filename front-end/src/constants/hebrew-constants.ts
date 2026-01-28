@@ -50,9 +50,10 @@ export const Stream = {
 
 export const HomePageText = {
     createMeetingButton: "צור פגישה חדשה",
-    JoinMeetingButton: "הצטרף לפגישה",
-    SubmitMeetingIDButton: "המשך",
-    MeetingIDInputPlaceholder: "הכנס מזהה פגישה",
+    joinMeetingButton: "הצטרף לפגישה",
+    submitMeetingIDButton: "המשך",
+    cancelMeetingIDButton: "ביטול",
+    meetingIDInputPlaceholder: "הכנס מזהה פגישה",
 };
 
 export const MeetingExitText = {
