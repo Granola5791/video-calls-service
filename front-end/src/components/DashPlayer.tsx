@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import shaka from 'shaka-player/dist/shaka-player.ui';
 import 'shaka-player/dist/controls.css';
 import { StyledVideo } from '../styled-components/StyledVideos';
@@ -11,7 +11,6 @@ interface DashPlayerProps {
 
 const DashPlayer = ({ url }: DashPlayerProps) => {
     const videoRef = useRef<HTMLVideoElement>(null);
-    const containerRef = useRef<HTMLDivElement>(null);
     const playerRef = useRef<shaka.Player | null>(null);
 
     useEffect(() => {
@@ -44,7 +43,7 @@ const DashPlayer = ({ url }: DashPlayerProps) => {
     const startStream = async () => {
         await WaitUntilAvailable(url);
 
-        if (!videoRef.current || !containerRef.current) return;
+        if (!videoRef.current) return;
 
         const player = new shaka.Player(videoRef.current);
         playerRef.current = player;
@@ -82,9 +81,7 @@ const DashPlayer = ({ url }: DashPlayerProps) => {
     };
 
     return (
-        <div ref={containerRef}>
-            <StyledVideo ref={videoRef} />
-        </div>
+        <StyledVideo ref={videoRef} />
     );
 };
 

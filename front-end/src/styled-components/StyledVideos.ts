@@ -3,7 +3,7 @@ import styled from "@emotion/styled";
 export const StyledVideo = styled.video({
     width: '100%',
     height: '100%',
-    objectFit: 'cover',
+    objectFit: 'contain',
 });
 
 export const StyledMeetingGridTile = styled.div({
@@ -13,4 +13,5 @@ export const StyledMeetingGridTile = styled.div({
     backgroundColor: "black",
     overflow: "hidden",
     borderRadius: "8px",
+    padding: "0px",
 });

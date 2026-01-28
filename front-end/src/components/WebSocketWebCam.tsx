@@ -6,7 +6,7 @@ interface WebSocketWebCamProps {
     wsUrl: string
 }
 
-const WebSocketWebCam = ({ wsUrl}: WebSocketWebCamProps) => {
+const WebSocketWebCam = ({ wsUrl }: WebSocketWebCamProps) => {
     const videoRef = useRef<HTMLVideoElement>(null);
     const wsRef = useRef<WebSocket | null>(null);
     const recorderRef = useRef<MediaRecorder | null>(null);
@@ -70,14 +70,12 @@ const WebSocketWebCam = ({ wsUrl}: WebSocketWebCamProps) => {
     };
 
     return (
-        <div>
-            <StyledVideo
-                ref={videoRef}
-                autoPlay
-                playsInline
-                muted
-            />
-        </div>
+        <StyledVideo
+            ref={videoRef}
+            autoPlay
+            playsInline
+            muted
+        />
     )
 }
 
