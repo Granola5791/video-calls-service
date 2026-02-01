@@ -28,7 +28,9 @@ func InitRouter() {
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowHeaders:     []string{"Content-Type"},
 		AllowCredentials: true,
-	}))
+	}),
+		RequireKeepAliveToken,
+	)
 
 	router.GET(GetStringFromConfig("server.api.stream_from_client_path"), RequireAuthentication, HandleStream)
 

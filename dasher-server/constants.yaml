@@ -29,3 +29,7 @@ auth_jwt:
 
 logger:
   ffmpeg_log_file: "./ffmpeg.log"
+
+keep_alive:
+  exp_name: "exp"
+  token_cookie_name: "keep_alive_token"
