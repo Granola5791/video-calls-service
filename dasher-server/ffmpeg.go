@@ -10,7 +10,6 @@ import (
 func InitMpegDash(meetingID string, userID int) (*exec.Cmd, io.WriteCloser, error) {
 	cmd := exec.Command(
 		"ffmpeg",
-		"-re",
 		"-f", "webm",
 		"-i", "pipe:0",
 
@@ -25,29 +24,29 @@ func InitMpegDash(meetingID string, userID int) (*exec.Cmd, io.WriteCloser, erro
 		"-map", "[v3out]",
 
 		"-map", "0:a",
-		"-c:a", "aac",
-		"-b:a", "128k",
+		"-c:a", "libopus",
+		"-b:a", "96k",
 
 		"-c:v", "libx264",
 		"-preset", "ultrafast",
 		"-tune", "zerolatency",
 
-		"-r", "30",
+		"-r", "15",
 
-		"-g", "30",
-		"-keyint_min", "30",
+		"-g", "15",
+		"-keyint_min", "15",
 		"-sc_threshold", "0",
 
 		"-profile:v", "main",
 
-		"-b:v:0", "3000k",
-		"-b:v:1", "1500k",
-		"-b:v:2", "800k",
+		"-b:v:0", "1200k",
+		"-b:v:1", "750k",
+		"-b:v:2", "300k",
 
 		"-f", "dash",
 		"-ldash", "1",
 		"-streaming", "1",
-		"-seg_duration", "1",
+		"-seg_duration", "0.5",
 		"-use_template", "1",
 		"-use_timeline", "1",
 		"-window_size", "5",
