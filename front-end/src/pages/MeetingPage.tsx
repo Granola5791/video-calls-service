@@ -1,13 +1,12 @@
 import React, { useEffect } from 'react'
 import { useParams } from 'react-router-dom';
 import { ApiEndpoints, BackendAddressHttp, BackendAddressWS, CallEventTypes, DasherServerAddressHttp, DasherServerAddressWS, HttpStatusCodes, SetUrlParams } from '../constants/backend-constants';
-import WebSocketWebCam from '../components/WebSocketWebCam';
 import DashPlayer from '../components/DashPlayer';
 import { StyledMeetingGrid } from '../styled-components/StyledBoxes';
-import { StyledMeetingGridTile } from '../styled-components/StyledVideos';
+import { StyledMeetingGridTile, StyledVideo } from '../styled-components/StyledVideos';
 import OneButtonPopUp from '../components/OneButtonPopUp';
 import { useNavigation } from '../utils/navigation';
-import { MeetingConfig } from '../constants/general-contants';
+import { MeetingConfig, StreamConfig } from '../constants/general-contants';
 import { MeetingExitText } from '../constants/hebrew-constants';
 import { StyledMeetingFooter } from '../styled-components/StyledFooters';
 
@@ -19,10 +18,11 @@ const NormalizeMeetingIDs = (meetingIDs: unknown): string[] => {
 const MeetingPage = () => {
 
     const { meetingID } = useParams();
-    const wsRef = React.useRef<WebSocket | null>(null);
-    const streamRef = React.useRef<MediaStream | null>(null);
+    const streamWsRef = React.useRef<WebSocket | null>(null);
+    const notificationsWsRef = React.useRef<WebSocket | null>(null);
+    const clientVideoRef = React.useRef<HTMLVideoElement>(null);
+    const recorderRef = React.useRef<MediaRecorder | null>(null);
     const [participantsIDs, setParticipantsIDs] = React.useState<string[]>([]);
-    const [isStreaming, setIsStreaming] = React.useState(false);
     const [meetingState, setMeetingState] = React.useState(MeetingConfig.meetingState.none);
     const [keepAliveIntervalID, setKeepAliveIntervalID] = React.useState<number>(0);
     const {
@@ -35,10 +35,8 @@ const MeetingPage = () => {
         }
 
         return () => {
-            if (wsRef.current) {
-                wsRef.current.close();
-            }
-            CloseWebCam();
+            CloseNotificationsConnection();
+            StopStream();
         };
     }, []);
 
@@ -47,6 +45,12 @@ const MeetingPage = () => {
             clearInterval(keepAliveIntervalID);
         }
     }, [meetingState]);
+
+    const CloseNotificationsConnection = () => {
+        if (notificationsWsRef.current) {
+            notificationsWsRef.current.close();
+        }
+    }
 
     const SendKeepAlive = async () => {
         const res = await fetch(BackendAddressHttp + SetUrlParams(ApiEndpoints.keepAlive, meetingID), {
@@ -63,8 +67,44 @@ const MeetingPage = () => {
         setKeepAliveIntervalID(intervalID);
     }
 
-    const StartStreaming = () => {
-        setIsStreaming(true);
+    const StartStreaming = async (wsUrl: string) => {
+        // Ask for camera access
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+
+        if (clientVideoRef.current?.srcObject) {
+            throw new Error('Already streaming');
+        }
+        // Show preview
+        if (clientVideoRef.current) {
+            clientVideoRef.current.srcObject = stream;
+            await clientVideoRef.current.play();
+        }
+
+        // Connect to WebSocket
+        const ws = new WebSocket(wsUrl);
+        streamWsRef.current = ws;
+
+        // Start MediaRecorder
+        const mimeType = 'video/webm; codecs=vp8,opus';
+        const recorder = new MediaRecorder(stream, { mimeType });
+        recorderRef.current = recorder;
+
+        recorder.ondataavailable = (event: BlobEvent) => {
+            if (event.data.size > 0) {
+                event.data.arrayBuffer().then((buffer) => {
+                    if (ws.readyState === WebSocket.OPEN) {
+                        ws.send(buffer);
+                        console.log(StreamConfig.sentChunkMsg, new Date().toISOString());
+                    }
+                });
+            }
+        };
+
+        ws.onmessage = (event) => {
+            if (event.data === StreamConfig.serverReadyMsg) {
+                recorder.start(StreamConfig.chunkIntervalMs); // Send data every second
+            }
+        }
     };
 
     const JoinMeetingBackend = async (meetingID: string) => {
@@ -85,7 +125,7 @@ const MeetingPage = () => {
 
     const SubscribeToMeetingUpdates = async (meetingID: string) => {
         const ws = new WebSocket(BackendAddressWS + SetUrlParams(ApiEndpoints.getCallNotifications, meetingID));
-        wsRef.current = ws;
+        notificationsWsRef.current = ws;
         ws.onmessage = (event) => {
             const data = JSON.parse(event.data);
             const participantID = data.participant_id
@@ -103,7 +143,7 @@ const MeetingPage = () => {
         };
 
         ws.onclose = () => {
-            wsRef.current = null;
+            notificationsWsRef.current = null;
         };
     };
 
@@ -119,10 +159,8 @@ const MeetingPage = () => {
 
     const JoinMeeting = async (meetingID: string) => {
         try {
-            const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-            streamRef.current = stream;
             await JoinMeetingDasher(meetingID);
-            StartStreaming();
+            await StartStreaming(DasherServerAddressWS + SetUrlParams(ApiEndpoints.startStream, meetingID));
             await JoinMeetingBackend(meetingID);
             await SubscribeToMeetingUpdates(meetingID);
             ContinuouslySendKeepAlive();
@@ -132,20 +170,28 @@ const MeetingPage = () => {
         }
     }
 
-    const CloseWebCam = () => {
-        streamRef.current?.getTracks().forEach((track) => track.stop());
-        streamRef.current = null;
-    }
+    const StopStream = () => {
+        if (recorderRef.current) {
+            recorderRef.current.stop();
+        }
+        if (streamWsRef.current) {
+            streamWsRef.current.close();
+        }
+        if (clientVideoRef.current && clientVideoRef.current.srcObject) {
+            const stream = clientVideoRef.current.srcObject as MediaStream;
+            stream.getTracks().forEach(track => track.stop());
+        }
+    };
 
     const LeaveMeeting = async () => {
         const LeaveMeetingFrontend = async (state: number) => {
             setMeetingState(state);
-            CloseWebCam();
+            StopStream();
             setTimeout(() => { goToHome() }, MeetingConfig.exitWaitTimeMs)
         }
 
         const LeaveMeetingDasher = () => {
-            wsRef.current?.close();
+            notificationsWsRef.current?.close();
         }
 
         const LeaveMeetingBackend = async () => {
@@ -207,10 +253,12 @@ const MeetingPage = () => {
             <StyledMeetingGrid>
                 {
                     <StyledMeetingGridTile>
-                        {isStreaming && <WebSocketWebCam
-                            wsUrl={DasherServerAddressWS + SetUrlParams(ApiEndpoints.startStream, meetingID!)}
+                        <StyledVideo
+                            ref={clientVideoRef}
+                            autoPlay
+                            playsInline
+                            muted
                         />
-                        }
                     </StyledMeetingGridTile>
                 }
                 {

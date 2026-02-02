@@ -46,7 +46,11 @@ func (m *MeetingNotifierStruct) RemoveParticipant(participantID uint) {
 	m.lock()
 	defer m.unlock()
 	m.notificationChanIn <- ParticipantNotification{ParticipantID: participantID, Event: ParticipantLeft}
-	m.participants[participantID].Close()
+	participant, ok := m.participants[participantID]
+	if !ok {
+		return
+	}
+	participant.Close()
 	delete(m.participants, participantID)
 }
 
