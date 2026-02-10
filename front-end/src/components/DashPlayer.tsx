@@ -51,14 +51,18 @@ const DashPlayer = ({ url }: DashPlayerProps) => {
         player.configure({
             streaming: {
                 lowLatencyMode: true,
-                bufferingGoal: 1,       // seconds to buffer normally
+                bufferingGoal: 1.5,       // seconds to buffer normally
                 rebufferingGoal: 0.5,     // seconds to buffer after a stall
+                updateIntervalSeconds: 1,
                 liveSync: {
                     enabled: true,
-                    targetLatency: 1,
-                    targetLatencyTolerance: 1,
+                    targetLatency: 0.5,
+                    targetLatencyTolerance: 0.5,
                     maxPlaybackRate: 1.25,
                 },
+            },
+            manifest: {
+                updatePeriod: 0.5,
             },
         });
 

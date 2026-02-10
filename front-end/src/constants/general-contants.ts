@@ -20,7 +20,7 @@ export const WebCamConfig = {
 
 export const StreamConfig = {
     serverReadyMsg: 'READY',
-    chunkIntervalMs: 2000, // 2 seconds
+    chunkIntervalMs: 500, // 0.5 seconds
     sentChunkMsg: 'Sent chunk at',
     checkStreamAvailabilityIntervalMs: 2000, // 2 seconds
 }
