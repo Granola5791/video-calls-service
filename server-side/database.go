@@ -27,6 +27,7 @@ type User struct {
 
 type Meeting struct {
 	UuidModel
+	BannedUsers []User `gorm:"many2many:meeting_banned_users;"`
 }
 
 type MeetingParticipant struct {
@@ -134,7 +135,9 @@ func AddParticipantToMeetingInDB(meetingID uuid.UUID, userID int) error {
 }
 
 func RemoveParticipantFromMeetingInDB(meetingID uuid.UUID, userID int) error {
-	return db.Where("meeting_id = ? AND user_id = ?", meetingID, userID).
+	return db.
+		Unscoped().
+		Where("meeting_id = ? AND user_id = ?", meetingID, userID).
 		Delete(&MeetingParticipant{}).Error
 }
 
