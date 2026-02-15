@@ -38,6 +38,13 @@ type MeetingParticipant struct {
 	Meeting   Meeting   `gorm:"foreignKey:MeetingID"`
 }
 
+type MeetingEvent struct {
+	gorm.Model
+	MeetingID uuid.UUID `gorm:"not null"`
+	UserID uint   `gorm:"not null"`
+	Event  string `gorm:"not null"`
+}
+
 type UserAuth struct {
 	HashedPassword string `gorm:"not null"`
 	Salt           string `gorm:"not null"`
@@ -67,7 +74,7 @@ func InitDatabaseConnection() error {
 		return err
 	}
 
-	err = db.AutoMigrate(&User{}, &Meeting{}, &MeetingParticipant{})
+	err = db.AutoMigrate(&User{}, &Meeting{}, &MeetingParticipant{}, &MeetingEvent{})
 	if err != nil {
 		return err
 	}
@@ -134,7 +141,7 @@ func AddParticipantToMeetingInDB(meetingID uuid.UUID, userID int) error {
 	return db.Create(&meetingParticipant).Error
 }
 
-func RemoveParticipantFromMeetingInDB(meetingID uuid.UUID, userID int) error {
+func RemoveParticipantFromMeetingInDB(meetingID uuid.UUID, userID uint) error {
 	return db.
 		Unscoped().
 		Where("meeting_id = ? AND user_id = ?", meetingID, userID).
@@ -205,4 +212,13 @@ func IsMeetingEmptyInDB(meetingID uuid.UUID) (bool, error) {
 func DeleteMeetingFromDB(meetingID uuid.UUID) error {
 	return db.Where("id = ?", meetingID).
 		Delete(&Meeting{}).Error
+}
+
+func LogEventToDB(meetingID uuid.UUID, userID uint, event string) error {
+	meetingEvent := MeetingEvent{
+		MeetingID: meetingID,
+		UserID:    userID,
+		Event:     event,
+	}
+	return db.Create(&meetingEvent).Error
 }

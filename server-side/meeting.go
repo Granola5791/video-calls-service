@@ -118,6 +118,11 @@ func HandleJoinMeeting(c *gin.Context) {
 		MaxAge:   GetIntFromConfig("keep_alive.token_exp"),
 	})
 
+	err = LogEventToDB(meetingID, uint(userID), GetStringFromConfig("database.meeting_events.participant_joined"))
+	if err != nil {
+		log.Println(err)
+	}
+
 	c.JSON(http.StatusOK, meetingParticipants)
 }
 
@@ -151,6 +156,11 @@ func HandleLeaveMeeting(c *gin.Context) {
 		return
 	}
 
+	err = LogEventToDB(meetingID, uint(userID), GetStringFromConfig("database.meeting_events.participant_left"))
+	if err != nil {
+		log.Println(err)
+	}
+
 	c.Status(http.StatusOK)
 }
 
@@ -160,7 +170,7 @@ func LeaveMeeting(meetingID uuid.UUID, participantID uint) error {
 		return err
 	}
 
-	err = RemoveParticipantFromMeetingInDB(meetingID, int(participantID))
+	err = RemoveParticipantFromMeetingInDB(meetingID, participantID)
 	if err != nil {
 		return err
 	}

@@ -50,7 +50,10 @@ func (m *MeetingKeepAliveStruct) AddParticipant(participantID uint) {
 	exp := GetIntFromConfig("keep_alive.token_exp")
 	m.mutex.Lock()
 	defer m.mutex.Unlock()
-	m.Participants[participantID] = time.AfterFunc(time.Duration(exp)*time.Second, func() { LeaveMeeting(m.ID, participantID) })
+	m.Participants[participantID] = time.AfterFunc(time.Duration(exp)*time.Second, func() {
+		LogEventToDB(m.ID, participantID, GetStringFromConfig("database.meeting_events.participant_timeout"))
+		LeaveMeeting(m.ID, participantID)
+	})
 }
 
 func (m *MeetingKeepAliveStruct) RemoveParticipant(participantID uint) {

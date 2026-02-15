@@ -8,6 +8,10 @@ hash:
 database:
   sslmode: disable
   timezone: Asia/Jerusalem
+  meeting_events:
+    participant_left: "Participant left"
+    participant_joined: "Participant joined"
+    participant_timeout: "Participant timeout"
 
 server:
   listen_addr: "localhost:8081"
