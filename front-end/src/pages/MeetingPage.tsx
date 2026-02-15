@@ -115,7 +115,7 @@ const MeetingPage = () => {
         if (res.ok) {
             const data = await res.json();
             setParticipantsIDs(NormalizeMeetingIDs(data));
-        } else if (res.status === HttpStatusCodes.BadRequest) {
+        } else if (res.status === HttpStatusCodes.BadRequest || res.status === HttpStatusCodes.NotFound) {
             setMeetingState(MeetingConfig.meetingState.wrongID);
         }
         if (!res.ok) {
