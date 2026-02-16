@@ -37,14 +37,11 @@ const MeetingPage = () => {
         return () => {
             CloseNotificationsConnection();
             StopStream();
+            if (keepAliveIntervalID !== 0) {
+                clearInterval(keepAliveIntervalID);
+            }
         };
     }, []);
-
-    useEffect(() => {
-        if (keepAliveIntervalID !== 0 && (!(meetingState === MeetingConfig.meetingState.active) || !(meetingState === MeetingConfig.meetingState.none))) {
-            clearInterval(keepAliveIntervalID);
-        }
-    }, [meetingState]);
 
     const CloseNotificationsConnection = () => {
         if (notificationsWsRef.current) {
@@ -115,7 +112,7 @@ const MeetingPage = () => {
         if (res.ok) {
             const data = await res.json();
             setParticipantsIDs(NormalizeMeetingIDs(data));
-        } else if (res.status === HttpStatusCodes.BadRequest || res.status === HttpStatusCodes.NotFound) {
+        } else if (res.status === HttpStatusCodes.NotFound) {
             setMeetingState(MeetingConfig.meetingState.wrongID);
         }
         if (!res.ok) {
@@ -159,9 +156,9 @@ const MeetingPage = () => {
 
     const JoinMeeting = async (meetingID: string) => {
         try {
+            await JoinMeetingBackend(meetingID);
             await JoinMeetingDasher(meetingID);
             await StartStreaming(DasherServerAddressWS + SetUrlParams(ApiEndpoints.startStream, meetingID));
-            await JoinMeetingBackend(meetingID);
             await SubscribeToMeetingUpdates(meetingID);
             ContinuouslySendKeepAlive();
             setMeetingState(MeetingConfig.meetingState.active);

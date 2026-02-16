@@ -29,7 +29,7 @@ const DashPlayer = ({ url }: DashPlayerProps) => {
         let res, available = false;
         while (!available) {
             try {
-                res = await fetch(url, { method: 'HEAD' });
+                res = await fetch(url, { method: 'HEAD', credentials: 'include' });
                 if (res.ok) {
                     available = true;
                 }
@@ -67,6 +67,11 @@ const DashPlayer = ({ url }: DashPlayerProps) => {
         });
 
         console.log(player.getConfiguration());
+
+        const networkingEngine = player.getNetworkingEngine();
+        networkingEngine?.registerRequestFilter((type, request) => {
+            request.allowCrossSiteCredentials = true;
+        });
 
 
         await player.load(url);

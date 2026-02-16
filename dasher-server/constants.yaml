@@ -16,6 +16,7 @@ stream:
 errors:
   forbidden: "We don't allow your kind in here."
   internal: "Something went wrong on our side."
+  passed_exp: "Your token is expired."
 
 meeting:
   meeting_id_name: "meeting_id"
