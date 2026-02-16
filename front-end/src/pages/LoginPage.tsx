@@ -9,6 +9,7 @@ import { ApiEndpoints, BackendAddressHttp, HttpStatusCodes } from "../constants/
 import { useNavigation } from "../utils/navigation"
 import { Typography } from "@mui/material"
 import { Link } from "react-router-dom"
+import { LocalStorage } from "../constants/general-contants"
 
 const LoginPage = () => {
 
@@ -28,6 +29,9 @@ const LoginPage = () => {
         })
         switch (res.status) {
             case HttpStatusCodes.OK:
+                const data = await res.json();
+                localStorage.setItem(LocalStorage.id, data.id);
+                localStorage.setItem(LocalStorage.role, data.role);
                 GoToHome();
                 break;
             case HttpStatusCodes.Unauthorized:

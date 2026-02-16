@@ -6,7 +6,7 @@ import { StyledMeetingGrid } from '../styled-components/StyledBoxes';
 import { StyledMeetingGridTile, StyledVideo } from '../styled-components/StyledVideos';
 import OneButtonPopUp from '../components/OneButtonPopUp';
 import { useNavigation } from '../utils/navigation';
-import { MeetingConfig, StreamConfig } from '../constants/general-contants';
+import { LocalStorage, MeetingConfig, StreamConfig } from '../constants/general-contants';
 import { HostOptions, MeetingExitText } from '../constants/hebrew-constants';
 import { StyledMeetingFooter } from '../styled-components/StyledFooters';
 
@@ -17,6 +17,7 @@ const NormalizeMeetingIDs = (meetingIDs: unknown): string[] => {
 
 const MeetingPage = () => {
 
+    const ID = localStorage.getItem(LocalStorage.id);
     const { meetingID } = useParams();
     const streamWsRef = React.useRef<WebSocket | null>(null);
     const notificationsWsRef = React.useRef<WebSocket | null>(null);
@@ -57,6 +58,9 @@ const MeetingPage = () => {
             credentials: 'include',
         })
         if (!res.ok) {
+            if(res.status === HttpStatusCodes.Unauthorized) {
+                setMeetingState(MeetingConfig.meetingState.kicked)
+            }
             throw new Error(res.statusText);
         }
     }
@@ -154,6 +158,7 @@ const MeetingPage = () => {
         };
 
         ws.onclose = () => {
+            console.log('Connection closed');
             notificationsWsRef.current = null;
         };
     };
@@ -206,6 +211,7 @@ const MeetingPage = () => {
         }
 
         const LeaveMeetingBackend = async () => {
+            notificationsWsRef.current?.close();
             await fetch(BackendAddressHttp + SetUrlParams(ApiEndpoints.leaveMeeting, meetingID), {
                 method: 'POST',
                 credentials: 'include',

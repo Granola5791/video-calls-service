@@ -62,5 +62,5 @@ func HandleLogin(c *gin.Context) {
 		MaxAge:   GetIntFromConfig("jwt.token_exp"),
 	})
 
-	c.JSON(http.StatusOK, gin.H{"success": GetStringFromConfig("success.login_successful"), "role": role})
+	c.JSON(http.StatusOK, gin.H{"id": userID, "role": role})
 }

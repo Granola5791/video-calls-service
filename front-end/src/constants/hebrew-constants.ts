@@ -61,7 +61,7 @@ export const MeetingExitText = {
         wrongID: "מזהה פגישה שגוי",
         error: "אירעה שגיאה",
         left: "יצאת מהפגישה",
-        kicked: "הוסרת מהפגישה",
+        kicked: "הועפת מהפגישה",
         ended: "הפגישה נגמרה",
         default: "יצאת מהפגישה",
     },

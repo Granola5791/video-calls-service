@@ -38,3 +38,8 @@ export const MeetingConfig = {
         kicked: 6,
     }
 }
+
+export const LocalStorage = {
+    id : 'id',
+    role: 'role'
+}
