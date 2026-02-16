@@ -27,6 +27,7 @@ type User struct {
 
 type Meeting struct {
 	UuidModel
+	HostID       uint `gorm:"not null"`
 	BannedUsers []User `gorm:"many2many:meeting_banned_users;"`
 }
 
@@ -41,8 +42,8 @@ type MeetingParticipant struct {
 type MeetingEvent struct {
 	gorm.Model
 	MeetingID uuid.UUID `gorm:"not null"`
-	UserID uint   `gorm:"not null"`
-	Event  string `gorm:"not null"`
+	UserID    uint      `gorm:"not null"`
+	Event     string    `gorm:"not null"`
 }
 
 type UserAuth struct {
@@ -124,8 +125,8 @@ func GetUserIDAndRoleFromDB(username string) (int, string, error) {
 	return int(user.ID), user.Role, nil
 }
 
-func CreateMeetingInDB(hostID int) (uuid.UUID, error) {
-	meeting := Meeting{}
+func CreateMeetingInDB(hostID uint) (uuid.UUID, error) {
+	meeting := Meeting{HostID: hostID}
 	err := db.Create(&meeting).Error
 	if err != nil {
 		return uuid.Nil, err
@@ -221,4 +222,26 @@ func LogEventToDB(meetingID uuid.UUID, userID uint, event string) error {
 		Event:     event,
 	}
 	return db.Create(&meetingEvent).Error
+}
+
+func IsHostOfMeetingInDB(meetingID uuid.UUID, userID uint) (bool, error) {
+	var count int64
+	err := db.Model(&Meeting{}).
+		Where("id = ?", meetingID).
+		Where("host_id = ?", userID).
+		Count(&count).Error
+	if err != nil {
+		return false, err
+	}
+	return count > 0, nil
+}
+
+func BanUserFromMeetingInDB(meetingID uuid.UUID, userID uint) error {
+	meeting := Meeting{UuidModel: UuidModel{ID: meetingID}}
+	user := User{Model: gorm.Model{ID: userID}}
+	err := db.
+		Model(&meeting).
+		Association("BannedUsers").
+		Append(&user)
+	return err
 }

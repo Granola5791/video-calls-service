@@ -7,7 +7,7 @@ import { StyledMeetingGridTile, StyledVideo } from '../styled-components/StyledV
 import OneButtonPopUp from '../components/OneButtonPopUp';
 import { useNavigation } from '../utils/navigation';
 import { MeetingConfig, StreamConfig } from '../constants/general-contants';
-import { MeetingExitText } from '../constants/hebrew-constants';
+import { HostOptions, MeetingExitText } from '../constants/hebrew-constants';
 import { StyledMeetingFooter } from '../styled-components/StyledFooters';
 
 
@@ -25,6 +25,8 @@ const MeetingPage = () => {
     const [participantsIDs, setParticipantsIDs] = React.useState<string[]>([]);
     const [meetingState, setMeetingState] = React.useState(MeetingConfig.meetingState.none);
     const [keepAliveIntervalID, setKeepAliveIntervalID] = React.useState<number>(0);
+    const [isHost, setIsHost] = React.useState(false);
+    const [hostOptions, setHostOptions] = React.useState<{ label: string, onClick: (userID: string) => void }[]>([]);
     const {
         goToHome,
     } = useNavigation();
@@ -62,6 +64,12 @@ const MeetingPage = () => {
     const ContinuouslySendKeepAlive = () => {
         const intervalID = setInterval(SendKeepAlive, MeetingConfig.keepAliveIntervalMs);
         setKeepAliveIntervalID(intervalID);
+    }
+
+    const ActivateHostOptions = () => {
+        setHostOptions([
+            { label: HostOptions.kick, onClick: KickFromMeeting },
+        ]);
     }
 
     const StartStreaming = async (wsUrl: string) => {
@@ -111,7 +119,13 @@ const MeetingPage = () => {
         })
         if (res.ok) {
             const data = await res.json();
-            setParticipantsIDs(NormalizeMeetingIDs(data));
+            const participants = data.participants
+            const is_host = data.is_host
+            setParticipantsIDs(NormalizeMeetingIDs(participants));
+            setIsHost(is_host);
+            if (is_host) {
+                ActivateHostOptions();
+            }
         } else if (res.status === HttpStatusCodes.NotFound) {
             setMeetingState(MeetingConfig.meetingState.wrongID);
         }
@@ -203,6 +217,13 @@ const MeetingPage = () => {
         LeaveMeetingFrontend(MeetingConfig.meetingState.left);
     }
 
+    const KickFromMeeting = async (userID: string) => {
+        await fetch(BackendAddressHttp + SetUrlParams(ApiEndpoints.kickParticipant, meetingID, userID), {
+            method: 'POST',
+            credentials: 'include',
+        })
+    }
+
     const GetExitText = () => {
         let title = '';
         switch (meetingState) {
@@ -261,7 +282,11 @@ const MeetingPage = () => {
                 {
                     participantsIDs.map((id) => (
                         <StyledMeetingGridTile key={id}>
-                            <DashPlayer url={SetUrlParams(DasherServerAddressHttp + ApiEndpoints.getStream, meetingID, id)} />
+                            <DashPlayer
+                                userID={id}
+                                url={SetUrlParams(DasherServerAddressHttp + ApiEndpoints.getStream, meetingID, id)}
+                                menuOptions={hostOptions}
+                            />
                         </StyledMeetingGridTile>
                     ))
                 }

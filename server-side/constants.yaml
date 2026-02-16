@@ -12,6 +12,7 @@ database:
     participant_left: "Participant left"
     participant_joined: "Participant joined"
     participant_timeout: "Participant timeout"
+    participant_kicked_by_host: "Participant kicked by host"
 
 server:
   listen_addr: "localhost:8081"
@@ -19,6 +20,7 @@ server:
   api:
     params:
       meeting_id_name: "meeting_id"
+      user_to_kick_name: "user_to_kick"
 
     check_login_path: /check-login
     check_admin_path: /check-admin
@@ -29,6 +31,8 @@ server:
     join_meeting_path: /join-meeting/:meeting_id
     leave_meeting_path: /leave-meeting/:meeting_id
     keep_alive_path: /keep-alive/:meeting_id
+    kick_participant_path: "kick-participant/:meeting_id/:user_to_kick"
+
 
 jwt:
   token_cookie_name: "auth_token"
@@ -60,6 +64,8 @@ meeting:
   meeting_id_name: "meeting_id"
   token_name: "meeting_token"
   token_exp: 3600 # in seconds
+  is_host_name: "is_host"
+  participants_name: "participants"
 
 notifications:
   channel_buffer_size: 16

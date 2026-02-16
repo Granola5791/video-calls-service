@@ -68,3 +68,7 @@ export const MeetingExitText = {
     popUpSubtitle: "מיד תועבר לדף הבית",
     popUpButton: "חזרה לדף הבית",
 };
+
+export const HostOptions = {
+    kick: "הסר מהפגישה",
+}

@@ -1,17 +1,22 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import shaka from 'shaka-player/dist/shaka-player.ui';
 import 'shaka-player/dist/controls.css';
 import { StyledVideo } from '../styled-components/StyledVideos';
 import { StreamConfig } from '../constants/general-contants';
 import { Sleep } from '../utils/sleep';
+import { Menu, MenuItem } from '@mui/material';
 
 interface DashPlayerProps {
+    userID: string;
     url: string;
+    menuOptions: { label: string; onClick: (userID: string) => void }[];
 }
 
-const DashPlayer = ({ url }: DashPlayerProps) => {
+const DashPlayer = ({ userID, url, menuOptions }: DashPlayerProps) => {
     const videoRef = useRef<HTMLVideoElement>(null);
     const playerRef = useRef<shaka.Player | null>(null);
+    const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
+    const openMenu = Boolean(menuAnchorEl);
 
     useEffect(() => {
         try {
@@ -97,8 +102,25 @@ const DashPlayer = ({ url }: DashPlayerProps) => {
         }
     };
 
+    const handleContextMenu = (event: React.MouseEvent<HTMLVideoElement>) => {
+        event.preventDefault();
+        setMenuAnchorEl(event.currentTarget);
+    };
+
     return (
-        <StyledVideo ref={videoRef} />
+        <>
+            <StyledVideo
+                ref={videoRef}
+                onContextMenu={handleContextMenu}
+            />
+            <Menu anchorEl={menuAnchorEl} open={openMenu} onClose={() => setMenuAnchorEl(null)}>
+                {menuOptions.map((option, index) => (
+                    <MenuItem key={index} onClick={() => {option.onClick(userID)}}>
+                        {option.label}
+                    </MenuItem>
+                ))}
+            </Menu>
+        </>
     );
 };
 

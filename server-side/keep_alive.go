@@ -73,12 +73,14 @@ func (m *MeetingKeepAliveStruct) Close() {
 	}
 }
 
-func (m *MeetingKeepAliveStruct) RefreshParticipantTimer(participantID uint) {
+func (m *MeetingKeepAliveStruct) RefreshParticipantTimer(participantID uint) (stillAlive bool) {
 	exp := GetIntFromConfig("keep_alive.token_exp")
 	participantTimer := m.Participants[participantID]
-	if participantTimer != nil {
-		participantTimer.Reset(time.Duration(exp) * time.Second)
+	if participantTimer == nil {
+		return false
 	}
+	participantTimer.Reset(time.Duration(exp) * time.Second)
+	return true
 }
 
 func (m *MeetingKeepAliveStruct) GetToken() string {

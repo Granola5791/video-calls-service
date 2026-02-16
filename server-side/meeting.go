@@ -35,7 +35,7 @@ func RemoveMeetingNotifier(meetingID uuid.UUID) {
 func HandleCreateMeeting(c *gin.Context) {
 	userID := c.GetInt(GetStringFromConfig("jwt.user_id_name"))
 	log.Println("user id:", userID)
-	meetingID, err := CreateMeetingInDB(userID)
+	meetingID, err := CreateMeetingInDB(uint(userID))
 	if err != nil {
 		c.AbortWithStatus(http.StatusInternalServerError)
 		return
@@ -92,6 +92,11 @@ func HandleJoinMeeting(c *gin.Context) {
 
 	log.Println("participants:", meetingParticipants)
 
+	isHost, err := IsHostOfMeetingInDB(meetingID, uint(userID))
+	if err != nil {
+		log.Println(err)
+	}
+
 	err = AddParticipantToMeetingInDB(meetingID, uint(userID))
 	if err != nil {
 		log.Println(err)
@@ -99,8 +104,10 @@ func HandleJoinMeeting(c *gin.Context) {
 		return
 	}
 
-	// Set cookie
-	token := meetingKeepAliveMap[meetingID].GetToken()
+	// Set keep alive cookie
+	meetingKeepAlive := meetingKeepAliveMap[meetingID]
+	meetingKeepAlive.AddParticipant(uint(userID))
+	token := meetingKeepAlive.GetToken()
 	http.SetCookie(c.Writer, &http.Cookie{
 		Name:     GetStringFromConfig("keep_alive.token_cookie_name"),
 		Value:    token,
@@ -116,7 +123,10 @@ func HandleJoinMeeting(c *gin.Context) {
 		log.Println(err)
 	}
 
-	c.JSON(http.StatusOK, meetingParticipants)
+	c.JSON(http.StatusOK, gin.H{
+		GetStringFromConfig("meeting.participants_name"): meetingParticipants,
+		GetStringFromConfig("meeting.is_host_name"):      isHost,
+	})
 }
 
 func HandleGetCallNotifications(c *gin.Context) {
@@ -224,7 +234,11 @@ func HandleKeepAlive(c *gin.Context) {
 		c.AbortWithStatus(http.StatusBadRequest)
 		return
 	}
-	meeting.RefreshParticipantTimer(uint(userID))
+	stillAlive := meeting.RefreshParticipantTimer(uint(userID))
+	if !stillAlive {
+		c.AbortWithStatus(http.StatusUnauthorized)
+		return
+	}
 
 	// Set cookie
 	token := meeting.GetToken()
