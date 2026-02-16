@@ -25,7 +25,7 @@ const MeetingPage = () => {
     const recorderRef = React.useRef<MediaRecorder | null>(null);
     const [participantsIDs, setParticipantsIDs] = React.useState<string[]>([]);
     const [meetingState, setMeetingState] = React.useState(MeetingConfig.meetingState.none);
-    const [keepAliveIntervalID, setKeepAliveIntervalID] = React.useState<number>(0);
+    const keepAliveIntervalIDRef = React.useRef(0);
     const [isHost, setIsHost] = React.useState(false);
     const [hostOptions, setHostOptions] = React.useState<{ label: string, onClick: (userID: string) => void }[]>([]);
     const {
@@ -40,8 +40,8 @@ const MeetingPage = () => {
         return () => {
             CloseNotificationsConnection();
             StopStream();
-            if (keepAliveIntervalID !== 0) {
-                clearInterval(keepAliveIntervalID);
+            if (keepAliveIntervalIDRef.current !== 0) {
+                clearInterval(keepAliveIntervalIDRef.current);
             }
         };
     }, []);
@@ -67,7 +67,7 @@ const MeetingPage = () => {
 
     const ContinuouslySendKeepAlive = () => {
         const intervalID = setInterval(SendKeepAlive, MeetingConfig.keepAliveIntervalMs);
-        setKeepAliveIntervalID(intervalID);
+        keepAliveIntervalIDRef.current = intervalID;
     }
 
     const ActivateHostOptions = () => {
@@ -158,7 +158,6 @@ const MeetingPage = () => {
         };
 
         ws.onclose = () => {
-            console.log('Connection closed');
             notificationsWsRef.current = null;
         };
     };
