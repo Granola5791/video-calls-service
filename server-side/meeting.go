@@ -92,18 +92,11 @@ func HandleJoinMeeting(c *gin.Context) {
 
 	log.Println("participants:", meetingParticipants)
 
-	// Add participant to meeting if not already in
-	exists, err := IsParticipantInMeetingInDB(meetingID, userID)
+	err = AddParticipantToMeetingInDB(meetingID, uint(userID))
 	if err != nil {
-		c.AbortWithStatus(http.StatusInternalServerError)
+		log.Println(err)
+		c.AbortWithStatus(http.StatusBadRequest)
 		return
-	}
-	if !exists {
-		err = AddParticipantToMeetingInDB(meetingID, userID)
-		if err != nil {
-			c.AbortWithStatus(http.StatusInternalServerError)
-			return
-		}
 	}
 
 	// Set cookie

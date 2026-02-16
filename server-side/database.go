@@ -133,9 +133,9 @@ func CreateMeetingInDB(hostID int) (uuid.UUID, error) {
 	return meeting.ID, nil
 }
 
-func AddParticipantToMeetingInDB(meetingID uuid.UUID, userID int) error {
+func AddParticipantToMeetingInDB(meetingID uuid.UUID, userID uint) error {
 	meetingParticipant := MeetingParticipant{
-		UserID:    uint(userID),
+		UserID:    userID,
 		MeetingID: meetingID,
 	}
 	return db.Create(&meetingParticipant).Error
@@ -148,7 +148,7 @@ func RemoveParticipantFromMeetingInDB(meetingID uuid.UUID, userID uint) error {
 		Delete(&MeetingParticipant{}).Error
 }
 
-func IsParticipantInMeetingInDB(meetingID uuid.UUID, userID int) (bool, error) {
+func IsParticipantInMeetingInDB(meetingID uuid.UUID, userID uint) (bool, error) {
 	var count int64
 	err := db.Model(&MeetingParticipant{}).
 		Where("meeting_id = ?", meetingID).
