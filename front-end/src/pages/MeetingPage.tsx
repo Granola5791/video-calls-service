@@ -58,7 +58,8 @@ const MeetingPage = () => {
             credentials: 'include',
         })
         if (!res.ok) {
-            if(res.status === HttpStatusCodes.Unauthorized) {
+            if (res.status === HttpStatusCodes.Unauthorized) {
+                setTimeout(() => { goToHome() }, MeetingConfig.exitWaitTimeMs)
                 setMeetingState(MeetingConfig.meetingState.kicked)
             }
             throw new Error(res.statusText);
@@ -132,6 +133,10 @@ const MeetingPage = () => {
             }
         } else if (res.status === HttpStatusCodes.NotFound) {
             setMeetingState(MeetingConfig.meetingState.wrongID);
+            setTimeout(() => { goToHome() }, MeetingConfig.exitWaitTimeMs)
+        } else if (res.status === HttpStatusCodes.Unauthorized) {
+            setMeetingState(MeetingConfig.meetingState.banned);
+            setTimeout(() => { goToHome() }, MeetingConfig.exitWaitTimeMs)
         }
         if (!res.ok) {
             throw new Error(res.statusText);
@@ -246,6 +251,9 @@ const MeetingPage = () => {
                 break;
             case MeetingConfig.meetingState.error:
                 title = MeetingExitText.popUpTitles.error;
+                break;
+            case MeetingConfig.meetingState.banned:
+                title = MeetingExitText.popUpTitles.banned;
                 break;
             default:
                 title = MeetingExitText.popUpTitles.default;

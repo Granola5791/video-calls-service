@@ -245,3 +245,17 @@ func BanUserFromMeetingInDB(meetingID uuid.UUID, userID uint) error {
 		Append(&user)
 	return err
 }
+
+func IsBannedFromMeetingInDB(meetingID uuid.UUID, userID uint) (bool, error) {
+    var count int64
+
+    err := db.Table("meeting_banned_users").
+        Where("meeting_id = ? AND user_id = ?", meetingID, userID).
+        Count(&count).Error
+
+    if err != nil {
+        return false, err
+    }
+
+    return count > 0, nil
+}

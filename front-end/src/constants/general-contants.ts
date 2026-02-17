@@ -36,6 +36,7 @@ export const MeetingConfig = {
         ended: 4,
         left: 5,
         kicked: 6,
+        banned: 7,
     }
 }
 

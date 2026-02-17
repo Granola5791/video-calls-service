@@ -9,20 +9,6 @@ import (
 	"github.com/google/uuid"
 )
 
-func RequireHost(c *gin.Context) {
-	meetingID := uuid.MustParse(c.Param(GetStringFromConfig("server.api.params.meeting_id_name")))
-	userID := c.GetInt(GetStringFromConfig("jwt.user_id_name"))
-	isHost, err := IsHostOfMeetingInDB(meetingID, uint(userID))
-	if err != nil {
-		c.AbortWithStatus(http.StatusInternalServerError)
-		return
-	}
-	if !isHost {
-		c.AbortWithStatus(http.StatusUnauthorized)
-		return
-	}
-}
-
 func HandleKickParticipant(c *gin.Context) {
 	meetingID := uuid.MustParse(c.Param(GetStringFromConfig("server.api.params.meeting_id_name")))
 	userToKick := c.Param(GetStringFromConfig("server.api.params.user_to_kick_name"))

@@ -37,7 +37,7 @@ func InitRouter() {
 	router.POST(GetStringFromConfig("server.api.signup_path"), HandleSignup)
 	router.POST(GetStringFromConfig("server.api.login_path"), HandleLogin)
 	router.POST(GetStringFromConfig("server.api.create_meeting_path"), RequireAuthentication, HandleCreateMeeting)
-	router.POST(GetStringFromConfig("server.api.join_meeting_path"), RequireAuthentication, HandleJoinMeeting)
+	router.POST(GetStringFromConfig("server.api.join_meeting_path"), RequireAuthentication, RequireNotBanned, HandleJoinMeeting)
 	router.POST(GetStringFromConfig("server.api.leave_meeting_path"), RequireAuthentication, HandleLeaveMeeting)
 	router.POST(GetStringFromConfig("server.api.keep_alive_path"), RequireAuthentication, RequireKeepAliveToken, HandleKeepAlive)
 	router.POST(GetStringFromConfig("server.api.kick_participant_path"), RequireAuthentication, RequireKeepAliveToken, RequireHost, HandleKickParticipant)

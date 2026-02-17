@@ -63,6 +63,7 @@ export const MeetingExitText = {
         left: "יצאת מהפגישה",
         kicked: "הועפת מהפגישה",
         ended: "הפגישה נגמרה",
+        banned: "ממש לא רוצים אותך פה",
         default: "יצאת מהפגישה",
     },
     popUpSubtitle: "מיד תועבר לדף הבית",
