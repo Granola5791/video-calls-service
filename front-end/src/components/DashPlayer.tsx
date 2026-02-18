@@ -31,6 +31,7 @@ const DashPlayer = ({ userID, url, menuOptions }: DashPlayerProps) => {
     }, []);
 
     const WaitUntilAvailable = async (url: string): Promise<void> => {
+        console.log("Waiting for stream availability...");
         let res, available = false;
         while (!available) {
             try {

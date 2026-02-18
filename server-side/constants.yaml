@@ -76,6 +76,6 @@ websocket:
   write_buffer_size: 1024
 
 keep_alive:
-  token_exp: 30 # in seconds
+  token_exp: 20 # in seconds
   token_cookie_name: "keep_alive_token"
   token_regen_interval: 10

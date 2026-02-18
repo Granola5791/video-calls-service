@@ -4,9 +4,9 @@ import (
 	"sync"
 
 	"context"
+
 	"github.com/google/uuid"
 )
-
 
 type MeetingNotifierStruct struct {
 	ID                 uuid.UUID

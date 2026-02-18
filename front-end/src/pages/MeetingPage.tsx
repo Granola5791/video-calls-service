@@ -27,6 +27,7 @@ const MeetingPage = () => {
     const [meetingState, setMeetingState] = React.useState(MeetingConfig.meetingState.none);
     const keepAliveIntervalIDRef = React.useRef(0);
     const [isHost, setIsHost] = React.useState(false);
+    const [dangerSignOn, setDangerSignOn] = React.useState(false);
     const [hostOptions, setHostOptions] = React.useState<{ label: string, onClick: (userID: string) => void }[]>([]);
     const {
         goToHome,
@@ -150,6 +151,7 @@ const MeetingPage = () => {
             const data = JSON.parse(event.data);
             const participantID = data.participant_id
             const eventType = data.event
+            const eventValue = data.value // usually zero
 
             switch (eventType) {
                 case CallEventTypes.participantJoined:
@@ -158,6 +160,10 @@ const MeetingPage = () => {
 
                 case CallEventTypes.participantLeft:
                     setParticipantsIDs((prevIDs) => prevIDs.filter((id) => id !== participantID));
+                    break;
+                case CallEventTypes.participantKickedByHost:
+                    setDangerSignOn(true);
+                    setTimeout(() => { setDangerSignOn(false) }, eventValue * 1000); // eventValue here is the time until participant is kicked for certain
                     break;
             }
         };
@@ -307,6 +313,7 @@ const MeetingPage = () => {
 
             <StyledMeetingFooter
                 onLeaveMeeting={LeaveMeeting}
+                dangerSignOn={dangerSignOn}
             />
         </div>
     )

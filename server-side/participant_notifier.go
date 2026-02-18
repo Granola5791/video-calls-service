@@ -3,8 +3,9 @@ package main
 import (
 	"context"
 
-	"github.com/gorilla/websocket"
 	"log"
+
+	"github.com/gorilla/websocket"
 )
 
 type ParticipantNotifierStruct struct {

@@ -19,6 +19,7 @@ type MeetingKeepAliveStruct struct {
 	mutex        sync.Mutex
 	CurrToken    string
 	TokenTimer   *time.Timer
+	TokenTimerStartTime time.Time
 	Participants map[uint]*time.Timer
 }
 
@@ -44,6 +45,7 @@ func (m *MeetingKeepAliveStruct) SetNewToken() {
 		m.TokenTimer.Stop()
 	}
 	m.TokenTimer = time.AfterFunc(time.Duration(timerInterval)*time.Second, m.SetNewToken)
+	m.TokenTimerStartTime = time.Now()
 }
 
 func (m *MeetingKeepAliveStruct) AddParticipant(participantID uint) {
@@ -85,6 +87,18 @@ func (m *MeetingKeepAliveStruct) RefreshParticipantTimer(participantID uint) (st
 
 func (m *MeetingKeepAliveStruct) GetToken() string {
 	return m.CurrToken
+}
+
+func (m *MeetingKeepAliveStruct) GetTokenStartTime() time.Time {
+	return m.TokenTimerStartTime
+}
+
+func (m *MeetingKeepAliveStruct) GetTokenExpTime() time.Time {
+	return m.TokenTimerStartTime.Add(time.Duration(GetIntFromConfig("keep_alive.token_exp")) * time.Second)
+}
+
+func (m *MeetingKeepAliveStruct) GetTokenRemainingTime() time.Duration {
+	return time.Until(m.GetTokenExpTime())
 }
 
 func RemoveMeetingKeepAlive(meetingID uuid.UUID) {
