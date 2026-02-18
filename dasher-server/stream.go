@@ -1,8 +1,10 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
@@ -51,6 +53,11 @@ func HandleStream(c *gin.Context) {
 		log.Println(err)
 	}
 	err = cmd.Wait()
+	if err != nil {
+		log.Println(err)
+	}
+
+	err = os.RemoveAll(fmt.Sprintf("%s/%s/%d", GetStringFromConfig("meeting.dir_path"), meetingID, userID))
 	if err != nil {
 		log.Println(err)
 	}
