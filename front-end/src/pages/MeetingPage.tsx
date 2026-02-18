@@ -26,6 +26,7 @@ const MeetingPage = () => {
     const [participantsIDs, setParticipantsIDs] = React.useState<string[]>([]);
     const [meetingState, setMeetingState] = React.useState(MeetingConfig.meetingState.none);
     const keepAliveIntervalIDRef = React.useRef(0);
+    const leaveMeetingTimeoutIDRef = React.useRef(0);
     const [isHost, setIsHost] = React.useState(false);
     const [dangerSignOn, setDangerSignOn] = React.useState(false);
     const [hostOptions, setHostOptions] = React.useState<{ label: string, onClick: (userID: string) => void }[]>([]);
@@ -60,8 +61,7 @@ const MeetingPage = () => {
         })
         if (!res.ok) {
             if (res.status === HttpStatusCodes.Unauthorized) {
-                setTimeout(() => { goToHome() }, MeetingConfig.exitWaitTimeMs)
-                setMeetingState(MeetingConfig.meetingState.kicked)
+                LeaveMeetingFrontend(MeetingConfig.meetingState.kicked);
             }
             throw new Error(res.statusText);
         }
@@ -133,11 +133,9 @@ const MeetingPage = () => {
                 ActivateHostOptions();
             }
         } else if (res.status === HttpStatusCodes.NotFound) {
-            setMeetingState(MeetingConfig.meetingState.wrongID);
-            setTimeout(() => { goToHome() }, MeetingConfig.exitWaitTimeMs)
+            LeaveMeetingFrontend(MeetingConfig.meetingState.wrongID);
         } else if (res.status === HttpStatusCodes.Unauthorized) {
-            setMeetingState(MeetingConfig.meetingState.banned);
-            setTimeout(() => { goToHome() }, MeetingConfig.exitWaitTimeMs)
+            LeaveMeetingFrontend(MeetingConfig.meetingState.banned);
         }
         if (!res.ok) {
             throw new Error(res.statusText);
@@ -209,13 +207,14 @@ const MeetingPage = () => {
         }
     };
 
-    const LeaveMeeting = async () => {
-        const LeaveMeetingFrontend = async (state: number) => {
-            setMeetingState(state);
-            StopStream();
-            setTimeout(() => { goToHome() }, MeetingConfig.exitWaitTimeMs)
-        }
+    const LeaveMeetingFrontend = async (state: number) => {
+        setMeetingState(state);
+        StopStream();
+        const timeOutId = setTimeout(() => { goToHome() }, MeetingConfig.exitWaitTimeMs)
+        leaveMeetingTimeoutIDRef.current = timeOutId
+    }
 
+    const LeaveMeeting = async () => {
         const LeaveMeetingDasher = () => {
             notificationsWsRef.current?.close();
         }
@@ -278,6 +277,7 @@ const MeetingPage = () => {
                 title={title}
                 buttonText={MeetingExitText.popUpButton}
                 onButtonClick={() => {
+                    clearTimeout(leaveMeetingTimeoutIDRef.current);
                     goToHome();
                 }}
             >
