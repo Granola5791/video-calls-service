@@ -101,6 +101,14 @@ func (m *MeetingKeepAliveStruct) GetTokenRemainingTime() time.Duration {
 	return time.Until(m.GetTokenExpTime())
 }
 
+func (m *MeetingKeepAliveStruct) CloseAllParticipants() {
+	m.mutex.Lock()
+	defer m.mutex.Unlock()
+	for _, timer := range m.Participants {
+		timer.Stop()
+	}
+}
+
 func RemoveMeetingKeepAlive(meetingID uuid.UUID) {
 	meetingKeepAliveMutex.Lock()
 	defer meetingKeepAliveMutex.Unlock()

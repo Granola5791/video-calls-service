@@ -155,13 +155,15 @@ const MeetingPage = () => {
                 case CallEventTypes.participantJoined:
                     setParticipantsIDs((prevIDs) => prevIDs.includes(participantID) ? prevIDs : [...prevIDs, participantID]);
                     break;
-
                 case CallEventTypes.participantLeft:
                     setParticipantsIDs((prevIDs) => prevIDs.filter((id) => id !== participantID));
                     break;
                 case CallEventTypes.participantKickedByHost:
                     setDangerSignOn(true);
                     setTimeout(() => { setDangerSignOn(false) }, eventValue * 1000); // eventValue here is the time until participant is kicked for certain
+                    break;
+                case CallEventTypes.meetingEnded:
+                    LeaveMeetingFrontend(MeetingConfig.meetingState.ended);
                     break;
             }
         };

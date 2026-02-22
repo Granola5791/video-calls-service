@@ -60,6 +60,15 @@ func (m *MeetingNotifierStruct) NotifyParticipants(notification ParticipantNotif
 	}
 }
 
+func (m *MeetingNotifierStruct) CloseAllParticipants() {
+	m.lock()
+	defer m.unlock()
+	m.NotifyParticipants(ParticipantNotification{Event: MeetingEnded})
+	for _, participant := range m.participants {
+		participant.Close()
+	}
+}
+
 func (m *MeetingNotifierStruct) Close() {
 	m.cancel()
 }

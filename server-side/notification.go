@@ -6,6 +6,7 @@ const (
 	ParticipantJoined Event = iota
 	ParticipantLeft
 	ParticipantKickedByHost
+	MeetingEnded
 )
 
 type ParticipantNotification struct {

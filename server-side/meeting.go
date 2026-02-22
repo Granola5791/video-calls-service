@@ -28,7 +28,9 @@ func AddMeetingNotifier(meetingID uuid.UUID) *MeetingNotifierStruct {
 func RemoveMeetingNotifier(meetingID uuid.UUID) {
 	meetingNotifiersMutex.Lock()
 	defer meetingNotifiersMutex.Unlock()
-	meetingNotifiers[meetingID].Close()
+	meeting := meetingNotifiers[meetingID]
+	meeting.CloseAllParticipants()
+	meeting.Close()
 	delete(meetingNotifiers, meetingID)
 }
 
@@ -168,6 +170,15 @@ func HandleLeaveMeeting(c *gin.Context) {
 }
 
 func LeaveMeeting(meetingID uuid.UUID, participantID uint) error {
+	isHost, _ := IsHostOfMeetingInDB(meetingID, participantID)
+	if isHost {
+		err := RemoveMeeting(meetingID)
+		if err != nil {
+			return err
+		}
+		return nil
+	}
+
 	err := RemoveParticipantNotifier(meetingID, participantID)
 	if err != nil {
 		return err
@@ -217,7 +228,7 @@ func RemoveMeeting(meetingID uuid.UUID) error {
 
 	RemoveMeetingKeepAlive(meetingID)
 
-	err := DeleteMeetingFromDB(meetingID)
+	err := DeleteMeetingParticipantsFromDB(meetingID)
 	if err != nil {
 		return err
 	}

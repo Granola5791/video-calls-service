@@ -27,7 +27,7 @@ type User struct {
 
 type Meeting struct {
 	UuidModel
-	HostID       uint `gorm:"not null"`
+	HostID      uint   `gorm:"not null"`
 	BannedUsers []User `gorm:"many2many:meeting_banned_users;"`
 }
 
@@ -210,9 +210,11 @@ func IsMeetingEmptyInDB(meetingID uuid.UUID) (bool, error) {
 	return participantCount == 0, nil
 }
 
-func DeleteMeetingFromDB(meetingID uuid.UUID) error {
-	return db.Where("id = ?", meetingID).
-		Delete(&Meeting{}).Error
+func DeleteMeetingParticipantsFromDB(meetingID uuid.UUID) error {
+	return db.
+		Unscoped().
+		Where("meeting_id = ?", meetingID).
+		Delete(&MeetingParticipant{}).Error
 }
 
 func LogEventToDB(meetingID uuid.UUID, userID uint, event string) error {
@@ -247,15 +249,15 @@ func BanUserFromMeetingInDB(meetingID uuid.UUID, userID uint) error {
 }
 
 func IsBannedFromMeetingInDB(meetingID uuid.UUID, userID uint) (bool, error) {
-    var count int64
+	var count int64
 
-    err := db.Table("meeting_banned_users").
-        Where("meeting_id = ? AND user_id = ?", meetingID, userID).
-        Count(&count).Error
+	err := db.Table("meeting_banned_users").
+		Where("meeting_id = ? AND user_id = ?", meetingID, userID).
+		Count(&count).Error
 
-    if err != nil {
-        return false, err
-    }
+	if err != nil {
+		return false, err
+	}
 
-    return count > 0, nil
+	return count > 0, nil
 }
