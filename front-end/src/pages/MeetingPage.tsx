@@ -66,7 +66,6 @@ const MeetingPage = () => {
             previewVideoRef.current.srcObject = stream;
             await previewVideoRef.current.play();
         }
-        console.log(previewVideoRef.current);
         setPreviewOn(true);
     }
 
