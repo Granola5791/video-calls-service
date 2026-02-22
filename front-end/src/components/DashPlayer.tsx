@@ -5,6 +5,7 @@ import { StyledVideo } from '../styled-components/StyledVideos';
 import { StreamConfig } from '../constants/general-contants';
 import { Sleep } from '../utils/sleep';
 import { Menu, MenuItem } from '@mui/material';
+import { ErrorMsgs } from '../constants/general-contants';
 
 interface DashPlayerProps {
     userID: string;
@@ -17,25 +18,34 @@ const DashPlayer = ({ userID, url, menuOptions }: DashPlayerProps) => {
     const playerRef = useRef<shaka.Player | null>(null);
     const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
     const openMenu = Boolean(menuAnchorEl);
+    const active = useRef(false);
 
     useEffect(() => {
         try {
+            active.current = true;
             startStream();
         } catch (error) {
-            console.error('Error starting stream:', error);
+            console.error(ErrorMsgs.cantStartStream, error);
         }
 
         return () => {
-            stopStream();
+            try {
+                active.current = false;
+                stopStream();
+            } catch (error) {
+                console.error(ErrorMsgs.cantStopStream, error);
+            }
         };
     }, []);
 
     const WaitUntilAvailable = async (url: string): Promise<void> => {
-        console.log("Waiting for stream availability...");
         let res, available = false;
-        while (!available) {
+        while (!available && active.current) {
             try {
-                res = await fetch(url, { method: 'HEAD', credentials: 'include' });
+                res = await fetch(url, {
+                    method: 'HEAD',
+                    credentials: 'include',
+                });
                 if (res.ok) {
                     available = true;
                 }
@@ -49,11 +59,10 @@ const DashPlayer = ({ userID, url, menuOptions }: DashPlayerProps) => {
     const startStream = async () => {
         await WaitUntilAvailable(url);
 
-        if (!videoRef.current) return;
+        if (!videoRef.current || !active.current) return;
 
         const player = new shaka.Player(videoRef.current);
         playerRef.current = player;
-
         player.configure({
             streaming: {
                 lowLatencyMode: true,
@@ -71,35 +80,46 @@ const DashPlayer = ({ userID, url, menuOptions }: DashPlayerProps) => {
                 updatePeriod: 0.5,
             },
         });
-
         console.log(player.getConfiguration());
+
 
         const networkingEngine = player.getNetworkingEngine();
         networkingEngine?.registerRequestFilter((type, request) => {
             request.allowCrossSiteCredentials = true;
         });
 
+        try {
+            if (active.current) {
+                await player.load(url);
+            }
+        } catch (error) {
+            console.error(ErrorMsgs.cantLoadStream, error);
+            startStream();
+        }
+        videoRef.current?.play();
 
-        await player.load(url);
 
-        videoRef.current.play();
     };
 
     const stopStream = () => {
-        if (videoRef.current?.srcObject) {
-            const stream = videoRef.current.srcObject as MediaStream;
-            stream.getTracks().forEach(track => track.stop());
-            videoRef.current.srcObject = null;
-        }
+        try {
+            if (videoRef.current?.srcObject) {
+                const stream = videoRef.current.srcObject as MediaStream;
+                stream.getTracks().forEach(track => track.stop());
+                videoRef.current.srcObject = null;
+            }
 
-        if (playerRef.current) {
-            playerRef.current.destroy();
-            playerRef.current = null;
-        }
+            if (playerRef.current) {
+                playerRef.current.destroy();
+                playerRef.current = null;
+            }
 
-        if (videoRef.current) {
-            videoRef.current.pause();
-            videoRef.current.src = '';
+            if (videoRef.current) {
+                videoRef.current.pause();
+                videoRef.current.src = '';
+            }
+        } catch (error) {
+            console.error(ErrorMsgs.cantStopStream, error);
         }
     };
 
@@ -116,7 +136,7 @@ const DashPlayer = ({ userID, url, menuOptions }: DashPlayerProps) => {
             />
             <Menu anchorEl={menuAnchorEl} open={openMenu} onClose={() => setMenuAnchorEl(null)}>
                 {menuOptions.map((option, index) => (
-                    <MenuItem key={index} onClick={() => {option.onClick(userID)}}>
+                    <MenuItem key={index} onClick={() => { option.onClick(userID) }}>
                         {option.label}
                     </MenuItem>
                 ))}

@@ -27,7 +27,7 @@ export const StreamConfig = {
 
 export const MeetingConfig = {
     exitWaitTimeMs: 5000,
-    keepAliveIntervalMs: 10000,
+    keepAliveIntervalMs: 7000,
     meetingState: {
         none: 0,
         wrongID: 1,
@@ -43,4 +43,10 @@ export const MeetingConfig = {
 export const LocalStorage = {
     id : 'id',
     role: 'role'
+}
+
+export const ErrorMsgs = {
+    cantStartStream: 'Unable to start stream: ',
+    cantStopStream: 'Unable to stop stream: ',
+    cantLoadStream: 'Unable to load stream: ',
 }
