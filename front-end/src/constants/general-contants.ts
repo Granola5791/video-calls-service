@@ -49,4 +49,5 @@ export const ErrorMsgs = {
     cantStartStream: 'Unable to start stream: ',
     cantStopStream: 'Unable to stop stream: ',
     cantLoadStream: 'Unable to load stream: ',
+    cantAccessWebCam: 'Unable to access webcam: ',
 }

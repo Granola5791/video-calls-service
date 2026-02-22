@@ -73,3 +73,8 @@ export const MeetingExitText = {
 export const HostOptions = {
     kick: "הסר מהפגישה",
 }
+
+export const StartMeetingText = {
+    enterMeetingButton: "היכנס לפגישה",
+    showPreviewButton: "הצג תצוגה מקדימה",
+}

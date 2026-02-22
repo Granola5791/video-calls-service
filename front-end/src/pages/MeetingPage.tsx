@@ -2,13 +2,14 @@ import React, { useEffect } from 'react'
 import { useParams } from 'react-router-dom';
 import { ApiEndpoints, BackendAddressHttp, BackendAddressWS, CallEventTypes, DasherServerAddressHttp, DasherServerAddressWS, HttpStatusCodes, SetUrlParams } from '../constants/backend-constants';
 import DashPlayer from '../components/DashPlayer';
-import { StyledMeetingGrid } from '../styled-components/StyledBoxes';
+import { CenteredColumn, StyledMeetingGrid } from '../styled-components/StyledBoxes';
 import { StyledMeetingGridTile, StyledVideo } from '../styled-components/StyledVideos';
 import OneButtonPopUp from '../components/OneButtonPopUp';
 import { useNavigation } from '../utils/navigation';
-import { LocalStorage, MeetingConfig, StreamConfig } from '../constants/general-contants';
-import { HostOptions, MeetingExitText } from '../constants/hebrew-constants';
+import { ErrorMsgs, LocalStorage, MeetingConfig, StreamConfig } from '../constants/general-contants';
+import { HostOptions, MeetingExitText, StartMeetingText } from '../constants/hebrew-constants';
 import { StyledMeetingFooter } from '../styled-components/StyledFooters';
+import { LongButton, LongButtonFilled } from '../styled-components/StyledButtons';
 
 
 const NormalizeMeetingIDs = (meetingIDs: unknown): string[] => {
@@ -21,6 +22,8 @@ const MeetingPage = () => {
     const { meetingID } = useParams();
     const streamWsRef = React.useRef<WebSocket | null>(null);
     const notificationsWsRef = React.useRef<WebSocket | null>(null);
+    const [previewOn, setPreviewOn] = React.useState(false);
+    const previewVideoRef = React.useRef<HTMLVideoElement>(null);
     const clientVideoRef = React.useRef<HTMLVideoElement>(null);
     const recorderRef = React.useRef<MediaRecorder | null>(null);
     const [participantsIDs, setParticipantsIDs] = React.useState<string[]>([]);
@@ -35,9 +38,11 @@ const MeetingPage = () => {
     } = useNavigation();
 
     useEffect(() => {
-        if (meetingID) {
-            JoinMeeting(meetingID);
+        if (!meetingID) {
+            setMeetingState(MeetingConfig.meetingState.wrongID);
+            return;
         }
+        RequestCameraAccess()
 
         return () => {
             CloseNotificationsConnection();
@@ -47,6 +52,28 @@ const MeetingPage = () => {
             }
         };
     }, []);
+
+    const RequestCameraAccess = async () => {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+        stream.getTracks().forEach(track => track.stop());
+    }
+
+    const ShowPreview = async () => {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+        if (previewVideoRef.current) {
+            previewVideoRef.current.srcObject = stream;
+            await previewVideoRef.current.play();
+        }
+        setPreviewOn(true);
+    }
+
+    const EnterMeeting = async () => {
+        if (previewVideoRef.current && previewVideoRef.current.srcObject) {
+            const stream = previewVideoRef.current.srcObject as MediaStream;
+            stream.getTracks().forEach(track => track.stop());
+        }
+        meetingID && JoinMeeting(meetingID);
+    }
 
     const CloseNotificationsConnection = () => {
         if (notificationsWsRef.current) {
@@ -81,10 +108,7 @@ const MeetingPage = () => {
     const StartStreaming = async (wsUrl: string) => {
         // Ask for camera access
         const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-
-        if (clientVideoRef.current?.srcObject) {
-            throw new Error('Already streaming');
-        }
+        
         // Show preview
         if (clientVideoRef.current) {
             clientVideoRef.current.srcObject = stream;
@@ -185,12 +209,12 @@ const MeetingPage = () => {
 
     const JoinMeeting = async (meetingID: string) => {
         try {
+            setMeetingState(MeetingConfig.meetingState.active);
             await JoinMeetingBackend(meetingID);
             await JoinMeetingDasher(meetingID);
             await StartStreaming(DasherServerAddressWS + SetUrlParams(ApiEndpoints.startStream, meetingID));
             await SubscribeToMeetingUpdates(meetingID);
             ContinuouslySendKeepAlive();
-            setMeetingState(MeetingConfig.meetingState.active);
         } catch (error) {
             console.error(error);
         }
@@ -267,6 +291,29 @@ const MeetingPage = () => {
                 break;
         }
         return title
+    }
+
+    if (meetingState === MeetingConfig.meetingState.none) {
+        return (
+            <CenteredColumn>
+                <StyledVideo
+                    ref={previewVideoRef}
+                    autoPlay
+                    playsInline
+                    muted
+                />
+                {!previewOn && <LongButton
+                    onClick={ShowPreview}
+                >
+                    {StartMeetingText.showPreviewButton}
+                </LongButton>}
+                <LongButtonFilled
+                    onClick={EnterMeeting}
+                >
+                    {StartMeetingText.enterMeetingButton}
+                </LongButtonFilled>
+            </CenteredColumn>
+        )
     }
 
     if (meetingState !== MeetingConfig.meetingState.active && meetingState !== MeetingConfig.meetingState.none) {
