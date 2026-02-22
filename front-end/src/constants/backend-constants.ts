@@ -45,7 +45,8 @@ export const HttpStatuses = {
 export const CallEventTypes = {
     participantJoined: 0,
     participantLeft: 1,
-    participantKickedByHost: 2
+    participantKickedByHost: 2,
+    meetingEnded: 3,
 }
 
 export const SetUrlParams = (url: string, ...params: any[]): string => {
