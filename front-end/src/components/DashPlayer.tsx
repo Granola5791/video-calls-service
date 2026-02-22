@@ -89,9 +89,7 @@ const DashPlayer = ({ userID, url, menuOptions }: DashPlayerProps) => {
         });
 
         try {
-            if (active.current) {
-                await player.load(url);
-            }
+            await player.load(url);
         } catch (error) {
             console.error(ErrorMsgs.cantLoadStream, error);
             startStream();
