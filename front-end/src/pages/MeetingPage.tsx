@@ -25,6 +25,7 @@ const MeetingPage = () => {
     const [previewOn, setPreviewOn] = React.useState(false);
     const previewVideoRef = React.useRef<HTMLVideoElement>(null);
     const clientVideoRef = React.useRef<HTMLVideoElement>(null);
+    const toCleanUpRef = React.useRef<MediaStream[]>([]); // Store streams that need to be cleaned up
     const recorderRef = React.useRef<MediaRecorder | null>(null);
     const [participantsIDs, setParticipantsIDs] = React.useState<string[]>([]);
     const [meetingState, setMeetingState] = React.useState(MeetingConfig.meetingState.none);
@@ -60,10 +61,12 @@ const MeetingPage = () => {
 
     const ShowPreview = async () => {
         const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+        toCleanUpRef.current.push(stream);
         if (previewVideoRef.current) {
             previewVideoRef.current.srcObject = stream;
             await previewVideoRef.current.play();
         }
+        console.log(previewVideoRef.current);
         setPreviewOn(true);
     }
 
@@ -108,7 +111,8 @@ const MeetingPage = () => {
     const StartStreaming = async (wsUrl: string) => {
         // Ask for camera access
         const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-        
+        toCleanUpRef.current.push(stream);
+
         // Show preview
         if (clientVideoRef.current) {
             clientVideoRef.current.srcObject = stream;
@@ -227,10 +231,7 @@ const MeetingPage = () => {
         if (streamWsRef.current) {
             streamWsRef.current.close();
         }
-        if (clientVideoRef.current && clientVideoRef.current.srcObject) {
-            const stream = clientVideoRef.current.srcObject as MediaStream;
-            stream.getTracks().forEach(track => track.stop());
-        }
+        toCleanUpRef.current.forEach(stream => stream.getTracks().forEach(track => track.stop()));
     };
 
     const LeaveMeetingFrontend = async (state: number) => {
@@ -296,11 +297,12 @@ const MeetingPage = () => {
     if (meetingState === MeetingConfig.meetingState.none) {
         return (
             <CenteredColumn>
-                <StyledVideo
+                <video
                     ref={previewVideoRef}
                     autoPlay
                     playsInline
                     muted
+                    width="50%"
                 />
                 {!previewOn && <LongButton
                     onClick={ShowPreview}
