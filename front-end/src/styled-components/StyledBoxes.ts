@@ -57,3 +57,11 @@ export const StyledMeetingGrid = styled.div({
     backgroundColor: Colors.meetingBackground,
     overflow: "hidden",
 });
+
+export const HamburgerMenuContainer = styled.div({
+    position: "fixed",
+    width: "20vw",
+    height: "100vh",
+    border: "1px solid black",
+    backgroundColor: Colors.primary,
+});

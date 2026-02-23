@@ -1,7 +1,7 @@
 import { AuthRequirements } from "./general-contants";
 
 export const General = {
-    appName: "שו״צ (זמני)",
+    appName: "Boom"
 };
 
 export const Auth = {

@@ -4,9 +4,11 @@ import { ApiEndpoints, DasherServerAddressHttp, BackendAddressHttp } from '../co
 import { LongButton, LongButtonFilled } from '../styled-components/StyledButtons'
 import { StyledTextField } from '../styled-components/StyledTextFields'
 import { useNavigation } from '../utils/navigation'
-import { HomePageText } from '../constants/hebrew-constants'
+import { General, HomePageText } from '../constants/hebrew-constants'
 import TwoButtonPopUp from '../components/TwoButtonPopUp'
 import { Colors } from '../constants/general-contants'
+import { StyledTitle } from '../styled-components/StyledText'
+import HamburgerMenu from '../components/HamburgerMenu'
 
 const HomePage = () => {
     const [meetingID, setMeetingID] = useState('');
@@ -42,22 +44,27 @@ const HomePage = () => {
 
     return (
         <CenteredScreen>
+            <HamburgerMenu />
             <CenteredColumn>
-                <LongButtonFilled onClick={CreateMeeting}>{HomePageText.createMeetingButton}</LongButtonFilled>
-                <LongButton onClick={() => setOpenJoinMeetingPopUp(true)}>{HomePageText.joinMeetingButton}</LongButton>
 
-                <TwoButtonPopUp
-                    open={openJoinMeetingPopUp}
-                    onButtonClick1={() => { goToMeeting(meetingID) }}
-                    onButtonClick2={() => { setOpenJoinMeetingPopUp(false) }}
-                    buttonText1={HomePageText.submitMeetingIDButton}
-                    buttonText2={HomePageText.cancelMeetingIDButton}
-                    buttonColor1={Colors.primary}
-                    button1Disabled={!meetingID}
-                >
-                    <StyledTextField value={meetingID} onChange={(e) => setMeetingID(e.target.value)} placeholder={HomePageText.meetingIDInputPlaceholder} />
-                </TwoButtonPopUp>
+                <StyledTitle>{General.appName}</StyledTitle>
+                <CenteredColumn>
+                    <LongButtonFilled onClick={CreateMeeting}>{HomePageText.createMeetingButton}</LongButtonFilled>
+                    <LongButton onClick={() => setOpenJoinMeetingPopUp(true)}>{HomePageText.joinMeetingButton}</LongButton>
 
+                    <TwoButtonPopUp
+                        open={openJoinMeetingPopUp}
+                        onButtonClick1={() => { goToMeeting(meetingID) }}
+                        onButtonClick2={() => { setOpenJoinMeetingPopUp(false) }}
+                        buttonText1={HomePageText.submitMeetingIDButton}
+                        buttonText2={HomePageText.cancelMeetingIDButton}
+                        buttonColor1={Colors.primary}
+                        button1Disabled={!meetingID}
+                    >
+                        <StyledTextField value={meetingID} onChange={(e) => setMeetingID(e.target.value)} placeholder={HomePageText.meetingIDInputPlaceholder} />
+                    </TwoButtonPopUp>
+
+                </CenteredColumn>
             </CenteredColumn>
         </CenteredScreen>
     )

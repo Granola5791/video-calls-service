@@ -1,7 +1,6 @@
 import styled from "@emotion/styled";
-import { Button } from "@mui/material";
+import { Button, IconButton } from "@mui/material";
 import { Colors } from "../constants/general-contants.ts";
-
 
 export const LongButton = styled(Button)({
     width: "300px",
@@ -87,4 +86,12 @@ export const LeaveMeetingButton = styled(MediumButton)({
     "&:hover": {
         backgroundColor: Colors.dangerHover,
     },
+});
+
+export const HamburgerMenuButton = styled(IconButton)({
+    position: "fixed",
+    backgroundColor: "transparent",
+    border: "none",
+    right: "4%",
+    top: "4%",
 });
