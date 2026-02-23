@@ -13,7 +13,7 @@ export async function CheckLoginLoader() {
     if (!res.ok) {
         throw new Response(HttpStatuses.unauthorized, {
             status: HttpStatusCodes.found,
-            headers: { Location: '/login' },
+            headers: { Location: '/' },
         });
     }
     return null;
@@ -24,7 +24,7 @@ export async function CheckAdminLoader() {
     if (!res.ok) {
         throw new Response(HttpStatuses.unauthorized, {
             status: HttpStatusCodes.found,
-            headers: { Location: '/login' },
+            headers: { Location: '/' },
         });
     }
     return null;
