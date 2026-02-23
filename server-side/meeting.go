@@ -76,16 +76,6 @@ func HandleJoinMeeting(c *gin.Context) {
 		return
 	}
 
-	meeting_exists, err := MeetingExistsInDB(meetingID)
-	if err != nil {
-		c.AbortWithStatus(http.StatusInternalServerError)
-		return
-	}
-	if !meeting_exists {
-		c.AbortWithStatus(http.StatusNotFound)
-		return
-	}
-
 	meetingParticipants, err := GetMeetingParticipantIDsFromDB(meetingID, uint(userID))
 	if err != nil {
 		c.AbortWithStatus(http.StatusInternalServerError)
