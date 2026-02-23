@@ -80,3 +80,7 @@ export const StartMeetingText = {
     showPreviewButton: "הצג תצוגה מקדימה",
     allowCameraAccess: "אנא אפשרו גישה למצלמה ולמיקרופון כדי להתחיל את הפגישה",
 }
+
+export const MeetingFooterText = {
+    meetingID: "מזהה פגישה: ",
+}

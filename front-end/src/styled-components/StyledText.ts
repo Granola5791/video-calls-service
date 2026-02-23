@@ -16,3 +16,9 @@ export const BoldText = styled.p ({
 export const StyledH1 = styled.h1 ({
     color: Colors.primary,
 });
+
+export const MeetingID = styled.h4 ({
+    position: 'absolute',
+    right: '10px',
+    color: 'gray',
+});

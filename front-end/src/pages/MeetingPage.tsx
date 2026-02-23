@@ -358,6 +358,7 @@ const MeetingPage = () => {
             <StyledMeetingFooter
                 onLeaveMeeting={LeaveMeeting}
                 dangerSignOn={dangerSignOn}
+                meetingID={meetingID}
             />
         </div>
     )
