@@ -9,6 +9,7 @@ export const StyledVideo = styled.video({
 export const StyledMeetingGridTile = styled.div({
     position: "relative",
     width: "100%",
+    maxHeight: "100%",
     aspectRatio: "16 / 9",
     backgroundColor: "black",
     overflow: "hidden",
