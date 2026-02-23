@@ -6,7 +6,6 @@ export const StyledTitle = styled.h1 ({
     fontWeight: 'bold',
     color: Colors.primary,
     textAlign: 'center',
-    // marginBottom: '20%',
 });
 
 export const BoldText = styled.p ({
@@ -17,8 +16,9 @@ export const StyledH1 = styled.h1 ({
     color: Colors.primary,
 });
 
-export const MeetingID = styled.h4 ({
+export const MeetingID = styled.p ({
     position: 'absolute',
     right: '10px',
     color: 'gray',
+    width: '35%',
 });

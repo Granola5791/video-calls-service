@@ -4,7 +4,7 @@ import MeetingFooter from "../components/MeetingFooter";
 export const StyledMeetingFooter = styled(MeetingFooter)({
     position: "fixed",
     bottom: '0px',
-    height: "10vh",
+    height: "13vh",
     width: "100%",
     left: "0px",
     right: "0px",

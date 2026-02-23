@@ -47,7 +47,7 @@ export const StyledMeetingGrid = styled.div({
     gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
     gap: "8px",
     width: "100%",
-    height: "90vh",
+    height: "87vh",
     top: "0px",
     right: "0px",
     left: "0px",
