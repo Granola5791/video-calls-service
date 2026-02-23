@@ -56,6 +56,7 @@ export const AdaptiveButton = styled(Button)({
 export const AdaptiveButtonFilled = styled(AdaptiveButton)({
     color: "white",
     backgroundColor: Colors.primary,
+    border: `2px solid ${Colors.primaryHover}`,
     "&:hover": {
         backgroundColor: Colors.primaryHover,
     },
@@ -64,6 +65,7 @@ export const AdaptiveButtonFilled = styled(AdaptiveButton)({
 export const SmallButtonFilled = styled(SmallButton)({
     color: "white",
     backgroundColor: Colors.primary,
+    border: `2px solid ${Colors.primaryHover}`,
     "&:hover": {
         backgroundColor: Colors.primaryHover,
     },
@@ -72,6 +74,7 @@ export const SmallButtonFilled = styled(SmallButton)({
 export const MediumButtonFilled = styled(MediumButton)({
     color: "white",
     backgroundColor: Colors.primary,
+    border: `2px solid ${Colors.primaryHover}`,
     "&:hover": {
         backgroundColor: Colors.primaryHover,
     },
@@ -80,6 +83,7 @@ export const MediumButtonFilled = styled(MediumButton)({
 export const LeaveMeetingButton = styled(MediumButton)({
     color: "white",
     backgroundColor: Colors.danger,
+    border: `2px solid ${Colors.dangerHover}`,
     "&:hover": {
         backgroundColor: Colors.dangerHover,
     },
