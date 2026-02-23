@@ -44,6 +44,7 @@ const MeetingPage = () => {
             setMeetingState(MeetingConfig.meetingState.wrongID);
             return;
         }
+        CheckIfAbleToJoinMeeting(meetingID);
         ShowPreview();
 
         return () => {
@@ -54,6 +55,27 @@ const MeetingPage = () => {
             }
         };
     }, []);
+
+    const CheckIfAbleToJoinMeeting = async (meetingID: string) => {
+        const res = await fetch(BackendAddressHttp + SetUrlParams(ApiEndpoints.isAbleToJoinMeeting, meetingID), {
+            method: 'GET',
+            credentials: 'include',
+        });
+        switch (res.status) {
+            case HttpStatusCodes.OK:
+                setMeetingState(MeetingConfig.meetingState.none);
+                break;
+            case HttpStatusCodes.NotFound:
+                setMeetingState(MeetingConfig.meetingState.wrongID);
+                break;
+            case HttpStatusCodes.Unauthorized:
+                setMeetingState(MeetingConfig.meetingState.banned);
+                break;
+            default:
+                setMeetingState(MeetingConfig.meetingState.error);
+                break;
+        }
+    }
 
     const ShowPreview = async () => {
         try {

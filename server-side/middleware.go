@@ -126,3 +126,20 @@ func RequireNotBanned(c *gin.Context) {
 		return
 	}
 }
+
+func RequireMeetingExists(c *gin.Context) {
+	meetingID, err := uuid.Parse(c.Param(GetStringFromConfig("server.api.params.meeting_id_name")))
+	if err != nil {
+		c.AbortWithStatus(http.StatusNotFound)
+		return
+	}
+	exists, err := MeetingExistsInDB(meetingID)
+	if err != nil {
+		c.AbortWithStatus(http.StatusInternalServerError)
+		return
+	}
+	if !exists {
+		c.AbortWithStatus(http.StatusNotFound)
+		return
+	}
+}

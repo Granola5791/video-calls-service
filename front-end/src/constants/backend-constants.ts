@@ -18,6 +18,7 @@ export const ApiEndpoints = {
     leaveMeeting: "/leave-meeting/{meeting_id}",
     keepAlive: "/keep-alive/{meeting_id}",
     kickParticipant: "/kick-participant/{meeting_id}/{participant_id}",
+    isAbleToJoinMeeting: "/is-able-to-join-meeting/{meeting_id}",
 };
 
 export const HttpStatusCodes = {

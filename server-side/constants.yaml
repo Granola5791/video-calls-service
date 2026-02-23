@@ -33,6 +33,7 @@ server:
     leave_meeting_path: /leave-meeting/:meeting_id
     keep_alive_path: /keep-alive/:meeting_id
     kick_participant_path: "kick-participant/:meeting_id/:user_to_kick"
+    is_able_to_join_meeting_path: /is-able-to-join-meeting/:meeting_id
 
 
 jwt:
