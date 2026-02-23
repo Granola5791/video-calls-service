@@ -84,3 +84,7 @@ export const StartMeetingText = {
 export const MeetingFooterText = {
     meetingID: "מזהה פגישה: ",
 }
+
+export const MenuOptions = {
+    disconnect: "התנתק",
+}

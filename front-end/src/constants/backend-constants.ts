@@ -6,6 +6,7 @@ export const DasherServerAddressHttp = "http://localhost:8082";
 export const ApiEndpoints = {
     signUp: "/signup",
     logIn: "/login",
+    logOut: "/logout",
     checkLoginApi: "/check-login",
     checkAdminApi: "/check-admin",
     startStream: "/stream/{meeting_id}",
