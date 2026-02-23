@@ -12,3 +12,7 @@ export const StyledTitle = styled.h1 ({
 export const BoldText = styled.p ({
     fontWeight: 'bold',
 });
+
+export const StyledH1 = styled.h1 ({
+    color: Colors.primary,
+});

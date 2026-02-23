@@ -2,7 +2,7 @@ import React, { useEffect } from 'react'
 import { useParams } from 'react-router-dom';
 import { ApiEndpoints, BackendAddressHttp, BackendAddressWS, CallEventTypes, DasherServerAddressHttp, DasherServerAddressWS, HttpStatusCodes, SetUrlParams } from '../constants/backend-constants';
 import DashPlayer from '../components/DashPlayer';
-import { CenteredColumn, StyledMeetingGrid } from '../styled-components/StyledBoxes';
+import { CenteredColumn, CenteredScreen, StyledMeetingGrid } from '../styled-components/StyledBoxes';
 import { StyledMeetingGridTile, StyledVideo } from '../styled-components/StyledVideos';
 import OneButtonPopUp from '../components/OneButtonPopUp';
 import { useNavigation } from '../utils/navigation';
@@ -10,6 +10,7 @@ import { ErrorMsgs, LocalStorage, MeetingConfig, StreamConfig } from '../constan
 import { HostOptions, MeetingExitText, StartMeetingText } from '../constants/hebrew-constants';
 import { StyledMeetingFooter } from '../styled-components/StyledFooters';
 import { LongButton, LongButtonFilled } from '../styled-components/StyledButtons';
+import { StyledH1, StyledTitle } from '../styled-components/StyledText';
 
 
 const NormalizeMeetingIDs = (meetingIDs: unknown): string[] => {
@@ -43,7 +44,7 @@ const MeetingPage = () => {
             setMeetingState(MeetingConfig.meetingState.wrongID);
             return;
         }
-        RequestCameraAccess()
+        ShowPreview();
 
         return () => {
             CloseNotificationsConnection();
@@ -54,26 +55,22 @@ const MeetingPage = () => {
         };
     }, []);
 
-    const RequestCameraAccess = async () => {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-        stream.getTracks().forEach(track => track.stop());
-    }
-
     const ShowPreview = async () => {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-        toCleanUpRef.current.push(stream);
-        if (previewVideoRef.current) {
-            previewVideoRef.current.srcObject = stream;
-            await previewVideoRef.current.play();
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+            toCleanUpRef.current.push(stream);
+            if (previewVideoRef.current) {
+                previewVideoRef.current.srcObject = stream;
+                await previewVideoRef.current.play();
+            }
+            setPreviewOn(true);
+        } catch (error) {
+            setPreviewOn(false);
         }
-        setPreviewOn(true);
     }
 
     const EnterMeeting = async () => {
-        if (previewVideoRef.current && previewVideoRef.current.srcObject) {
-            const stream = previewVideoRef.current.srcObject as MediaStream;
-            stream.getTracks().forEach(track => track.stop());
-        }
+        StopStream();
         meetingID && JoinMeeting(meetingID);
     }
 
@@ -296,18 +293,15 @@ const MeetingPage = () => {
     if (meetingState === MeetingConfig.meetingState.none) {
         return (
             <CenteredColumn>
+                <StyledTitle>{StartMeetingText.title}</StyledTitle>
+                {!previewOn && <h4>{StartMeetingText.allowCameraAccess}</h4>}
                 <video
                     ref={previewVideoRef}
                     autoPlay
                     playsInline
                     muted
-                    width="50%"
+                    width="40%"
                 />
-                {!previewOn && <LongButton
-                    onClick={ShowPreview}
-                >
-                    {StartMeetingText.showPreviewButton}
-                </LongButton>}
                 <LongButtonFilled
                     onClick={EnterMeeting}
                 >

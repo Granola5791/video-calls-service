@@ -75,6 +75,8 @@ export const HostOptions = {
 }
 
 export const StartMeetingText = {
-    enterMeetingButton: "היכנס לפגישה",
+    title: "מוכנים לפגישה?",
+    enterMeetingButton: "יאללה תכניס אותי",
     showPreviewButton: "הצג תצוגה מקדימה",
+    allowCameraAccess: "אנא אפשרו גישה למצלמה ולמיקרופון כדי להתחיל את הפגישה",
 }

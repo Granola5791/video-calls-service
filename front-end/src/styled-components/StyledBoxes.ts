@@ -30,9 +30,11 @@ export const CenteredScreen = styled.div({
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
+    flexDirection: 'column',
     height: '100vh',
     width: '100vw',
     margin: 'auto',
+    gap: '20px',
 })
 
 export const CenteredFilledScreen = styled(CenteredScreen)({
