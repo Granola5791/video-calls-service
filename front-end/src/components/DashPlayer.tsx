@@ -16,8 +16,8 @@ interface DashPlayerProps {
 const DashPlayer = ({ userID, url, menuOptions }: DashPlayerProps) => {
     const videoRef = useRef<HTMLVideoElement>(null);
     const playerRef = useRef<shaka.Player | null>(null);
-    const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
-    const openMenu = Boolean(menuAnchorEl);
+    const [menuAnchorPos, setMenuAnchorPos] = useState<{ top: number, left: number } | undefined>(undefined);
+    const openMenu = Boolean(menuAnchorPos);
     const active = useRef(false);
 
     useEffect(() => {
@@ -122,8 +122,11 @@ const DashPlayer = ({ userID, url, menuOptions }: DashPlayerProps) => {
     };
 
     const handleContextMenu = (event: React.MouseEvent<HTMLVideoElement>) => {
+        if (menuOptions.length === 0) {
+            return;
+        }
         event.preventDefault();
-        setMenuAnchorEl(event.currentTarget);
+        setMenuAnchorPos({ top: event.clientY, left: event.clientX });
     };
 
     return (
@@ -132,7 +135,12 @@ const DashPlayer = ({ userID, url, menuOptions }: DashPlayerProps) => {
                 ref={videoRef}
                 onContextMenu={handleContextMenu}
             />
-            <Menu anchorEl={menuAnchorEl} open={openMenu} onClose={() => setMenuAnchorEl(null)}>
+            <Menu
+                open={openMenu}
+                anchorReference='anchorPosition'
+                anchorPosition={menuAnchorPos}
+                onClose={() => setMenuAnchorPos(undefined)}
+            >
                 {menuOptions.map((option, index) => (
                     <MenuItem key={index} onClick={() => { option.onClick(userID) }}>
                         {option.label}
