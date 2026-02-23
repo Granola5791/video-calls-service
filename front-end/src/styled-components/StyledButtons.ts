@@ -16,6 +16,7 @@ export const LongButton = styled(Button)({
 export const LongButtonFilled = styled(LongButton)({
     color: "white",
     backgroundColor: Colors.primary,
+    border: `2px solid ${Colors.primaryHover}`,
     "&:hover": {
         backgroundColor: Colors.primaryHover,
     },

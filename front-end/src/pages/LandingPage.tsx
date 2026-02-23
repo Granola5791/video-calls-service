@@ -15,11 +15,12 @@ const LandingPage = () => {
     return (
         <CenteredFilledScreen>
             <CenteredColumn >
-                <StyledTitle>{General.appName}</StyledTitle>
                 <CenteredColumn>
-                    <LongButtonFilled>{LandingPageText.joinMeetingButton}</LongButtonFilled>
+                    <StyledTitle>{General.appName}</StyledTitle>
+                </CenteredColumn>
+                <CenteredColumn>
+                    <LongButtonFilled onClick={GoToLogIn}>{LandingPageText.logInButton}</LongButtonFilled>
                     <LongButton onClick={GoToSignUp}>{LandingPageText.signUpButton}</LongButton>
-                    <LongButton onClick={GoToLogIn}>{LandingPageText.logInButton}</LongButton>
                 </CenteredColumn>
             </CenteredColumn>
         </CenteredFilledScreen>

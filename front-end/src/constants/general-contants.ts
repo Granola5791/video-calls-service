@@ -1,6 +1,6 @@
 export const Colors = {
-    primary: '#ff1a8dff',
-    primaryHover: '#ff52b4ff',
+    primary: '#02c78f',
+    primaryHover: '#02c78fd3',
     meetingBackground: '#111',
     danger: 'rgb(255, 0, 0)',
     dangerHover: 'rgb(255, 60, 60)',

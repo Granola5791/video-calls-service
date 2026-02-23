@@ -6,6 +6,7 @@ export const StyledTitle = styled.h1 ({
     fontWeight: 'bold',
     color: Colors.primary,
     textAlign: 'center',
+    // marginBottom: '20%',
 });
 
 export const BoldText = styled.p ({
