@@ -6,6 +6,8 @@ import { StreamConfig } from '../constants/general-contants';
 import { Sleep } from '../utils/sleep';
 import { Menu, MenuItem } from '@mui/material';
 import { ErrorMsgs } from '../constants/general-contants';
+import { SmallMuteButton } from '../styled-components/StyledButtons';
+import { MutedIcon, SmallMutedIcon, SmallUnmutedIcon, UnmutedIcon } from '../styled-components/StyledIcons';
 
 interface DashPlayerProps {
     userID: string;
@@ -19,6 +21,7 @@ const DashPlayer = ({ userID, url, menuOptions }: DashPlayerProps) => {
     const [menuAnchorPos, setMenuAnchorPos] = useState<{ top: number, left: number } | undefined>(undefined);
     const openMenu = Boolean(menuAnchorPos);
     const active = useRef(false);
+    const [muted, setMuted] = useState(false);
 
     useEffect(() => {
         try {
@@ -131,10 +134,16 @@ const DashPlayer = ({ userID, url, menuOptions }: DashPlayerProps) => {
 
     return (
         <>
-            <StyledVideo
-                ref={videoRef}
-                onContextMenu={handleContextMenu}
-            />
+            <div>
+                <StyledVideo
+                    ref={videoRef}
+                    onContextMenu={handleContextMenu}
+                    muted={muted}
+                />
+                <SmallMuteButton onClick={() => setMuted(!muted)}>
+                    {muted ? <SmallMutedIcon /> : <SmallUnmutedIcon />}
+                </SmallMuteButton>
+            </div>
             <Menu
                 open={openMenu}
                 anchorReference='anchorPosition'

@@ -95,3 +95,15 @@ export const HamburgerMenuButton = styled(IconButton)({
     right: "4%",
     top: "4%",
 });
+
+export const MuteButton = styled(IconButton)({
+    position: "fixed",
+    left: "5%",
+});
+
+export const SmallMuteButton = styled(IconButton)({
+    position: "absolute",
+    left: "3%",
+    top: "5%",
+    padding: "0",
+});

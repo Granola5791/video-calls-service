@@ -17,14 +17,20 @@ export const WatchingIcon = styled(VisibilityIcon)({
 
 export const MutedIcon = styled(MicOffIcon)({
     color: "gray",
-    position: "fixed",
-    left: "5%",
     fontSize: "175%",
 });
 
 export const UnmutedIcon = styled(MicIcon)({
     color: "white",
-    position: "fixed",
-    left: "5%",
     fontSize: "175%",
+});
+
+export const SmallMutedIcon = styled(MicOffIcon)({
+    color: "gray",
+    fontSize: "100%",
+});
+
+export const SmallUnmutedIcon = styled(MicIcon)({
+    color: "white",
+    fontSize: "100%",
 });

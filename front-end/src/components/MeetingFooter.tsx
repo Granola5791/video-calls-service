@@ -1,4 +1,4 @@
-import { LeaveMeetingButton } from '../styled-components/StyledButtons';
+import { LeaveMeetingButton, MuteButton } from '../styled-components/StyledButtons';
 import CallEndIcon from '@mui/icons-material/CallEnd';
 import { WatchingIcon, MutedIcon, UnmutedIcon } from '../styled-components/StyledIcons';
 import { MeetingID } from '../styled-components/StyledText';
@@ -34,9 +34,9 @@ const MeetingFooter = ({ onLeaveMeeting, className, dangerSignOn, meetingID = ""
                     <ContentCopyIcon />
                 </IconButton>
             </MeetingID>
-            <IconButton color='inherit' onClick={OnToggleMute}>
+            <MuteButton color='inherit' onClick={OnToggleMute}>
                 {muted ? <MutedIcon /> : <UnmutedIcon />}
-            </IconButton>
+            </MuteButton>
             {dangerSignOn && <WatchingIcon />}
         </div>
     )
