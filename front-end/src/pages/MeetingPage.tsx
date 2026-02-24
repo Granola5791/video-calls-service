@@ -284,6 +284,16 @@ const MeetingPage = () => {
         })
     }
 
+    const ToggleMute = () => {
+        const stream = clientVideoRef.current?.srcObject as MediaStream;
+
+        if (stream) {
+            stream.getAudioTracks().forEach((track) => {
+                track.enabled = !track.enabled;
+            });
+        }
+    };
+
     const GetExitText = () => {
         let title = '';
         switch (meetingState) {
@@ -381,6 +391,7 @@ const MeetingPage = () => {
                 onLeaveMeeting={LeaveMeeting}
                 dangerSignOn={dangerSignOn}
                 meetingID={meetingID}
+                toggleMuteFunc={ToggleMute}
             />
         </div>
     )

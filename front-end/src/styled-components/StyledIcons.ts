@@ -1,6 +1,8 @@
 import styled from "@emotion/styled";
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import MenuIcon from '@mui/icons-material/Menu';
+import MicOffIcon from '@mui/icons-material/MicOff';
+import MicIcon from '@mui/icons-material/Mic';
 
 export const HamburgerMenuIcon = styled(MenuIcon)({
     fontSize: "150%",
@@ -11,4 +13,18 @@ export const WatchingIcon = styled(VisibilityIcon)({
     position: "absolute",
     left: "10%",
     fontSize: "250%",
+});
+
+export const MutedIcon = styled(MicOffIcon)({
+    color: "gray",
+    position: "fixed",
+    left: "5%",
+    fontSize: "175%",
+});
+
+export const UnmutedIcon = styled(MicIcon)({
+    color: "white",
+    position: "fixed",
+    left: "5%",
+    fontSize: "175%",
 });
