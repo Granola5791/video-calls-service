@@ -20,5 +20,6 @@ export const MeetingID = styled.p ({
     position: 'absolute',
     right: '10px',
     color: 'gray',
-    width: '35%',
+    width: '30%',
+    fontSize: '0.9rem',
 });
