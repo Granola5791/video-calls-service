@@ -53,9 +53,10 @@ func HandleCreateMeeting(c *gin.Context) {
 		Name:     GetStringFromConfig("meeting.token_name"),
 		Value:    token,
 		Path:     "/", // visible to all paths
+		Domain:   GetStringFromConfig("jwt.domain"),
 		HttpOnly: true,
 		Secure:   true,
-		SameSite: http.SameSiteStrictMode,
+		SameSite: http.SameSiteNoneMode,
 		MaxAge:   GetIntFromConfig("meeting.token_exp"),
 	})
 
@@ -104,9 +105,10 @@ func HandleJoinMeeting(c *gin.Context) {
 		Name:     GetStringFromConfig("keep_alive.token_cookie_name"),
 		Value:    token,
 		Path:     "/",
+		Domain:   GetStringFromConfig("jwt.domain"),
 		HttpOnly: true,
 		Secure:   true,
-		SameSite: http.SameSiteStrictMode,
+		SameSite: http.SameSiteNoneMode,
 		MaxAge:   GetIntFromConfig("keep_alive.token_exp"),
 	})
 
@@ -247,9 +249,10 @@ func HandleKeepAlive(c *gin.Context) {
 		Name:     GetStringFromConfig("keep_alive.token_cookie_name"),
 		Value:    token,
 		Path:     "/",
+		Domain:   GetStringFromConfig("jwt.domain"),
 		HttpOnly: true,
 		Secure:   true,
-		SameSite: http.SameSiteStrictMode,
+		SameSite: http.SameSiteNoneMode,
 		MaxAge:   GetIntFromConfig("keep_alive.token_exp"),
 	})
 

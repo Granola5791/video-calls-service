@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"net/http"
 	"os"
 	"strings"
@@ -17,6 +18,7 @@ func RequireAuthentication(c *gin.Context) {
 	tokenName := GetStringFromConfig("jwt.token_cookie_name")
 	tokenString, err := c.Cookie(tokenName)
 	if err != nil {
+		log.Println(err)
 		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
@@ -140,6 +142,14 @@ func RequireMeetingExists(c *gin.Context) {
 	}
 	if !exists {
 		c.AbortWithStatus(http.StatusNotFound)
+		return
+	}
+}
+
+func RequireSameOrigin(c *gin.Context) {
+	origin := c.Request.Header.Get("Origin")
+	if origin != GetStringFromConfig("server.frontend_addr") {
+		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
 }

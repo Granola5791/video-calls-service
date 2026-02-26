@@ -2,6 +2,7 @@ package main
 
 import (
 	"net/http"
+	"os"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -29,6 +30,7 @@ func InitRouter() {
 		AllowHeaders:     []string{"Content-Type"},
 		AllowCredentials: true,
 	}),
+		RequireSameOrigin,
 		RequireKeepAliveToken,
 	)
 
@@ -39,5 +41,9 @@ func InitRouter() {
 
 	router.StaticFS(GetStringFromConfig("server.api.stream_to_client_path"), gin.Dir("./meetings", false))
 
-	router.Run(GetStringFromConfig("server.listen_addr"))
+	router.RunTLS(
+		GetStringFromConfig("server.listen_addr"),
+		os.Getenv("TLS_CERT_PATH"),
+		os.Getenv("TLS_KEY_PATH"),
+	)
 }

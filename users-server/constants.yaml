@@ -15,7 +15,7 @@ database:
     participant_kicked_by_host: "Participant kicked by host"
 
 server:
-  listen_addr: "localhost:8081"
+  listen_addr: "usersserver.local.my:8081"
   frontend_addr: "http://localhost:5173"
   api:
     params:
@@ -39,6 +39,7 @@ server:
 jwt:
   token_cookie_name: "auth_token"
   token_exp: 3600 # in seconds
+  domain: ".local.my"
   user_id_name: "user_id"
   role_name: "role"
   in_meeting_name: "in_meeting"

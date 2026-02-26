@@ -56,9 +56,10 @@ func HandleLogin(c *gin.Context) {
 		Name:     GetStringFromConfig("jwt.token_cookie_name"),
 		Value:    token,
 		Path:     "/", // visible to all paths
+		Domain: GetStringFromConfig("jwt.domain"),
 		HttpOnly: true,
 		Secure:   true,
-		SameSite: http.SameSiteStrictMode,
+		SameSite: http.SameSiteNoneMode,
 		MaxAge:   GetIntFromConfig("jwt.token_exp"),
 	})
 

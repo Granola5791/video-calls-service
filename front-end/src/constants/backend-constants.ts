@@ -1,7 +1,7 @@
-export const BackendAddressHttp = "http://localhost:8081";
-export const BackendAddressWS = "ws://localhost:8081";
-export const DasherServerAddressWS = "ws://localhost:8082";
-export const DasherServerAddressHttp = "http://localhost:8082";
+export const UsersServerAddressHttp = "https://usersserver.local.my:8081";
+export const UsersServerAddressWS = "wss://usersserver.local.my:8081";
+export const DasherServerAddressWS = "wss://dasherserver.local.my:8082";
+export const DasherServerAddressHttp = "https://dasherserver.local.my:8082";
 
 export const ApiEndpoints = {
     signUp: "/signup",

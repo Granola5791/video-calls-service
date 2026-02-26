@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { CenteredColumn, CenteredScreen } from '../styled-components/StyledBoxes'
-import { ApiEndpoints, DasherServerAddressHttp, BackendAddressHttp } from '../constants/backend-constants'
+import { ApiEndpoints, DasherServerAddressHttp, UsersServerAddressHttp } from '../constants/backend-constants'
 import { LongButton, LongButtonFilled } from '../styled-components/StyledButtons'
 import { StyledTextField } from '../styled-components/StyledTextFields'
 import { useNavigation } from '../utils/navigation'
@@ -18,7 +18,7 @@ const HomePage = () => {
     } = useNavigation();
 
     const CreateMeeting = async () => {
-        const res1 = await fetch(BackendAddressHttp + ApiEndpoints.createMeeting, {
+        const res1 = await fetch(UsersServerAddressHttp + ApiEndpoints.createMeeting, {
             method: 'POST',
             credentials: 'include',
         });
@@ -48,7 +48,7 @@ const HomePage = () => {
         }
 
         const LogoutBackend = async () => {
-            await fetch(BackendAddressHttp + ApiEndpoints.logOut, {
+            await fetch(UsersServerAddressHttp + ApiEndpoints.logOut, {
                 method: 'POST',
                 credentials: 'include',
             });

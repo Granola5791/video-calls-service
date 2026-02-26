@@ -2,6 +2,7 @@ package main
 
 import (
 	"net/http"
+	"os"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -23,12 +24,15 @@ func InitWsUpgrader() {
 func InitRouter() {
 	router := gin.Default()
 
-	router.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{GetStringFromConfig("server.frontend_addr")},
-		AllowMethods:     []string{"POST", "GET", "OPTIONS", "PUT", "DELETE"},
-		AllowHeaders:     []string{"Content-Type"},
-		AllowCredentials: true,
-	}))
+	router.Use(
+		cors.New(cors.Config{
+			AllowOrigins:     []string{GetStringFromConfig("server.frontend_addr")},
+			AllowMethods:     []string{"POST", "GET", "OPTIONS", "PUT", "DELETE"},
+			AllowHeaders:     []string{"Content-Type"},
+			AllowCredentials: true,
+		}),
+		RequireSameOrigin,
+	)
 
 	router.GET(GetStringFromConfig("server.api.check_login_path"), RequireAuthentication)
 	router.GET(GetStringFromConfig("server.api.check_admin_path"), RequireAuthentication, RequireAdmin)
@@ -44,5 +48,9 @@ func InitRouter() {
 	router.POST(GetStringFromConfig("server.api.keep_alive_path"), RequireAuthentication, RequireKeepAliveToken, HandleKeepAlive)
 	router.POST(GetStringFromConfig("server.api.kick_participant_path"), RequireAuthentication, RequireKeepAliveToken, RequireHost, HandleKickParticipant)
 
-	router.Run(GetStringFromConfig("server.listen_addr"))
+	router.RunTLS(
+		GetStringFromConfig("server.listen_addr"),
+		os.Getenv("TLS_CERT_PATH"),
+		os.Getenv("TLS_KEY_PATH"),
+	)
 }
