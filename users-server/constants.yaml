@@ -16,7 +16,7 @@ database:
 
 server:
   listen_addr: "usersserver.local.my:8081"
-  frontend_addr: "http://localhost:5173"
+  frontend_addr: "https://frontend.local.my:5173"
   api:
     params:
       meeting_id_name: "meeting_id"

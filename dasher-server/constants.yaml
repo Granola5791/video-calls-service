@@ -1,6 +1,6 @@
 server:
   listen_addr: "dasherserver.local.my:8082"
-  frontend_addr: "http://localhost:5173"
+  frontend_addr: "https://frontend.local.my:5173"
   api:
     stream_from_client_path: "stream/:meeting_id"
     stream_to_client_path: "get-stream"
