@@ -134,16 +134,14 @@ const DashPlayer = ({ userID, url, menuOptions }: DashPlayerProps) => {
 
     return (
         <>
-            <div>
-                <StyledVideo
-                    ref={videoRef}
-                    onContextMenu={handleContextMenu}
-                    muted={muted}
-                />
-                <SmallMuteButton onClick={() => setMuted(!muted)}>
-                    {muted ? <SmallMutedIcon /> : <SmallUnmutedIcon />}
-                </SmallMuteButton>
-            </div>
+            <StyledVideo
+                ref={videoRef}
+                onContextMenu={handleContextMenu}
+                muted={muted}
+            />
+            <SmallMuteButton onClick={() => setMuted(!muted)}>
+                {muted ? <SmallMutedIcon /> : <SmallUnmutedIcon />}
+            </SmallMuteButton>
             <Menu
                 open={openMenu}
                 anchorReference='anchorPosition'
