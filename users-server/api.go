@@ -45,10 +45,8 @@ func InitRouter() {
 	router.POST(GetStringFromConfig("server.api.create_meeting_path"), RequireAuthentication, HandleCreateMeeting)
 	router.POST(GetStringFromConfig("server.api.join_meeting_path"), RequireAuthentication, RequireMeetingExists, RequireNotBanned, HandleJoinMeeting)
 	router.POST(GetStringFromConfig("server.api.leave_meeting_path"), RequireAuthentication, HandleLeaveMeeting)
-	router.POST(GetStringFromConfig("server.api.keep_alive_path"), RequireAuthentication, RequireKeepAliveToken, HandleKeepAlive)
+	router.POST(GetStringFromConfig("server.api.keep_alive_path"), RequireAuthentication, RequireKeepAliveToken, RequireFaceDetection, HandleKeepAlive)
 	router.POST(GetStringFromConfig("server.api.kick_participant_path"), RequireAuthentication, RequireKeepAliveToken, RequireHost, HandleKickParticipant)
-
-	router.POST("/send-face-detection/:meeting_id", RequireAuthentication, HandleFaceDetection)
 
 	router.RunTLS(
 		GetStringFromConfig("server.listen_addr"),

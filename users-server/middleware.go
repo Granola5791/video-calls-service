@@ -153,3 +153,38 @@ func RequireSameOrigin(c *gin.Context) {
 		return
 	}
 }
+
+func RequireFaceDetection(c *gin.Context) {
+	meetingID := uuid.MustParse(c.Param(GetStringFromConfig("server.api.params.meeting_id_name")))
+	userID := c.GetInt(GetStringFromConfig("jwt.user_id_name"))
+	videoChunks, err := GetUserVideoChunksFromDB(meetingID, uint(userID))
+	if err != nil {
+		log.Println(err)
+		c.AbortWithStatus(http.StatusInternalServerError)
+		return
+	}
+	go MarkUserVideoChunksAsVisitedInDB(
+		meetingID,
+		uint(userID),
+		videoChunks[0].ChunkNumber,
+		videoChunks[len(videoChunks)-1].ChunkNumber,
+	)
+
+	outputPipeRead, err := ConcatenateChunks(videoChunks)
+	if err != nil {
+		log.Println(err)
+		c.AbortWithStatus(http.StatusInternalServerError)
+		return
+	}
+
+	framesWithFace, err := SendvideoToFaceDetector(GetStringFromConfig("ai_server.api.face_detection_path"), outputPipeRead)
+	if err != nil {
+		log.Println(err)
+		c.AbortWithStatus(http.StatusInternalServerError)
+		return
+	}
+
+	if framesWithFace < GetIntFromConfig("face_detection.min_frames_with_face") {
+		c.AbortWithStatus(http.StatusUnauthorized)
+	}
+}

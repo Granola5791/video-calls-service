@@ -1,44 +1,15 @@
 package main
 
 import (
+	"encoding/json"
 	"io"
 	"log"
 	"net/http"
 	"os/exec"
-
-	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 )
 
-func HandleFaceDetection(c *gin.Context) {
-	meetingID := uuid.MustParse(c.Param(GetStringFromConfig("server.api.params.meeting_id_name")))
-	userID := c.GetInt(GetStringFromConfig("jwt.user_id_name"))
-	videoChunks, err := GetUserVideoChunksFromDB(meetingID, uint(userID))
-	if err != nil {
-		log.Println(err)
-		c.AbortWithStatus(http.StatusInternalServerError)
-		return
-	}
-	go MarkUserVideoChunksAsVisitedInDB(
-		meetingID,
-		uint(userID),
-		videoChunks[0].ChunkNumber,
-		videoChunks[len(videoChunks)-1].ChunkNumber,
-	)
-
-	outputPipeRead, err := ConcatenateChunks(videoChunks)
-	if err != nil {
-		log.Println(err)
-		c.AbortWithStatus(http.StatusInternalServerError)
-		return
-	}
-
-	err = SendvideoToFaceDetector(outputPipeRead)
-	if err != nil {
-		log.Println(err)
-		c.AbortWithStatus(http.StatusInternalServerError)
-		return
-	}
+type FaceDetectionResponse struct {
+	FramesWithFace int `json:"frames_with_face"`
 }
 
 func ConcatenateChunks(chunks []UserVideoChunk) (*io.PipeReader, error) {
@@ -85,19 +56,29 @@ func ConcatenateChunks(chunks []UserVideoChunk) (*io.PipeReader, error) {
 	return outPipeRead, nil
 }
 
-func SendvideoToFaceDetector(dataPipeRead *io.PipeReader) error {
-	req, err := http.NewRequest("GET", "http://127.0.0.1:8000//upload-video", dataPipeRead)
+func SendvideoToFaceDetector(url string, dataPipeRead *io.PipeReader) (framesWithFace int, err error) {
+	req, err := http.NewRequest("GET", url, dataPipeRead)
 	if err != nil {
-		return err
+		return 0, err
 	}
 	req.Header.Set("Content-Type", "video/webm")
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		return err
+		return 0, err
 	}
 	defer resp.Body.Close()
 
-	return nil
+	var faceDetectionResponse FaceDetectionResponse
+	bodyBytes, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return 0, err
+	}
+	err = json.Unmarshal(bodyBytes, &faceDetectionResponse)
+	if err != nil {
+		return 0, err
+	}
+
+	return faceDetectionResponse.FramesWithFace, nil
 }

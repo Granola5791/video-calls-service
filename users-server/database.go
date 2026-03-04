@@ -58,9 +58,9 @@ type UserRole struct {
 
 type UserVideoChunk struct {
 	gorm.Model
-	UserID      uint      `gorm:"not null; uniqueIndex:idx_user_video_chunk"`
+	UserID      uint      `gorm:"not null"`
 	User        User      `gorm:"foreignKey:UserID"`
-	MeetingID   uuid.UUID `gorm:"not null; uniqueIndex:idx_user_video_chunk"`
+	MeetingID   uuid.UUID `gorm:"not null"`
 	Meeting     Meeting   `gorm:"foreignKey:MeetingID"`
 	Chunk       []byte    `gorm:"not null"`
 	ChunkNumber uint      `gorm:"not null"`
