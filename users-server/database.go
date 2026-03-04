@@ -56,6 +56,17 @@ type UserRole struct {
 	Role string `gorm:"not null"`
 }
 
+type UserVideoChunk struct {
+	gorm.Model
+	UserID      uint      `gorm:"not null; uniqueIndex:idx_user_video_chunk"`
+	User        User      `gorm:"foreignKey:UserID"`
+	MeetingID   uuid.UUID `gorm:"not null; uniqueIndex:idx_user_video_chunk"`
+	Meeting     Meeting   `gorm:"foreignKey:MeetingID"`
+	Chunk       []byte    `gorm:"not null"`
+	ChunkNumber uint      `gorm:"not null"`
+	Visited     bool      `gorm:"not null"`
+}
+
 var db *gorm.DB
 
 func InitDatabaseConnection() error {
@@ -75,7 +86,15 @@ func InitDatabaseConnection() error {
 		return err
 	}
 
-	err = db.AutoMigrate(&User{}, &Meeting{}, &MeetingParticipant{}, &MeetingEvent{})
+	err = db.AutoMigrate(
+		&User{},
+		&Meeting{},
+		&MeetingParticipant{},
+		&MeetingEvent{},
+		&UserAuth{},
+		&UserRole{},
+		&UserVideoChunk{},
+	)
 	if err != nil {
 		return err
 	}
@@ -260,4 +279,23 @@ func IsBannedFromMeetingInDB(meetingID uuid.UUID, userID uint) (bool, error) {
 	}
 
 	return count > 0, nil
+}
+
+func GetUserVideoChunksFromDB(meetingID uuid.UUID, userID uint) ([]UserVideoChunk, error) {
+	var userVideoChunks []UserVideoChunk
+
+	err := db.
+		Where("meeting_id = ? AND user_id = ? AND visited = false", meetingID, userID).
+		Order("chunk_number ASC").
+		Find(&userVideoChunks).Error
+
+	return userVideoChunks, err
+}
+
+// mark user video chunks in the range [minChunkNumber, maxChunkNumber] inclusive as visited
+func MarkUserVideoChunksAsVisitedInDB(meetingID uuid.UUID, userID uint, minChunkNumber uint, maxChunkNumber uint) error {
+	return db.
+		Model(&UserVideoChunk{}).
+		Where("meeting_id = ? AND user_id = ? AND chunk_number >= ? AND chunk_number <= ?", meetingID, userID, minChunkNumber, maxChunkNumber).
+		Update("visited", true).Error
 }
