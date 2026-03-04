@@ -7,12 +7,13 @@ import (
 	"os"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"github.com/gorilla/websocket"
 )
 
 func HandleStream(c *gin.Context) {
-	meetingID := c.Param(GetStringFromConfig("meeting.meeting_id_name"))
-	userID, _ := c.Get(GetStringFromConfig("auth_jwt.user_id_name"))
+	meetingID := uuid.MustParse(c.Param(GetStringFromConfig("meeting.meeting_id_name")))
+	userID := c.GetInt(GetStringFromConfig("auth_jwt.user_id_name"))
 
 	ws, err := wsUpgrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
@@ -22,7 +23,7 @@ func HandleStream(c *gin.Context) {
 	}
 	defer ws.Close()
 
-	cmd, stdin, err := InitMpegDash(meetingID, userID.(int))
+	cmd, stdin, err := InitMpegDash(meetingID.String(), uint(userID))
 	if err != nil {
 		c.String(http.StatusInternalServerError, GetStringFromConfig("error.internal"))
 		return
@@ -34,6 +35,7 @@ func HandleStream(c *gin.Context) {
 		return
 	}
 
+	chunkNumber := uint(0)
 	for {
 		messageType, data, err := ws.ReadMessage()
 		if err != nil {
@@ -43,7 +45,8 @@ func HandleStream(c *gin.Context) {
 
 		if messageType == websocket.BinaryMessage {
 			// Here we do the fun stuff with the received video data
-			log.Printf(GetStringFromConfig("stream.got_chunk_msg"), len(data))
+			go SaveVideoChunkToDB(data, meetingID, uint(userID), uint(chunkNumber))
+			chunkNumber++
 			PrepareForMpegDash(stdin, data)
 		}
 	}

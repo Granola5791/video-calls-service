@@ -20,6 +20,10 @@ func main() {
 		log.Fatal(err)
 	}
 	InitLogger()
+	err = InitDatabaseConnection()
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	InitWsUpgrader()
 	InitRouter()

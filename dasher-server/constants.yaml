@@ -34,3 +34,7 @@ logger:
 keep_alive:
   exp_name: "exp"
   token_cookie_name: "keep_alive_token"
+
+database:
+  sslmode: disable
+  timezone: Asia/Jerusalem

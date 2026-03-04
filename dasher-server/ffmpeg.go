@@ -7,7 +7,7 @@ import (
 	"os/exec"
 )
 
-func InitMpegDash(meetingID string, userID int) (*exec.Cmd, io.WriteCloser, error) {
+func InitMpegDash(meetingID string, userID uint) (*exec.Cmd, io.WriteCloser, error) {
 	cmd := exec.Command(
 		"ffmpeg",
 		"-f", "webm",
