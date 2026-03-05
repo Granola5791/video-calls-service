@@ -163,6 +163,10 @@ func RequireFaceDetection(c *gin.Context) {
 		c.AbortWithStatus(http.StatusInternalServerError)
 		return
 	}
+	if(len(videoChunks) == 0) {
+		c.AbortWithStatus(http.StatusUnauthorized)
+		return
+	}
 	go MarkUserVideoChunksAsVisitedInDB(
 		meetingID,
 		uint(userID),
@@ -177,14 +181,20 @@ func RequireFaceDetection(c *gin.Context) {
 		return
 	}
 
-	framesWithFace, err := SendvideoToFaceDetector(GetStringFromConfig("ai_server.api.face_detection_path"), outputPipeRead)
+	defer outputPipeRead.Close()
+
+	url := GetStringFromConfig("ai_server.url") + GetStringFromConfig("ai_server.api.face_detection_path")
+	framesWithFace, totalFrames, err := SendvideoToFaceDetector(url, outputPipeRead)
 	if err != nil {
 		log.Println(err)
 		c.AbortWithStatus(http.StatusInternalServerError)
 		return
 	}
 
-	if framesWithFace < GetIntFromConfig("face_detection.min_frames_with_face") {
+	minTotalFrames := GetIntFromConfig("face_detection.min_total_frames")
+	minFaceFramesPercentage := GetIntFromConfig("face_detection.min_frames_with_face_percentage")
+	FaceFramePercentage := 100 * framesWithFace / totalFrames
+	if totalFrames < minTotalFrames || FaceFramePercentage < minFaceFramesPercentage {
 		c.AbortWithStatus(http.StatusUnauthorized)
 	}
 }

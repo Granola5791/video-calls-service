@@ -88,4 +88,5 @@ ai_server:
     face_detection_path: "/face-detection"
 
 face_detection:
-  min_frames_with_face: 130
+  min_frames_with_face_percentage: 50
+  min_total_frames: 30

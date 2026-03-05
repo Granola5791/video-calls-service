@@ -299,3 +299,13 @@ func MarkUserVideoChunksAsVisitedInDB(meetingID uuid.UUID, userID uint, minChunk
 		Where("meeting_id = ? AND user_id = ? AND chunk_number >= ? AND chunk_number <= ?", meetingID, userID, minChunkNumber, maxChunkNumber).
 		Update("visited", true).Error
 }
+
+func GetFirstUserVideoChunkFromDB(meetingID uuid.UUID, userID uint) (*UserVideoChunk, error) {
+	var userVideoChunk UserVideoChunk
+	err := db.
+		Where("meeting_id = ? AND user_id = ? AND chunk_number = 0", meetingID, userID).
+		Order("created_at DESC").
+		First(&userVideoChunk).Error
+
+	return &userVideoChunk, err
+}

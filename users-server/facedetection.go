@@ -1,15 +1,19 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"io"
 	"log"
 	"net/http"
 	"os/exec"
+
+	"github.com/google/uuid"
 )
 
 type FaceDetectionResponse struct {
 	FramesWithFace int `json:"frames_with_face"`
+	TotalFrames    int `json:"total_frames"`
 }
 
 func ConcatenateChunks(chunks []UserVideoChunk) (*io.PipeReader, error) {
@@ -17,13 +21,10 @@ func ConcatenateChunks(chunks []UserVideoChunk) (*io.PipeReader, error) {
 	inPipeRead, inPipeWrite := io.Pipe()
 
 	cmd := exec.Command(
-		"ffmpeg",
-		"-i",
-		"pipe:0",
-		"-c",
-		"copy",
-		"-f",
-		"webm",
+		"ffmpeg", "-y",
+		"-i", "pipe:0",
+		"-c", "copy",
+		"-f", "webm",
 		"pipe:1",
 	)
 	cmd.Stdin = inPipeRead
@@ -32,6 +33,17 @@ func ConcatenateChunks(chunks []UserVideoChunk) (*io.PipeReader, error) {
 	err := cmd.Start()
 	if err != nil {
 		return nil, err
+	}
+
+	if chunks[0].ChunkNumber != 0 {
+		header, err := GetHeaderUserVideoChunks(chunks[0].UserID, chunks[0].MeetingID)
+		if err != nil {
+			return nil, err
+		}
+		_, err = inPipeWrite.Write(header)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	go func() {
@@ -56,29 +68,47 @@ func ConcatenateChunks(chunks []UserVideoChunk) (*io.PipeReader, error) {
 	return outPipeRead, nil
 }
 
-func SendvideoToFaceDetector(url string, dataPipeRead *io.PipeReader) (framesWithFace int, err error) {
-	req, err := http.NewRequest("GET", url, dataPipeRead)
+func SendvideoToFaceDetector(url string, dataPipeRead *io.PipeReader) (framesWithFace, totalFrames int, err error) {
+	req, err := http.NewRequest("POST", url, dataPipeRead)
 	if err != nil {
-		return 0, err
+		log.Println(err)
+		return 0, 0, err
 	}
 	req.Header.Set("Content-Type", "video/webm")
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		return 0, err
+		log.Println(err)
+		return 0, 0, err
 	}
 	defer resp.Body.Close()
 
 	var faceDetectionResponse FaceDetectionResponse
 	bodyBytes, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return 0, err
+		log.Println(err)
+		return 0, 0, err
 	}
 	err = json.Unmarshal(bodyBytes, &faceDetectionResponse)
 	if err != nil {
-		return 0, err
+		log.Println(err)
+		return 0, 0, err
 	}
 
-	return faceDetectionResponse.FramesWithFace, nil
+	return faceDetectionResponse.FramesWithFace, faceDetectionResponse.TotalFrames, nil
+}
+
+func GetHeaderOfWebm(firstChunk []byte) []byte {
+	clusterStart := []byte{0x1F, 0x43, 0xB6, 0x75} // start of the first cluster
+	index := bytes.Index(firstChunk, clusterStart)
+	return firstChunk[:index]
+}
+
+func GetHeaderUserVideoChunks(userID uint, meetingID uuid.UUID) ([]byte, error) {
+	firstChunk, err := GetFirstUserVideoChunkFromDB(meetingID, userID)
+	if err != nil {
+		return nil, err
+	}
+	return GetHeaderOfWebm(firstChunk.Chunk), nil
 }

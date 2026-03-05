@@ -47,3 +47,8 @@ sketch
 *.mpd
 *.webm
 *.pem
+*.jpg
+*.mp4
+*.ipynb
+*.vscode
+__pycache__
