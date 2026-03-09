@@ -10,8 +10,6 @@ import shutil
 from pathlib import Path
 import tempfile
 
-face_detector = FaceDetector()
-
 app = FastAPI()
 
 
@@ -21,6 +19,8 @@ async def face_detection(request: Request, BackgroundTasks: BackgroundTasks):
     total_frames = 0
 
     video_bytes = await request.body()
+
+    face_detector = FaceDetector()
     try:
         with tempfile.NamedTemporaryFile(suffix=".webm", delete=False) as tfile:
             tfile.write(video_bytes)
