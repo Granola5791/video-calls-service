@@ -114,6 +114,9 @@ func GetHeaderUserVideoChunks(userID uint, meetingID uuid.UUID) ([]byte, error) 
 }
 
 func PassedFaceDetectionThreshold(framesWithFace, totalFrames int) bool {
+	if framesWithFace == 0 || totalFrames == 0 { // to avoid division by zero
+		return false
+	}
 	minTotalFrames := GetIntFromConfig("face_detection.min_total_frames")
 	minFaceFramesPercentage := GetIntFromConfig("face_detection.min_frames_with_face_percentage")
 	FaceFramePercentage := 100 * framesWithFace / totalFrames
