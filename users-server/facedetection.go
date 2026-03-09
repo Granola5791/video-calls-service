@@ -112,3 +112,10 @@ func GetHeaderUserVideoChunks(userID uint, meetingID uuid.UUID) ([]byte, error) 
 	}
 	return GetHeaderOfWebm(firstChunk.Chunk), nil
 }
+
+func PassedFaceDetectionThreshold(framesWithFace, totalFrames int) bool {
+	minTotalFrames := GetIntFromConfig("face_detection.min_total_frames")
+	minFaceFramesPercentage := GetIntFromConfig("face_detection.min_frames_with_face_percentage")
+	FaceFramePercentage := 100 * framesWithFace / totalFrames
+	return totalFrames >= minTotalFrames && FaceFramePercentage >= minFaceFramesPercentage
+}

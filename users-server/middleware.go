@@ -191,10 +191,8 @@ func RequireFaceDetection(c *gin.Context) {
 		return
 	}
 
-	minTotalFrames := GetIntFromConfig("face_detection.min_total_frames")
-	minFaceFramesPercentage := GetIntFromConfig("face_detection.min_frames_with_face_percentage")
-	FaceFramePercentage := 100 * framesWithFace / totalFrames
-	if totalFrames < minTotalFrames || FaceFramePercentage < minFaceFramesPercentage {
+	if !PassedFaceDetectionThreshold(framesWithFace, totalFrames) {
+		KickParticipantFromMeeting(meetingID, uint(userID))
 		c.AbortWithStatus(http.StatusUnauthorized)
 	}
 }
