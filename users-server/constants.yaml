@@ -84,7 +84,7 @@ keep_alive:
   token_regen_interval: 10
 
 ai_server:
-  url: "http://127.0.0.1:8000"
+  url: "https://aiserver.local.my:8000"
   api:
     face_detection_path: "/face-detection"
 

@@ -5,12 +5,20 @@ import mediapipe as mp
 from mediapipe.tasks import python
 from mediapipe.tasks.python import vision
 import cv2
+import uvicorn
 from face_detector import FaceDetector
 import shutil
 from pathlib import Path
 import tempfile
+import ssl
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 app = FastAPI()
+ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+ssl_context.load_cert_chain(os.getenv("TLS_CERT_PATH"), os.getenv("TLS_KEY_PATH"))
 
 
 @app.post("/face-detection")
@@ -52,3 +60,13 @@ async def face_detection(request: Request, BackgroundTasks: BackgroundTasks):
         "frames_with_face": frames_with_face,
         "total_frames": total_frames,
     }
+
+
+if __name__ == "__main__":
+    uvicorn.run(
+        os.getenv("APP_NAME"),
+        host=os.getenv("HOST"),
+        port=int(os.getenv("PORT")),
+        ssl_certfile=os.getenv("TLS_CERT_PATH"),
+        ssl_keyfile=os.getenv("TLS_KEY_PATH"),
+    )
