@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 import { useParams } from 'react-router-dom';
-import { ApiEndpoints, UsersServerAddressHttp, UsersServerAddressWS, CallEventTypes, DasherServerAddressHttp, DasherServerAddressWS, HttpStatusCodes, SetUrlParams } from '../constants/backend-constants';
+import { DasherServer, UsersServer, CallEventTypes, HttpStatusCodes, SetUrlParams } from '../constants/backend-constants';
 import DashPlayer from '../components/DashPlayer';
 import { CenteredColumn, CenteredScreen, StyledMeetingGrid } from '../styled-components/StyledBoxes';
 import { StyledMeetingGridTile, StyledVideo } from '../styled-components/StyledVideos';
@@ -11,7 +11,6 @@ import { HostOptions, MeetingExitText, StartMeetingText } from '../constants/heb
 import { StyledMeetingFooter } from '../styled-components/StyledFooters';
 import { LongButton, LongButtonFilled } from '../styled-components/StyledButtons';
 import { StyledH1, StyledTitle } from '../styled-components/StyledText';
-
 
 const NormalizeMeetingIDs = (meetingIDs: unknown): string[] => {
     return Array.isArray(meetingIDs) ? meetingIDs : [];
@@ -57,7 +56,7 @@ const MeetingPage = () => {
     }, []);
 
     const CheckIfAbleToJoinMeeting = async (meetingID: string) => {
-        const res = await fetch(UsersServerAddressHttp + SetUrlParams(ApiEndpoints.isAbleToJoinMeeting, meetingID), {
+        const res = await fetch(UsersServer.httpAddress + SetUrlParams(UsersServer.api.isAbleToJoinMeeting, meetingID), {
             method: 'GET',
             credentials: 'include',
         });
@@ -103,7 +102,7 @@ const MeetingPage = () => {
     }
 
     const SendKeepAlive = async () => {
-        const res = await fetch(UsersServerAddressHttp + SetUrlParams(ApiEndpoints.keepAlive, meetingID), {
+        const res = await fetch(UsersServer.httpAddress + SetUrlParams(UsersServer.api.keepAlive, meetingID), {
             method: 'POST',
             credentials: 'include',
         })
@@ -165,7 +164,7 @@ const MeetingPage = () => {
     };
 
     const JoinMeetingBackend = async (meetingID: string) => {
-        let res = await fetch(UsersServerAddressHttp + SetUrlParams(ApiEndpoints.joinMeeting, meetingID), {
+        let res = await fetch(UsersServer.httpAddress + SetUrlParams(UsersServer.api.joinMeeting, meetingID), {
             method: 'POST',
             credentials: 'include',
         })
@@ -189,7 +188,7 @@ const MeetingPage = () => {
     }
 
     const SubscribeToMeetingUpdates = async (meetingID: string) => {
-        const ws = new WebSocket(UsersServerAddressWS + SetUrlParams(ApiEndpoints.getCallNotifications, meetingID));
+        const ws = new WebSocket(UsersServer.wsAddress + SetUrlParams(UsersServer.api.getCallNotifications, meetingID));
         notificationsWsRef.current = ws;
         ws.onmessage = (event) => {
             const data = JSON.parse(event.data);
@@ -220,7 +219,7 @@ const MeetingPage = () => {
     };
 
     const JoinMeetingDasher = async (meetingID: string) => {
-        let res = await fetch(DasherServerAddressHttp + SetUrlParams(ApiEndpoints.joinMeeting, meetingID), {
+        let res = await fetch(DasherServer.httpAddress + SetUrlParams(DasherServer.api.joinMeeting, meetingID), {
             method: 'POST',
             credentials: 'include',
         })
@@ -234,7 +233,7 @@ const MeetingPage = () => {
             setMeetingState(MeetingConfig.meetingState.active);
             await JoinMeetingBackend(meetingID);
             await JoinMeetingDasher(meetingID);
-            await StartStreaming(DasherServerAddressWS + SetUrlParams(ApiEndpoints.startStream, meetingID));
+            await StartStreaming(DasherServer.wsAddress + SetUrlParams(DasherServer.api.startStream, meetingID));
             await SubscribeToMeetingUpdates(meetingID);
             ContinuouslySendKeepAlive();
         } catch (error) {
@@ -266,7 +265,7 @@ const MeetingPage = () => {
 
         const LeaveMeetingBackend = async () => {
             notificationsWsRef.current?.close();
-            await fetch(UsersServerAddressHttp + SetUrlParams(ApiEndpoints.leaveMeeting, meetingID), {
+            await fetch(UsersServer.httpAddress + SetUrlParams(UsersServer.api.leaveMeeting, meetingID), {
                 method: 'POST',
                 credentials: 'include',
             })
@@ -278,7 +277,7 @@ const MeetingPage = () => {
     }
 
     const KickFromMeeting = async (userID: string) => {
-        await fetch(UsersServerAddressHttp + SetUrlParams(ApiEndpoints.kickParticipant, meetingID, userID), {
+        await fetch(UsersServer.httpAddress + SetUrlParams(UsersServer.api.kickParticipant, meetingID, userID), {
             method: 'POST',
             credentials: 'include',
         })
@@ -379,7 +378,7 @@ const MeetingPage = () => {
                         <StyledMeetingGridTile key={id}>
                             <DashPlayer
                                 userID={id}
-                                url={SetUrlParams(DasherServerAddressHttp + ApiEndpoints.getStream, meetingID, id)}
+                                url={SetUrlParams(DasherServer.httpAddress + DasherServer.api.getStream, meetingID, id)}
                                 menuOptions={hostOptions}
                             />
                         </StyledMeetingGridTile>

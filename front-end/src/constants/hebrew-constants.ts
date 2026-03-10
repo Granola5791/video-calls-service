@@ -54,6 +54,7 @@ export const HomePageText = {
     submitMeetingIDButton: "המשך",
     cancelMeetingIDButton: "ביטול",
     meetingIDInputPlaceholder: "הכנס מזהה פגישה",
+    requireFaceLabel: "ודא פנים בתמונה",
 };
 
 export const MeetingExitText = {

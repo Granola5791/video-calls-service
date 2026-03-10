@@ -1,4 +1,4 @@
-import { UsersServerAddressHttp, ApiEndpoints, HttpStatuses, HttpStatusCodes } from "../constants/backend-constants";
+import { UsersServer, HttpStatuses, HttpStatusCodes } from "../constants/backend-constants";
 
 async function fetchWithCredentials(apiPath: string) {
     const res = await fetch(apiPath, {
@@ -9,7 +9,7 @@ async function fetchWithCredentials(apiPath: string) {
 }
 
 export async function CheckLoginLoader() {
-    const res = await fetchWithCredentials(UsersServerAddressHttp + ApiEndpoints.checkLoginApi);
+    const res = await fetchWithCredentials(UsersServer.httpAddress + UsersServer.api.checkLoginApi);
     if (!res.ok) {
         throw new Response(HttpStatuses.unauthorized, {
             status: HttpStatusCodes.found,
@@ -20,7 +20,7 @@ export async function CheckLoginLoader() {
 }
 
 export async function CheckAdminLoader() {
-    const res = await fetchWithCredentials(UsersServerAddressHttp + ApiEndpoints.checkAdminApi);
+    const res = await fetchWithCredentials(UsersServer.httpAddress + UsersServer.api.checkAdminApi);
     if (!res.ok) {
         throw new Response(HttpStatuses.unauthorized, {
             status: HttpStatusCodes.found,

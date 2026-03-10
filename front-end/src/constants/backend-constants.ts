@@ -1,25 +1,56 @@
-export const UsersServerAddressHttp = "https://usersserver.local.my:8081";
-export const UsersServerAddressWS = "wss://usersserver.local.my:8081";
-export const DasherServerAddressWS = "wss://dasherserver.local.my:8082";
-export const DasherServerAddressHttp = "https://dasherserver.local.my:8082";
+// export const UsersServerAddressHttp = "https://usersserver.local.my:8081";
+// export const UsersServerAddressWS = "wss://usersserver.local.my:8081";
+// export const DasherServerAddressWS = "wss://dasherserver.local.my:8082";
+// export const DasherServerAddressHttp = "https://dasherserver.local.my:8082";
 
-export const ApiEndpoints = {
-    signUp: "/signup",
-    logIn: "/login",
-    logOut: "/logout",
-    checkLoginApi: "/check-login",
-    checkAdminApi: "/check-admin",
-    startStream: "/stream/{meeting_id}",
-    getStream: "/get-stream/{meeting_id}/{user_id}/stream.mpd",
-    createMeeting: "/create-meeting",
-    getCallParticipants: "/get-call-participants",
-    joinMeeting: "/join-meeting/{meeting_id}",
-    getCallNotifications: "/get-call-notifications/{meeting_id}",
-    leaveMeeting: "/leave-meeting/{meeting_id}",
-    keepAlive: "/keep-alive/{meeting_id}",
-    kickParticipant: "/kick-participant/{meeting_id}/{participant_id}",
-    isAbleToJoinMeeting: "/is-able-to-join-meeting/{meeting_id}",
-};
+export const DasherServer = {
+    httpAddress: "https://dasherserver.local.my:8082",
+    wsAddress: "wss://dasherserver.local.my:8082",
+    api: {
+        startStream: "/stream/{meeting_id}",
+        getStream: "/get-stream/{meeting_id}/{user_id}/stream.mpd",
+        createMeeting: "/create-meeting",
+        joinMeeting: "/join-meeting/{meeting_id}",
+    },
+}
+
+export const UsersServer = {
+    httpAddress: "https://usersserver.local.my:8081",
+    wsAddress: "wss://usersserver.local.my:8081",
+    api: {
+        signUp: "/signup",
+        logIn: "/login",
+        logOut: "/logout",
+        checkLoginApi: "/check-login",
+        checkAdminApi: "/check-admin",
+        createMeeting: "/create-meeting/{require_face}",
+        getCallParticipants: "/get-call-participants",
+        joinMeeting: "/join-meeting/{meeting_id}",
+        getCallNotifications: "/get-call-notifications/{meeting_id}",
+        leaveMeeting: "/leave-meeting/{meeting_id}",
+        keepAlive: "/keep-alive/{meeting_id}",
+        kickParticipant: "/kick-participant/{meeting_id}/{participant_id}",
+        isAbleToJoinMeeting: "/is-able-to-join-meeting/{meeting_id}",
+    },
+}
+
+// export const ApiEndpoints = {
+//     signUp: "/signup",
+//     logIn: "/login",
+//     logOut: "/logout",
+//     checkLoginApi: "/check-login",
+//     checkAdminApi: "/check-admin",
+//     startStream: "/stream/{meeting_id}",
+//     getStream: "/get-stream/{meeting_id}/{user_id}/stream.mpd",
+//     createMeeting: "/create-meeting/{require_face}",
+//     getCallParticipants: "/get-call-participants",
+//     joinMeeting: "/join-meeting/{meeting_id}",
+//     getCallNotifications: "/get-call-notifications/{meeting_id}",
+//     leaveMeeting: "/leave-meeting/{meeting_id}",
+//     keepAlive: "/keep-alive/{meeting_id}",
+//     kickParticipant: "/kick-participant/{meeting_id}/{participant_id}",
+//     isAbleToJoinMeeting: "/is-able-to-join-meeting/{meeting_id}",
+// };
 
 export const HttpStatusCodes = {
     OK: 200,
@@ -54,13 +85,13 @@ export const CallEventTypes = {
 export const SetUrlParams = (url: string, ...params: any[]): string => {
     let result = url;
     let paramIndex = 0;
-    
+
     result = result.replace(/\{[^}]+\}/g, () => {
         if (paramIndex < params.length) {
             return String(params[paramIndex++]);
         }
         return '';
     });
-    
+
     return result;
 }

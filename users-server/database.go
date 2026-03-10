@@ -27,8 +27,9 @@ type User struct {
 
 type Meeting struct {
 	UuidModel
-	HostID      uint   `gorm:"not null"`
-	BannedUsers []User `gorm:"many2many:meeting_banned_users;"`
+	HostID                  uint   `gorm:"not null"`
+	IsFaceDetectionRequired bool   `gorm:"not null;default:false"`
+	BannedUsers             []User `gorm:"many2many:meeting_banned_users;"`
 }
 
 type MeetingParticipant struct {
@@ -144,8 +145,11 @@ func GetUserIDAndRoleFromDB(username string) (int, string, error) {
 	return int(user.ID), user.Role, nil
 }
 
-func CreateMeetingInDB(hostID uint) (uuid.UUID, error) {
-	meeting := Meeting{HostID: hostID}
+func CreateMeetingInDB(hostID uint, isFaceDetectionRequired bool) (uuid.UUID, error) {
+	meeting := Meeting{
+		HostID:                  hostID,
+		IsFaceDetectionRequired: isFaceDetectionRequired,
+	}
 	err := db.Create(&meeting).Error
 	if err != nil {
 		return uuid.Nil, err
@@ -308,4 +312,16 @@ func GetFirstUserVideoChunkFromDB(meetingID uuid.UUID, userID uint) (*UserVideoC
 		First(&userVideoChunk).Error
 
 	return &userVideoChunk, err
+}
+
+func isFaceDetectionRequiredInDB(meetingID uuid.UUID) (bool, error) {
+	var count int64
+	err := db.Model(&Meeting{}).
+		Where("id = ?", meetingID).
+		Where("is_face_detection_required = ?", true).
+		Count(&count).Error
+	if err != nil {
+		return false, err
+	}
+	return count > 0, nil
 }

@@ -8,8 +8,6 @@ import SignupPage from './pages/SignupPage.tsx'
 import HomePage from './pages/HomePage.tsx'
 import { CheckLoginLoader } from './utils/check-login.ts'
 import TestPage from './pages/TestPage.tsx'
-import WebSocketWebCam from './components/WebSocketWebCam.tsx'
-import { DasherServerAddressWS, ApiEndpoints } from './constants/backend-constants.ts'
 import MeetingPage from './pages/MeetingPage.tsx'
 
 const router = createBrowserRouter([
@@ -38,10 +36,6 @@ const router = createBrowserRouter([
     {
         path: "/test",
         element: <TestPage />
-    },
-    {
-        path: "/test2",
-        element: <WebSocketWebCam wsUrl={DasherServerAddressWS + ApiEndpoints.startStream} />
     },
 ])
 

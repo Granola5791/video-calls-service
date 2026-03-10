@@ -157,6 +157,18 @@ func RequireSameOrigin(c *gin.Context) {
 func RequireFaceDetection(c *gin.Context) {
 	meetingID := uuid.MustParse(c.Param(GetStringFromConfig("server.api.params.meeting_id_name")))
 	userID := c.GetInt(GetStringFromConfig("jwt.user_id_name"))
+
+	// check if face detection is required
+	required, err := isFaceDetectionRequiredInDB(meetingID)
+	if err != nil {
+		log.Println(err)
+		c.AbortWithStatus(http.StatusInternalServerError)
+		return
+	}
+	if !required {
+		return
+	}
+
 	videoChunks, err := GetUserVideoChunksFromDB(meetingID, uint(userID))
 	if err != nil {
 		log.Println(err)

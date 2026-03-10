@@ -21,13 +21,14 @@ server:
     params:
       meeting_id_name: "meeting_id"
       user_to_kick_name: "user_to_kick"
+      is_face_detection_required_name: "is_face_detection_required"
 
     check_login_path: /check-login
     check_admin_path: /check-admin
     signup_path: /signup
     login_path: /login
     logout_path: /logout
-    create_meeting_path: /create-meeting
+    create_meeting_path: /create-meeting/:is_face_detection_required
     get_call_notifications_path: /get-call-notifications/:meeting_id
     join_meeting_path: /join-meeting/:meeting_id
     leave_meeting_path: /leave-meeting/:meeting_id

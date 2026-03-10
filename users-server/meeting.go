@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"sync"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -28,7 +29,10 @@ func AddMeetingNotifier(meetingID uuid.UUID) *MeetingNotifierStruct {
 func RemoveMeetingNotifier(meetingID uuid.UUID) {
 	meetingNotifiersMutex.Lock()
 	defer meetingNotifiersMutex.Unlock()
-	meeting := meetingNotifiers[meetingID]
+	meeting, ok := meetingNotifiers[meetingID]
+	if !ok {
+		return
+	}
 	meeting.CloseAllParticipants()
 	meeting.Close()
 	delete(meetingNotifiers, meetingID)
@@ -36,9 +40,17 @@ func RemoveMeetingNotifier(meetingID uuid.UUID) {
 
 func HandleCreateMeeting(c *gin.Context) {
 	userID := c.GetInt(GetStringFromConfig("jwt.user_id_name"))
-	log.Println("user id:", userID)
-	meetingID, err := CreateMeetingInDB(uint(userID))
+	isFaceDetectionRequired, err := strconv.ParseBool(c.Param(GetStringFromConfig("server.api.params.is_face_detection_required_name")))
 	if err != nil {
+		log.Println(err)
+		c.AbortWithStatus(http.StatusBadRequest)
+		return
+	}
+
+	log.Println("user id:", userID)
+	meetingID, err := CreateMeetingInDB(uint(userID), isFaceDetectionRequired)
+	if err != nil {
+		log.Println(err)
 		c.AbortWithStatus(http.StatusInternalServerError)
 		return
 	}
@@ -46,6 +58,7 @@ func HandleCreateMeeting(c *gin.Context) {
 	jwtKey := []byte(os.Getenv("MEETING_JWT_SECRET"))
 	token, err := GenerateMeetingToken(meetingID, jwtKey, GetIntFromConfig("meeting.token_exp"))
 	if err != nil {
+		log.Println(err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": GetStringFromConfig("errors.internal_server_error")})
 		return
 	}
