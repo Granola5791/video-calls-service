@@ -9,6 +9,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/google/uuid"
 )
 
 func RequireAuthentication(c *gin.Context) {
@@ -86,16 +87,15 @@ func RequireAuthorizedMeeting(c *gin.Context) {
 func RequireKeepAliveToken(c *gin.Context) {
 	// check route
 	if strings.HasPrefix(c.Request.URL.Path, "/"+GetStringFromConfig("server.api.create_meeting_path")) {
-		log.Println("here")
 		return
 	}
-	log.Println(c.Request.URL.Path, "vs", GetStringFromConfig("server.api.create_meeting_path"))
+
+	meetingID := uuid.MustParse(c.Param(GetStringFromConfig("server.api.params.meeting_id_name")))
 
 	// get cookie
 	tokenName := GetStringFromConfig("keep_alive.token_cookie_name")
 	tokenString, err := c.Cookie(tokenName)
 	if err != nil {
-		log.Println(err)
 		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
@@ -104,7 +104,6 @@ func RequireKeepAliveToken(c *gin.Context) {
 	jwtKey := []byte(os.Getenv("KEEP_ALIVE_JWT_SECRET"))
 	token, err := ParseToken(tokenString, jwtKey)
 	if err != nil {
-		log.Println(err)
 		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
@@ -116,9 +115,14 @@ func RequireKeepAliveToken(c *gin.Context) {
 		return
 	}
 
+	// check if token is for the correct meeting
+	if claims[GetStringFromConfig("jwt.meeting_id_name")].(string) != meetingID.String() {
+		c.AbortWithStatus(http.StatusUnauthorized)
+		return
+	}
+
 	// check if token is expired
-	if claims[GetStringFromConfig("keep_alive.exp_name")].(float64) < float64(time.Now().Unix()) {
-		log.Println(GetStringFromConfig("errors.passed_exp"))
+	if claims[GetStringFromConfig("jwt.exp_name")].(float64) < float64(time.Now().Unix()) {
 		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}

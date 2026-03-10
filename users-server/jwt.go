@@ -31,7 +31,7 @@ func GenerateLoginToken(userID int, role string, jwtKey []byte, expTimeSec int) 
 
 func GenerateKeepAliveToken(jwtKey []byte, meetingID uuid.UUID, expTimeSec int) (string, error) {
 	claims := jwt.MapClaims{
-		GetStringFromConfig("jwt.meeting_id_name"): meetingID,
+		GetStringFromConfig("jwt.meeting_id_name"): meetingID.String(),
 		GetStringFromConfig("jwt.exp_name"):        time.Now().Add(time.Second * time.Duration(expTimeSec)).Unix(),
 	}
 	return GenerateJwtToken(claims, jwtKey)

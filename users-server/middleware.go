@@ -67,6 +67,7 @@ func RequireAdmin(c *gin.Context) {
 }
 
 func RequireKeepAliveToken(c *gin.Context) {
+	meetingID := uuid.MustParse(c.Param(GetStringFromConfig("server.api.params.meeting_id_name")))
 
 	// get cookie
 	tokenName := GetStringFromConfig("keep_alive.token_cookie_name")
@@ -87,6 +88,12 @@ func RequireKeepAliveToken(c *gin.Context) {
 	// validate token claims
 	claims, ok := token.Claims.(jwt.MapClaims)
 	if !ok {
+		c.AbortWithStatus(http.StatusUnauthorized)
+		return
+	}
+
+	// check if token is for the correct meeting
+	if claims[GetStringFromConfig("jwt.meeting_id_name")].(string) != meetingID.String() {
 		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
