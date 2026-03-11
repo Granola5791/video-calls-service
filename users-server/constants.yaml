@@ -46,6 +46,7 @@ jwt:
   exp_name: "exp"
   admin_role: "admin"
   meeting_id_name: "meeting_id"
+  username_name: "username"
 
 errors:
   invalid_input: "Invalid input"

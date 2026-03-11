@@ -20,9 +20,10 @@ func GenerateMeetingToken(meetingID uuid.UUID, jwtKey []byte, expTimeSec int) (s
 	return GenerateJwtToken(claims, jwtKey)
 }
 
-func GenerateLoginToken(userID int, role string, jwtKey []byte, expTimeSec int) (string, error) {
+func GenerateLoginToken(userID uint, username string, role string, jwtKey []byte, expTimeSec int) (string, error) {
 	claims := jwt.MapClaims{
 		GetStringFromConfig("jwt.user_id_name"): userID,
+		GetStringFromConfig("jwt.username_name"): username,
 		GetStringFromConfig("jwt.role_name"):    role,
 		GetStringFromConfig("jwt.exp_name"):     time.Now().Add(time.Second * time.Duration(expTimeSec)).Unix(),
 	}

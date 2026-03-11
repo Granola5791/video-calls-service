@@ -23,3 +23,16 @@ export const MeetingID = styled.p ({
     width: '30%',
     fontSize: '0.9rem',
 });
+
+export const NameTag = styled.p ({
+    position: 'absolute',
+    right: '0px',
+    top: '0px',
+    color: 'white',
+    width: 'fit-content',
+    height: 'fit-content',
+    fontSize: '0.9rem',
+    backgroundColor: 'black',
+    margin: '0px',
+    padding: '1%',
+});

@@ -12,8 +12,18 @@ import { StyledMeetingFooter } from '../styled-components/StyledFooters';
 import { LongButtonFilled } from '../styled-components/StyledButtons';
 import { StyledTitle } from '../styled-components/StyledText';
 
-const NormalizeMeetingIDs = (meetingIDs: unknown): string[] => {
-    return Array.isArray(meetingIDs) ? meetingIDs : [];
+type Participant = {
+    id: string;
+    name: string;
+}
+
+/**
+ * Normalize an array to return an empty array if it's not an array.
+ * @param arr - The array to normalize.
+ * @returns An empty array if arr is not an array, arr otherwise.
+ */
+const NormalizeArray = (arr: unknown) => {
+    return Array.isArray(arr) ? arr : [];
 }
 
 const MeetingPage = () => {
@@ -27,7 +37,7 @@ const MeetingPage = () => {
     const clientVideoRef = React.useRef<HTMLVideoElement>(null);
     const toCleanUpRef = React.useRef<MediaStream[]>([]); // Store streams that need to be cleaned up
     const recorderRef = React.useRef<MediaRecorder | null>(null);
-    const [participantsIDs, setParticipantsIDs] = React.useState<string[]>([]);
+    const [participants, setParticipants] = React.useState<Participant[]>([]);
     const [meetingState, setMeetingState] = React.useState(MeetingConfig.meetingState.none);
     const keepAliveIntervalIDRef = React.useRef(0);
     const leaveMeetingTimeoutIDRef = React.useRef(0);
@@ -170,9 +180,12 @@ const MeetingPage = () => {
         })
         if (res.ok) {
             const data = await res.json();
-            const participants = data.participants
+            const participants: Participant[] = NormalizeArray(data.participants).map((participant: any) => ({
+                id: participant.user_id,
+                name: participant.username,
+            }));
             const is_host = data.is_host
-            setParticipantsIDs(NormalizeMeetingIDs(participants));
+            setParticipants(participants);
             setIsHost(is_host);
             if (is_host) {
                 ActivateHostOptions();
@@ -193,15 +206,21 @@ const MeetingPage = () => {
         ws.onmessage = (event) => {
             const data = JSON.parse(event.data);
             const participantID = data.participant_id
+            const participantName = data.participant_name
             const eventType = data.event
             const eventValue = data.value // usually zero
 
             switch (eventType) {
                 case CallEventTypes.participantJoined:
-                    setParticipantsIDs((prevIDs) => prevIDs.includes(participantID) ? prevIDs : [...prevIDs, participantID]);
+                    const newParticipant = { id: participantID, name: participantName };
+                    setParticipants((prev) =>
+                        prev.some((p) => p.id === participantID)
+                            ? prev
+                            : [...prev, newParticipant]
+                    );
                     break;
                 case CallEventTypes.participantLeft:
-                    setParticipantsIDs((prevIDs) => prevIDs.filter((id) => id !== participantID));
+                    setParticipants((prevParticipants) => prevParticipants.filter(({ id }) => id !== participantID));
                     break;
                 case CallEventTypes.participantKickedByHost:
                     setDangerSignOn(true);
@@ -375,11 +394,12 @@ const MeetingPage = () => {
                     </StyledMeetingGridTile>
                 }
                 {
-                    participantsIDs.map((id) => (
-                        <StyledMeetingGridTile key={id}>
+                    participants.map((participant) => (
+                        <StyledMeetingGridTile key={participant.id}>
                             <DashPlayer
-                                userID={id}
-                                url={SetUrlParams(DasherServer.httpAddress + DasherServer.api.getStream, meetingID, id)}
+                                userID={participant.id}
+                                userName={participant.name}
+                                url={SetUrlParams(DasherServer.httpAddress + DasherServer.api.getStream, meetingID, participant.id)}
                                 menuOptions={hostOptions}
                             />
                         </StyledMeetingGridTile>

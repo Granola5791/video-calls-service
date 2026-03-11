@@ -68,6 +68,17 @@ type UserVideoChunk struct {
 	Visited     bool      `gorm:"not null"`
 }
 
+type ParticipantInfo struct {
+	UserID   uint   `json:"user_id"`
+	Username string `json:"username"`
+}
+
+type UserInfo struct {
+	UserID   uint   `json:"user_id"`
+	Username string `json:"username"`
+	Role     string `json:"role"`
+}
+
 var db *gorm.DB
 
 func InitDatabaseConnection() error {
@@ -134,15 +145,20 @@ func GetUserAuthFromDB(username string) (string, string, error) {
 	return userAuth.HashedPassword, userAuth.Salt, nil
 }
 
-func GetUserIDAndRoleFromDB(username string) (int, string, error) {
+func GetUserInfoFromDB(username string) (UserInfo, error) {
 	var user User
 	err := db.Model(&User{}).
 		Where("username = ?", username).
 		First(&user).Error
 	if err != nil {
-		return 0, "", err
+		return UserInfo{}, err
 	}
-	return int(user.ID), user.Role, nil
+	ret := UserInfo{
+		UserID:   user.ID,
+		Username: user.Username,
+		Role:     user.Role,
+	}
+	return ret, nil
 }
 
 func CreateMeetingInDB(hostID uint, isFaceDetectionRequired bool) (uuid.UUID, error) {
@@ -184,23 +200,26 @@ func IsParticipantInMeetingInDB(meetingID uuid.UUID, userID uint) (bool, error) 
 	return count > 0, nil
 }
 
-func GetMeetingParticipantIDsFromDB(meetingID uuid.UUID, usersToIgnore ...uint) ([]uint, error) {
-	var ids []uint
+func GetMeetingParticipantIDsFromDB(meetingID uuid.UUID, usersToIgnore ...uint) ([]ParticipantInfo, error) {
+	var results []ParticipantInfo
 
-	query := db.
-		Model(&MeetingParticipant{}).
-		Where("meeting_id = ?", meetingID)
+	// Start the query joining the users table to get the name
+	query := db.Table("meeting_participants").
+		Select("meeting_participants.user_id, users.username").
+		Joins("join users on users.id = meeting_participants.user_id").
+		Where("meeting_participants.meeting_id = ?", meetingID)
 
 	if len(usersToIgnore) > 0 {
-		query = query.Where("user_id NOT IN ?", usersToIgnore)
+		query = query.Where("meeting_participants.user_id NOT IN ?", usersToIgnore)
 	}
 
-	err := query.Pluck("user_id", &ids).Error
+	// Use Scan instead of Pluck when dealing with structs/multiple columns
+	err := query.Scan(&results).Error
 	if err != nil {
 		return nil, err
 	}
 
-	return ids, nil
+	return results, nil
 }
 
 func MeetingExistsInDB(meetingID uuid.UUID) (bool, error) {

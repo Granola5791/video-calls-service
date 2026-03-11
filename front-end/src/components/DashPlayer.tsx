@@ -7,15 +7,17 @@ import { Sleep } from '../utils/sleep';
 import { Menu, MenuItem } from '@mui/material';
 import { ErrorMsgs } from '../constants/general-contants';
 import { SmallMuteButton } from '../styled-components/StyledButtons';
-import { MutedIcon, SmallMutedIcon, SmallUnmutedIcon, UnmutedIcon } from '../styled-components/StyledIcons';
+import { SmallMutedIcon, SmallUnmutedIcon } from '../styled-components/StyledIcons';
+import { NameTag } from '../styled-components/StyledText';
 
 interface DashPlayerProps {
     userID: string;
+    userName: string;
     url: string;
     menuOptions: { label: string; onClick: (userID: string) => void }[];
 }
 
-const DashPlayer = ({ userID, url, menuOptions }: DashPlayerProps) => {
+const DashPlayer = ({ userID, url, menuOptions, userName }: DashPlayerProps) => {
     const videoRef = useRef<HTMLVideoElement>(null);
     const playerRef = useRef<shaka.Player | null>(null);
     const [menuAnchorPos, setMenuAnchorPos] = useState<{ top: number, left: number } | undefined>(undefined);
@@ -142,6 +144,7 @@ const DashPlayer = ({ userID, url, menuOptions }: DashPlayerProps) => {
             <SmallMuteButton onClick={() => setMuted(!muted)}>
                 {muted ? <SmallMutedIcon /> : <SmallUnmutedIcon />}
             </SmallMuteButton>
+            <NameTag>{userName}</NameTag>
             <Menu
                 open={openMenu}
                 anchorReference='anchorPosition'

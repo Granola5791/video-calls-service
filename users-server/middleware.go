@@ -45,6 +45,7 @@ func RequireAuthentication(c *gin.Context) {
 	}
 
 	c.Set(GetStringFromConfig("jwt.user_id_name"), int(claims[GetStringFromConfig("jwt.user_id_name")].(float64)))
+	c.Set(GetStringFromConfig("jwt.username_name"), claims[GetStringFromConfig("jwt.username_name")].(string))
 	c.Set(GetStringFromConfig("jwt.role_name"), claims[GetStringFromConfig("jwt.role_name")].(string))
 
 	c.Next()
@@ -182,7 +183,7 @@ func RequireFaceDetection(c *gin.Context) {
 		c.AbortWithStatus(http.StatusInternalServerError)
 		return
 	}
-	if(len(videoChunks) == 0) {
+	if len(videoChunks) == 0 {
 		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}

@@ -5,8 +5,8 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"sync"
 	"strconv"
+	"sync"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -138,6 +138,7 @@ func HandleJoinMeeting(c *gin.Context) {
 
 func HandleGetCallNotifications(c *gin.Context) {
 	userID := c.GetInt(GetStringFromConfig("jwt.user_id_name"))
+	userName := c.GetString(GetStringFromConfig("jwt.username_name"))
 	meetingID := uuid.MustParse(c.Param(GetStringFromConfig("server.api.params.meeting_id_name")))
 	ws, err := wsUpgrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
@@ -152,7 +153,7 @@ func HandleGetCallNotifications(c *gin.Context) {
 		return
 	}
 
-	participantNotifier := meeting.AddParticipant(uint(userID))
+	participantNotifier := meeting.AddParticipant(uint(userID), userName)
 	go participantNotifier.Run(ws)
 }
 

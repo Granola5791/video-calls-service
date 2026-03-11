@@ -32,13 +32,13 @@ func (m *MeetingNotifierStruct) unlock() {
 	m.mutex.Unlock()
 }
 
-func (m *MeetingNotifierStruct) AddParticipant(participantID uint) *ParticipantNotifierStruct {
+func (m *MeetingNotifierStruct) AddParticipant(participantID uint, participantName string) *ParticipantNotifierStruct {
 	participant := &ParticipantNotifierStruct{}
 	participant.Init(participantID, m.ctx)
 	m.lock()
 	defer m.unlock()
 	m.participants[participantID] = participant
-	m.notificationChanIn <- ParticipantNotification{ParticipantID: participantID, Event: ParticipantJoined}
+	m.notificationChanIn <- ParticipantNotification{ParticipantID: participantID, ParticipantName: participantName, Event: ParticipantJoined}
 	return participant
 }
 
