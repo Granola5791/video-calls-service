@@ -2,15 +2,15 @@ import React, { useEffect } from 'react'
 import { useParams } from 'react-router-dom';
 import { DasherServer, UsersServer, CallEventTypes, HttpStatusCodes, SetUrlParams } from '../constants/backend-constants';
 import DashPlayer from '../components/DashPlayer';
-import { CenteredColumn, CenteredScreen, StyledMeetingGrid } from '../styled-components/StyledBoxes';
+import { CenteredColumn, StyledMeetingGrid } from '../styled-components/StyledBoxes';
 import { StyledMeetingGridTile, StyledVideo } from '../styled-components/StyledVideos';
 import OneButtonPopUp from '../components/OneButtonPopUp';
 import { useNavigation } from '../utils/navigation';
-import { ErrorMsgs, LocalStorage, MeetingConfig, StreamConfig } from '../constants/general-contants';
+import { LocalStorage, MeetingConfig, StreamConfig } from '../constants/general-contants';
 import { HostOptions, MeetingExitText, StartMeetingText } from '../constants/hebrew-constants';
 import { StyledMeetingFooter } from '../styled-components/StyledFooters';
-import { LongButton, LongButtonFilled } from '../styled-components/StyledButtons';
-import { StyledH1, StyledTitle } from '../styled-components/StyledText';
+import { LongButtonFilled } from '../styled-components/StyledButtons';
+import { StyledTitle } from '../styled-components/StyledText';
 
 const NormalizeMeetingIDs = (meetingIDs: unknown): string[] => {
     return Array.isArray(meetingIDs) ? meetingIDs : [];
@@ -335,6 +335,7 @@ const MeetingPage = () => {
                 />
                 <LongButtonFilled
                     onClick={EnterMeeting}
+                    disabled={!previewOn}
                 >
                     {StartMeetingText.enterMeetingButton}
                 </LongButtonFilled>
