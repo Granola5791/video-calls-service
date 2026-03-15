@@ -1,15 +1,17 @@
 package main
 
 import (
+	"encoding/json"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
+	"strings"
 
 	"github.com/google/uuid"
 )
 
 func HandleTranscription(meetingID uuid.UUID) {
-	log.Println("started transcrioption")
 	meetingParticipants, err := GetAllMeetingParticipantIDsFromDB(meetingID)
 	if err != nil {
 		log.Println(err)
@@ -21,18 +23,20 @@ func HandleTranscription(meetingID uuid.UUID) {
 			log.Println(err)
 			return
 		}
-		log.Println(t)
+		var s []string
+		json.Unmarshal(t, &s)
+		standardizedText := StandardizeTranscriptionText(s)
+		fmt.Println(standardizedText)
 	}
 }
 
-func GetTranscription(meetingID uuid.UUID, userID uint) (string, error) {
-	log.Println("started transcrioption for user", userID)
+func GetTranscription(meetingID uuid.UUID, userID uint) ([]byte, error) {
 	reader, writer := io.Pipe()
 
 	url := GetStringFromConfig("ai_server.url") + GetStringFromConfig("ai_server.api.transcription_path")
 	req, err := http.NewRequest("POST", url, reader)
 	if err != nil {
-		return "", err
+		return []byte{}, err
 	}
 	req.Header.Set("Content-Type", "video/webm")
 
@@ -47,17 +51,25 @@ func GetTranscription(meetingID uuid.UUID, userID uint) (string, error) {
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		return "", err
+		return []byte{}, err
 	}
 	defer resp.Body.Close()
 
 	bodyBytes, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return "", err
+		return []byte{}, err
 	}
 
 	if resp.StatusCode == http.StatusOK {
-		return string(bodyBytes), nil
+		return bodyBytes, nil
 	}
-	return string(bodyBytes), nil
+	return bodyBytes, nil
+}
+
+// return a text with the following format:
+// 	startTime1 endtime1 text1\n
+// 	startTime2 endtime2 text2\n
+//	...
+func StandardizeTranscriptionText(segments []string) string {
+	return strings.Join(segments, "\n")
 }

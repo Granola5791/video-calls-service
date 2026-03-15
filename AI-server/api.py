@@ -72,10 +72,10 @@ async def transcribe(request: Request):
                 temp_video.write(chunk)
             temp_video.flush()
             segments, info = transcription_model.transcribe(temp_video.name, language="he", beam_size=1)
-            result = [f"{s.start} {s.end} {s.text}" for s in segments]
+            result = [f"{s.start:.2f} {s.end:.2f} {s.text}" for s in segments]
             for r in result:
                 print(r)
-            return {"result": "ndvckjn"}
+            return result
     except Exception as e:
         print(e)
         return {"result": "ndvckjn"}
