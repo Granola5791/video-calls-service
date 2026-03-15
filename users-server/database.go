@@ -194,8 +194,8 @@ func AddParticipantToMeetingInDB(meetingID uuid.UUID, userID uint) error {
 
 func RemoveParticipantFromMeetingInDB(meetingID uuid.UUID, userID uint) error {
 	return db.
-				Unscoped().
-Where("meeting_id = ? AND user_id = ?", meetingID, userID).
+		Unscoped().
+		Where("meeting_id = ? AND user_id = ?", meetingID, userID).
 		Delete(&MeetingParticipant{}).Error
 }
 
@@ -269,8 +269,8 @@ func IsMeetingEmptyInDB(meetingID uuid.UUID) (bool, error) {
 
 func RemoveAllMeetingParticipantsFromDB(meetingID uuid.UUID) error {
 	return db.
-				Unscoped().
-Where("meeting_id = ?", meetingID).
+		Unscoped().
+		Where("meeting_id = ?", meetingID).
 		Delete(&MeetingParticipant{}).Error
 }
 
@@ -388,8 +388,17 @@ func GetAllMeetingParticipantIDsFromDB(meetingID uuid.UUID) ([]uint, error) {
 	participantJoinedEvent := GetStringFromConfig("database.meeting_events.participant_joined")
 	err := db.
 		Model(&MeetingEvent{}).
-		Where("meeting_id = ? AND event = '" + participantJoinedEvent + "'", meetingID).
+		Where("meeting_id = ? AND event = '"+participantJoinedEvent+"'", meetingID).
 		Distinct().
 		Pluck("user_id", &meetingParticipants).Error
 	return meetingParticipants, err
+}
+
+func InsertTranscriptionToDB(meetingID uuid.UUID, userID uint, transcription string) error {
+	return db.
+		Create(&ParticipantTranscription{
+			MeetingID:  meetingID,
+			UserID:     userID,
+			Transcript: transcription,
+		}).Error
 }

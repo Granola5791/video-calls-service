@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -18,15 +17,19 @@ func HandleTranscription(meetingID uuid.UUID) {
 		return
 	}
 	for _, participant := range meetingParticipants {
-		t, err := GetTranscription(meetingID, participant)
+		transcription, err := GetTranscription(meetingID, participant)
 		if err != nil {
 			log.Println(err)
 			return
 		}
-		var s []string
-		json.Unmarshal(t, &s)
-		standardizedText := StandardizeTranscriptionText(s)
-		fmt.Println(standardizedText)
+		var res []string
+		json.Unmarshal(transcription, &res)
+		standardizedText := StandardizeTranscriptionText(res)
+		err = InsertTranscriptionToDB(meetingID, participant, standardizedText)
+		if err != nil {
+			log.Println(err)
+			return
+		}
 	}
 }
 
