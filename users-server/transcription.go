@@ -70,6 +70,9 @@ func GetTranscription(meetingID uuid.UUID, userID uint) ([]byte, error) {
 // 	startTime1 endtime1 text1\n
 // 	startTime2 endtime2 text2\n
 //	...
+//
+// an example of a standardize transcription text
+// can be found in the transcription_test.txt file
 func StandardizeTranscriptionText(segments []string) string {
 	return strings.Join(segments, "\n")
 }
