@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"os"
 	"time"
 
@@ -68,6 +69,15 @@ type UserVideoChunk struct {
 	Visited     bool      `gorm:"not null"`
 }
 
+type ParticipantTranscription struct {
+	gorm.Model
+	UserID     uint      `gorm:"not null; uniqueIndex:idx_user_meeting"`
+	User       User      `gorm:"foreignKey:UserID"`
+	MeetingID  uuid.UUID `gorm:"not null; uniqueIndex:idx_user_meeting"`
+	Meeting    Meeting   `gorm:"foreignKey:MeetingID"`
+	Transcript string    `gorm:"not null"`
+}
+
 type ParticipantInfo struct {
 	UserID   uint   `json:"user_id"`
 	Username string `json:"username"`
@@ -106,6 +116,7 @@ func InitDatabaseConnection() error {
 		&UserAuth{},
 		&UserRole{},
 		&UserVideoChunk{},
+		&ParticipantTranscription{},
 	)
 	if err != nil {
 		return err
@@ -183,8 +194,8 @@ func AddParticipantToMeetingInDB(meetingID uuid.UUID, userID uint) error {
 
 func RemoveParticipantFromMeetingInDB(meetingID uuid.UUID, userID uint) error {
 	return db.
-		Unscoped().
-		Where("meeting_id = ? AND user_id = ?", meetingID, userID).
+				Unscoped().
+Where("meeting_id = ? AND user_id = ?", meetingID, userID).
 		Delete(&MeetingParticipant{}).Error
 }
 
@@ -200,7 +211,11 @@ func IsParticipantInMeetingInDB(meetingID uuid.UUID, userID uint) (bool, error) 
 	return count > 0, nil
 }
 
-func GetMeetingParticipantIDsFromDB(meetingID uuid.UUID, usersToIgnore ...uint) ([]ParticipantInfo, error) {
+// GetParticipantsInMeetingFromDB retrieves the participants currently in a meeting from the database.
+// The function takes a meeting ID and an optional list of user IDs to ignore.
+// It returns a slice of ParticipantInfo structs containing the user ID and username of each participant.
+// If an error occurs while querying the database, it is returned along with a nil result.
+func GetParticipantsInMeetingFromDB(meetingID uuid.UUID, usersToIgnore ...uint) ([]ParticipantInfo, error) {
 	var results []ParticipantInfo
 
 	// Start the query joining the users table to get the name
@@ -252,10 +267,10 @@ func IsMeetingEmptyInDB(meetingID uuid.UUID) (bool, error) {
 	return participantCount == 0, nil
 }
 
-func DeleteMeetingParticipantsFromDB(meetingID uuid.UUID) error {
+func RemoveAllMeetingParticipantsFromDB(meetingID uuid.UUID) error {
 	return db.
-		Unscoped().
-		Where("meeting_id = ?", meetingID).
+				Unscoped().
+Where("meeting_id = ?", meetingID).
 		Delete(&MeetingParticipant{}).Error
 }
 
@@ -343,4 +358,38 @@ func isFaceDetectionRequiredInDB(meetingID uuid.UUID) (bool, error) {
 		return false, err
 	}
 	return count > 0, nil
+}
+
+// pipe in all user video chunks from the database
+func PipeAllUserVideoChunksFromDB(meetingID uuid.UUID, userID uint, pipeIn io.Writer) error {
+	rows, err := db.Model(&UserVideoChunk{}).
+		Where("meeting_id = ? AND user_id = ?", meetingID, userID).
+		Order("chunk_number ASC").
+		Rows()
+	if err != nil {
+		return err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var userVideoChunk UserVideoChunk
+		db.ScanRows(rows, &userVideoChunk)
+		_, err = pipeIn.Write(userVideoChunk.Chunk)
+		if err != nil {
+			return err
+		}
+	}
+	return rows.Err()
+}
+
+// get ids of all participants who joined the meeting
+// including participants who left the meeting
+func GetAllMeetingParticipantIDsFromDB(meetingID uuid.UUID) ([]uint, error) {
+	var meetingParticipants []uint
+	participantJoinedEvent := GetStringFromConfig("database.meeting_events.participant_joined")
+	err := db.
+		Model(&MeetingEvent{}).
+		Where("meeting_id = ? AND event = '" + participantJoinedEvent + "'", meetingID).
+		Distinct().
+		Pluck("user_id", &meetingParticipants).Error
+	return meetingParticipants, err
 }

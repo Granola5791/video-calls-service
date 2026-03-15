@@ -90,7 +90,7 @@ func HandleJoinMeeting(c *gin.Context) {
 		return
 	}
 
-	meetingParticipants, err := GetMeetingParticipantIDsFromDB(meetingID, uint(userID))
+	meetingParticipants, err := GetParticipantsInMeetingFromDB(meetingID, uint(userID))
 	if err != nil {
 		c.AbortWithStatus(http.StatusInternalServerError)
 		return
@@ -234,10 +234,12 @@ func RemoveMeeting(meetingID uuid.UUID) error {
 
 	RemoveMeetingKeepAlive(meetingID)
 
-	err := DeleteMeetingParticipantsFromDB(meetingID)
+	err := RemoveAllMeetingParticipantsFromDB(meetingID)
 	if err != nil {
 		return err
 	}
+
+	go HandleTranscription(meetingID)
 
 	return nil
 }

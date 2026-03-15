@@ -2,6 +2,8 @@ server:
   listen_addr: "dasherserver.local.my:8082"
   frontend_addr: "https://frontend.local.my:5173"
   api:
+    params:
+      meeting_id_name: "meeting_id"
     stream_from_client_path: "stream/:meeting_id"
     stream_to_client_path: "get-stream"
     create_meeting_path: "create-meeting"
@@ -38,3 +40,7 @@ keep_alive:
 database:
   sslmode: disable
   timezone: Asia/Jerusalem
+
+jwt:
+  meeting_id_name: "meeting_id"
+  exp_name: "exp"

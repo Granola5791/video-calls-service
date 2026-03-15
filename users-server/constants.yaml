@@ -88,6 +88,7 @@ ai_server:
   url: "https://aiserver.local.my:8000"
   api:
     face_detection_path: "/face-detection"
+    transcription_path: "/transcription"
 
 face_detection:
   min_frames_with_face_percentage: 50
