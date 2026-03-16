@@ -4,8 +4,10 @@ server:
   api:
     params:
       meeting_id_name: "meeting_id"
+      user_id_name: "user_id"
+      file_name_name: "file_name"
     stream_from_client_path: "stream/:meeting_id"
-    stream_to_client_path: "get-stream"
+    stream_to_client_path: "get-stream/:meeting_id/:user_id/:file_name"
     create_meeting_path: "create-meeting"
     join_meeting_path: "join-meeting/:meeting_id"
 

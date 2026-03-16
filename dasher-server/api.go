@@ -35,11 +35,11 @@ func InitRouter() {
 	)
 
 	router.GET(GetStringFromConfig("server.api.stream_from_client_path"), RequireAuthentication, HandleStream)
+	router.GET(GetStringFromConfig("server.api.stream_to_client_path"), RequireAuthentication, HandleStreamToClient)
+	router.HEAD(GetStringFromConfig("server.api.stream_to_client_path"), RequireAuthentication, HandleCheckStreamAvailable)
 
 	router.POST(GetStringFromConfig("server.api.create_meeting_path"), RequireAuthentication, RequireAuthorizedMeeting, HandleCreateMeeting)
 	router.POST(GetStringFromConfig("server.api.join_meeting_path"), RequireAuthentication, HandleJoinMeeting)
-
-	router.StaticFS(GetStringFromConfig("server.api.stream_to_client_path"), gin.Dir("./meetings", false))
 
 	router.RunTLS(
 		GetStringFromConfig("server.listen_addr"),
