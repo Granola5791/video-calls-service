@@ -274,3 +274,14 @@ func HandleKeepAlive(c *gin.Context) {
 
 	c.Status(http.StatusOK)
 }
+
+func HandleGetAllMeetingParticipants(c *gin.Context) {
+	meetingID := uuid.MustParse(c.Param(GetStringFromConfig("server.api.params.meeting_id_name")))
+	meetingParticipants, err := GetAllMeetingParticipantIDsFromDB(meetingID)
+	if err != nil {
+		log.Println(err)
+		c.AbortWithStatus(http.StatusInternalServerError)
+		return
+	}
+	c.JSON(http.StatusOK, meetingParticipants)
+}

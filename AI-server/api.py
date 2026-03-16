@@ -21,7 +21,9 @@ app = FastAPI()
 ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
 ssl_context.load_cert_chain(os.getenv("TLS_CERT_PATH"), os.getenv("TLS_KEY_PATH"))
 
-transcription_model = faster_whisper.WhisperModel('ivrit-ai/whisper-large-v3-turbo-ct2', compute_type="int8")
+transcription_model = faster_whisper.WhisperModel(
+    "ivrit-ai/whisper-large-v3-turbo-ct2", compute_type="int8"
+)
 
 
 @app.post("/face-detection")
@@ -54,7 +56,6 @@ async def face_detection(request: Request):
                 total_frames += 1
             cap.release()
     finally:
-        print("tfile.name:", tfile.name)  # Print the name of the temporary file before deleting itfile
         if os.path.exists(tfile.name):
             os.remove(tfile.name)
     print("total_frames:", total_frames)
@@ -64,15 +65,24 @@ async def face_detection(request: Request):
         "total_frames": total_frames,
     }
 
+
 @app.post("/transcription")
-async def transcribe(request: Request):
+async def transcribe(request: Request, offset: float = 0):
     try:
         with tempfile.NamedTemporaryFile(suffix=".webm", delete=False) as temp_video:
             async for chunk in request.stream():
                 temp_video.write(chunk)
             temp_video.flush()
-            segments, info = transcription_model.transcribe(temp_video.name, language="he", beam_size=1)
-            result = [f"{s.start:.2f} {s.end:.2f} {s.text}" for s in segments]
+            segments, info = transcription_model.transcribe(
+                temp_video.name,
+                language="he",
+                beam_size=1,
+                vad_filter=True,
+                vad_parameters=dict(min_silence_duration_ms=1000),
+            )
+            result = [
+                f"{s.start+offset:.2f} {s.end+offset:.2f} {s.text}" for s in segments
+            ]
             for r in result:
                 print(r)
             return result
@@ -82,7 +92,6 @@ async def transcribe(request: Request):
     finally:
         if os.path.exists(temp_video.name):
             os.remove(temp_video.name)
-
 
 
 if __name__ == "__main__":

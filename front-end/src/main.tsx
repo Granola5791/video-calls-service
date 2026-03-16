@@ -9,6 +9,8 @@ import HomePage from './pages/HomePage.tsx'
 import { CheckLoginLoader } from './utils/check-login.ts'
 import TestPage from './pages/TestPage.tsx'
 import MeetingPage from './pages/MeetingPage.tsx'
+import TranscriptsPage from './pages/TranscriptsPage.tsx'
+import MeetingTranscriptPage from './pages/MeetingTranscriptPage.tsx'
 
 const router = createBrowserRouter([
     {
@@ -31,6 +33,16 @@ const router = createBrowserRouter([
     {
         path: "/meeting/:meetingID",
         element: <MeetingPage />,
+        loader: CheckLoginLoader,
+    },
+    {
+        path: "/transcripts",
+        element: <TranscriptsPage />,
+        loader: CheckLoginLoader,
+    },
+    {
+        path: "/transcript/:meetingID",
+        element: <MeetingTranscriptPage />,
         loader: CheckLoginLoader,
     },
     {

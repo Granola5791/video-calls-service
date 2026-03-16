@@ -9,5 +9,6 @@ export function useNavigation() {
         goToJoinMeeting: () => navigate("/join-meeting"),
         goToHome: () => navigate("/home"),
         goToMeeting: (meetingID: string) => navigate(`/meeting/${meetingID}`),
+        goToTranscript: (meetingID: string) => navigate(`/transcript/${meetingID}`),
     };
 }

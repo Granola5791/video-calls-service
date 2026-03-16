@@ -402,3 +402,32 @@ func InsertTranscriptionToDB(meetingID uuid.UUID, userID uint, transcription str
 			Transcript: transcription,
 		}).Error
 }
+
+func GetTranscriptionMeetingsFromDB() ([]string, error) {
+	var meetingIDs []string
+	err := db.
+		Model(&ParticipantTranscription{}).
+		Distinct().
+		Pluck("meeting_id", &meetingIDs).Error
+	return meetingIDs, err
+}
+
+func GetTranscriptFromDB(meetingID uuid.UUID, userID uint) (string, error) {
+	var transcript string
+	err := db.
+		Model(&ParticipantTranscription{}).
+		Select("transcript").
+		Where("meeting_id = ? AND user_id = ?", meetingID, userID).
+		Take(&transcript).Error
+	return transcript, err
+}
+
+func GetUsernameFromDB(userID uint) (string, error) {
+	var username string
+	err := db.
+		Model(&User{}).
+		Select("username").
+		Where("id = ?", userID).
+		Take(&username).Error
+	return username, err
+}
