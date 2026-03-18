@@ -42,7 +42,8 @@ export const MeetingConfig = {
 
 export const LocalStorage = {
     id : 'id',
-    role: 'role'
+    role: 'role',
+    username: 'username',
 }
 
 export const ErrorMsgs = {
@@ -53,11 +54,16 @@ export const ErrorMsgs = {
 }
 
 export const RouterPaths = {
-    home: 'home',
+    home: '/',
     transcripts: 'transcripts',
     landing: '/landing',
     meetingTranscript: 'transcript/:meetingID',
     login: '/login',
     signup: '/signup',
     meeting: '/meeting/:meetingID',
+}
+
+export const Roles = {
+    user: 'user',
+    admin: 'admin',
 }

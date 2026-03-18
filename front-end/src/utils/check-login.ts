@@ -1,4 +1,5 @@
 import { UsersServer, HttpStatuses, HttpStatusCodes } from "../constants/backend-constants";
+import { RouterPaths } from "../constants/general-contants";
 
 async function fetchWithCredentials(apiPath: string) {
     const res = await fetch(apiPath, {
@@ -13,7 +14,7 @@ export async function CheckLoginLoader() {
     if (!res.ok) {
         throw new Response(HttpStatuses.unauthorized, {
             status: HttpStatusCodes.found,
-            headers: { Location: '/' },
+            headers: { Location: RouterPaths.landing },
         });
     }
     return null;
@@ -24,7 +25,7 @@ export async function CheckAdminLoader() {
     if (!res.ok) {
         throw new Response(HttpStatuses.unauthorized, {
             status: HttpStatusCodes.found,
-            headers: { Location: '/' },
+            headers: { Location: RouterPaths.landing },
         });
     }
     return null;

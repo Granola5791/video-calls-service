@@ -5,12 +5,15 @@ import { useNavigation } from '../utils/navigation';
 const TranscriptsPage = () => {
     const [meetings, setMeetings] = React.useState<string[]>([]);
     const {
-        goToTranscript,
+        goToMeetingTranscript: goToTranscript,
     } = useNavigation();
 
     useEffect(() => {
         const fetchMeetings = async () => {
-            const response = await fetch(UsersServer.httpAddress + UsersServer.api.getTranscriptionMeetings);
+            const response = await fetch(UsersServer.httpAddress + UsersServer.api.getTranscriptionMeetings, {
+                method: 'GET',
+                credentials: 'include',
+            });
             const data = await response.json();
             setMeetings(data);
         };

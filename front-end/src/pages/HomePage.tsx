@@ -4,11 +4,10 @@ import { UsersServer, DasherServer, SetUrlParams } from '../constants/backend-co
 import { LongButton, LongButtonFilled } from '../styled-components/StyledButtons'
 import { StyledTextField } from '../styled-components/StyledTextFields'
 import { useNavigation } from '../utils/navigation'
-import { General, HomePageText, MenuOptions } from '../constants/hebrew-constants'
+import { General, HomePageText } from '../constants/hebrew-constants'
 import TwoButtonPopUp from '../components/TwoButtonPopUp'
 import { Colors } from '../constants/general-contants'
 import { StyledTitle } from '../styled-components/StyledText'
-import HamburgerMenu from '../components/HamburgerMenu'
 import Checkbox from '@mui/material/Checkbox';
 import { FormControlLabel } from '@mui/material'
 
@@ -45,27 +44,8 @@ const HomePage = () => {
         goToMeeting(meetingId);
     }
 
-    const LogOut = () => {
-        const LogoutFrontend = () => {
-            localStorage.clear();
-            window.location.href = '/';
-        }
-
-        const LogoutBackend = async () => {
-            await fetch(UsersServer.httpAddress + UsersServer.api.logOut, {
-                method: 'POST',
-                credentials: 'include',
-            });
-        }
-
-        LogoutBackend().then(LogoutFrontend);
-    }
-
     return (
         <CenteredScreen>
-            <HamburgerMenu
-                topButtons={[{ text: MenuOptions.disconnect, onClick: LogOut }]}
-            />
             <CenteredColumn>
 
                 <StyledTitle>{General.appName}</StyledTitle>

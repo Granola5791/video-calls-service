@@ -32,6 +32,7 @@ const LoginPage = () => {
                 const data = await res.json();
                 localStorage.setItem(LocalStorage.id, data.id);
                 localStorage.setItem(LocalStorage.role, data.role);
+                localStorage.setItem(LocalStorage.username, data.username);
                 GoToHome();
                 break;
             case HttpStatusCodes.Unauthorized:

@@ -9,9 +9,10 @@ interface HamburgerMenuProps {
     onOpen?: () => void,
     topButtons?: { text: string, onClick: () => void }[],
     bottomButtons?: { text: string, onClick: () => void }[],
+    title?: string
 }
 
-const HamburgerMenu = ({ onClose, onOpen, topButtons, bottomButtons }: HamburgerMenuProps) => {
+const HamburgerMenu = ({ onClose, onOpen, topButtons, bottomButtons, title}: HamburgerMenuProps) => {
 
     const [open, setOpen] = useState(false);
 
@@ -36,6 +37,7 @@ const HamburgerMenu = ({ onClose, onOpen, topButtons, bottomButtons }: Hamburger
             </HamburgerMenuButton>
             <Drawer anchor='right' open={open} onClose={handleClose}>
                 <HamburgerMenuContainer>
+                    {title && <h4 style={{textAlign: 'center'}}>{title}</h4>}
                     <List>
                         {topButtons && topButtons.map((button, index) => (
                             <ListItem key={index} disablePadding>

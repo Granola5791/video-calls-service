@@ -1,14 +1,15 @@
 import { useNavigate } from "react-router-dom";
+import { RouterPaths } from "../constants/general-contants";
 
 export function useNavigation() {
     const navigate = useNavigate();
 
     return {
-        goToSignUp: () => navigate("/signup"),
-        goToLogIn: () => navigate("/login"),
-        goToJoinMeeting: () => navigate("/join-meeting"),
-        goToHome: () => navigate("/home"),
+        goToSignUp: () => navigate(RouterPaths.signup),
+        goToLogIn: () => navigate(RouterPaths.login),
+        goToHome: () => navigate(RouterPaths.home),
         goToMeeting: (meetingID: string) => navigate(`/meeting/${meetingID}`),
-        goToTranscript: (meetingID: string) => navigate(`/transcript/${meetingID}`),
+        goToMeetingTranscript: (meetingID: string) => navigate(`/transcript/${meetingID}`),
+        goToTranscripts: () => navigate(RouterPaths.transcripts),
     };
 }
