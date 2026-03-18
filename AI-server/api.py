@@ -21,9 +21,7 @@ app = FastAPI()
 ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
 ssl_context.load_cert_chain(os.getenv("TLS_CERT_PATH"), os.getenv("TLS_KEY_PATH"))
 
-transcription_model = faster_whisper.WhisperModel(
-    "ivrit-ai/whisper-large-v3-turbo-ct2", compute_type="int8"
-)
+transcription_model = faster_whisper.WhisperModel("ivrit-ai/whisper-large-v3-turbo-ct2")
 
 
 @app.post("/face-detection")
@@ -88,7 +86,10 @@ async def transcribe(request: Request, offset: float = 0):
             return result
     except Exception as e:
         print(e)
-        return {"result": "ndvckjn"}
+        raise HTTPException(
+            status_code=500,
+            detail="Failed to transcribe audio",
+        )
     finally:
         if os.path.exists(temp_video.name):
             os.remove(temp_video.name)

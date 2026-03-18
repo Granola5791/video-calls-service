@@ -92,6 +92,10 @@ func GetTranscription(meetingID uuid.UUID, userID uint, offset float64, minTime 
 		return []byte{}, err
 	}
 	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		log.Println(resp.StatusCode, resp.Status)
+		return []byte{}, err
+	}
 
 	bodyBytes, err := io.ReadAll(resp.Body)
 	if err != nil {
