@@ -11,43 +11,51 @@ import TestPage from './pages/TestPage.tsx'
 import MeetingPage from './pages/MeetingPage.tsx'
 import TranscriptsPage from './pages/TranscriptsPage.tsx'
 import MeetingTranscriptPage from './pages/MeetingTranscriptPage.tsx'
+import Layout from './components/Layout.tsx'
+import { RouterPaths } from './constants/general-contants.ts'
 
 const router = createBrowserRouter([
     {
         path: "/",
-        element: <LandingPage />
+        element: <Layout/>,
+        children: [
+            {
+                path: RouterPaths.home,
+                element: <HomePage/>,
+                loader: CheckLoginLoader,
+            },
+            {
+                path: RouterPaths.transcripts,
+                element: <TranscriptsPage/>,
+                loader: CheckLoginLoader,
+            },
+            {
+                path: RouterPaths.meetingTranscript,
+                element: <MeetingTranscriptPage/>,
+                loader: CheckLoginLoader,
+            },
+        ]
     },
     {
-        path: "/login",
+        path: RouterPaths.landing,
+        element: <LandingPage />
+    },  
+    {
+        path: RouterPaths.login,
         element: <LoginPage />
     },
     {
-        path: "/signup",
+        path: RouterPaths.signup,
         element: <SignupPage />
     },
     {
-        path: "/home",
-        element: <HomePage />,
-        loader: CheckLoginLoader,
-    },
-    {
-        path: "/meeting/:meetingID",
+        path: RouterPaths.meeting,
         element: <MeetingPage />,
         loader: CheckLoginLoader,
     },
     {
-        path: "/transcripts",
-        element: <TranscriptsPage />,
-        loader: CheckLoginLoader,
-    },
-    {
-        path: "/transcript/:meetingID",
-        element: <MeetingTranscriptPage />,
-        loader: CheckLoginLoader,
-    },
-    {
         path: "/test",
-        element: <TestPage />
+        element: <TestPage />,
     },
 ])
 

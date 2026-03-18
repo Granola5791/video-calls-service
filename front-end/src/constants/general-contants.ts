@@ -51,3 +51,13 @@ export const ErrorMsgs = {
     cantLoadStream: 'Unable to load stream: ',
     cantAccessWebCam: 'Unable to access webcam: ',
 }
+
+export const RouterPaths = {
+    home: 'home',
+    transcripts: 'transcripts',
+    landing: '/landing',
+    meetingTranscript: 'transcript/:meetingID',
+    login: '/login',
+    signup: '/signup',
+    meeting: '/meeting/:meetingID',
+}
