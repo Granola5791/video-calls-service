@@ -106,7 +106,7 @@ func GetHeaderOfWebm(firstChunk []byte) []byte {
 }
 
 func GetHeaderUserVideoChunks(userID uint, meetingID uuid.UUID) ([]byte, error) {
-	firstChunk, err := GetFirstUserVideoChunkFromDB(meetingID, userID)
+	firstChunk, err := GetLatestStartChunkFromDB(meetingID, userID)
 	if err != nil {
 		return nil, err
 	}

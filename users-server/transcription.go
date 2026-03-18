@@ -14,6 +14,11 @@ import (
 	"github.com/google/uuid"
 )
 
+type Offset struct {
+	Offset float64   `json:"offset"`
+	Time   time.Time `json:"time"`
+}
+
 func HandleTranscription(meetingID uuid.UUID) {
 	meetingParticipants, err := GetAllMeetingParticipantIDsFromDB(meetingID)
 	if err != nil {
@@ -28,15 +33,28 @@ func HandleTranscription(meetingID uuid.UUID) {
 	}
 
 	for i, participant := range meetingParticipants {
+		fullTranscription := []string{}
 
-		transcription, err := GetTranscription(meetingID, participant, offsets[i])
-		if err != nil {
-			log.Println(err)
-			return
+		for j := range offsets[i] {
+			minTime := time.Time{}
+			maxTime := time.Time{}
+			if j != 0 {
+				minTime = offsets[i][j].Time
+			}
+			if j != len(offsets[i])-1 {
+				maxTime = offsets[i][j+1].Time
+			}
+
+			transcription, err := GetTranscription(meetingID, participant, offsets[i][j].Offset, minTime, maxTime)
+			if err != nil {
+				log.Println(err)
+				return
+			}
+			var res []string
+			json.Unmarshal(transcription, &res)
+			fullTranscription = append(fullTranscription, res...)
 		}
-		var res []string
-		json.Unmarshal(transcription, &res)
-		standardizedText := StandardizeTranscriptionText(res)
+		standardizedText := StandardizeTranscriptionText(fullTranscription)
 		err = InsertTranscriptionToDB(meetingID, participant, standardizedText)
 		if err != nil {
 			log.Println(err)
@@ -45,7 +63,7 @@ func HandleTranscription(meetingID uuid.UUID) {
 	}
 }
 
-func GetTranscription(meetingID uuid.UUID, userID uint, offset float64) ([]byte, error) {
+func GetTranscription(meetingID uuid.UUID, userID uint, offset float64, minTime time.Time, maxTime time.Time) ([]byte, error) {
 	reader, writer := io.Pipe()
 
 	url := fmt.Sprintf("%s%s?%s=%f",
@@ -62,7 +80,7 @@ func GetTranscription(meetingID uuid.UUID, userID uint, offset float64) ([]byte,
 
 	go func() {
 		defer writer.Close()
-		err := PipeAllUserVideoChunksFromDB(meetingID, userID, writer)
+		err := PipeUserVideoChunksBetweenFromDB(meetingID, userID, minTime, maxTime, writer)
 		if err != nil {
 			log.Println(err)
 		}
@@ -98,32 +116,42 @@ func StandardizeTranscriptionText(segments []string) string {
 	return strings.Join(segments, "\n")
 }
 
-func GetOffsetsOfUsers(meetingID uuid.UUID, participants []uint) ([]float64, error) {
-	starts := make([]time.Time, len(participants))
-	offsets := make([]float64, len(participants))
+func GetOffsetsOfUsers(meetingID uuid.UUID, participants []uint) ([][]Offset, error) {
+	offsets := make([][]Offset, len(participants))
 	for i := range participants {
-		firstChunk, err := GetFirstUserVideoChunkFromDB(meetingID, participants[i])
+		cnt, err := CountStartChunksFromDB(meetingID, participants[i])
 		if err != nil {
-			return []float64{}, err
+			return [][]Offset{}, err
 		}
-		starts[i] = firstChunk.CreatedAt
+		offsets[i] = make([]Offset, int(cnt))
+		for j := 0; j < int(cnt); j++ {
+			firstChunk, err := GetKthStartChunkFromDB(meetingID, participants[i], j)
+			if err != nil {
+				return [][]Offset{}, err
+			}
+			offsets[i][j].Time = firstChunk.CreatedAt
+		}
 	}
-	first := MinTime(starts)
+	first := MinTimeInOffsets(offsets)
 
 	for i := range participants {
-		offsets[i] = starts[i].Sub(first).Seconds()
+		for j := range offsets[i] {
+			offsets[i][j].Offset = offsets[i][j].Time.Sub(first).Seconds()
+		}
 	}
 	return offsets, nil
 }
 
-func MinTime(times []time.Time) time.Time {
-	if len(times) == 0 {
+func MinTimeInOffsets(offsets [][]Offset) time.Time {
+	if len(offsets) == 0 {
 		return time.Time{}
 	}
-	minTime := times[0]
-	for _, time := range times {
-		if time.Before(minTime) {
-			minTime = time
+	minTime := offsets[0][0].Time
+	for i := range offsets {
+		for j := range offsets[i] {
+			if offsets[i][j].Time.Before(minTime) {
+				minTime = offsets[i][j].Time
+			}
 		}
 	}
 	return minTime

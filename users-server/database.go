@@ -338,7 +338,7 @@ func MarkUserVideoChunksAsVisitedInDB(meetingID uuid.UUID, userID uint, minChunk
 		Update("visited", true).Error
 }
 
-func GetFirstUserVideoChunkFromDB(meetingID uuid.UUID, userID uint) (*UserVideoChunk, error) {
+func GetLatestStartChunkFromDB(meetingID uuid.UUID, userID uint) (*UserVideoChunk, error) {
 	var userVideoChunk UserVideoChunk
 	err := db.
 		Where("meeting_id = ? AND user_id = ? AND chunk_number = 0", meetingID, userID).
@@ -346,6 +346,25 @@ func GetFirstUserVideoChunkFromDB(meetingID uuid.UUID, userID uint) (*UserVideoC
 		First(&userVideoChunk).Error
 
 	return &userVideoChunk, err
+}
+
+func GetKthStartChunkFromDB(meetingID uuid.UUID, userID uint, k int) (*UserVideoChunk, error) {
+	var userVideoChunk UserVideoChunk
+	err := db.
+		Where("meeting_id = ? AND user_id = ? AND chunk_number = 0", meetingID, userID).
+		Order("created_at ASC").
+		Offset(k).
+		First(&userVideoChunk).Error
+
+	return &userVideoChunk, err
+}
+
+func CountStartChunksFromDB(meetingID uuid.UUID, userID uint) (int64, error) {
+	var count int64
+	err := db.Model(&UserVideoChunk{}).
+		Where("meeting_id = ? AND user_id = ? AND chunk_number = 0", meetingID, userID).
+		Count(&count).Error
+	return count, err
 }
 
 func isFaceDetectionRequiredInDB(meetingID uuid.UUID) (bool, error) {
@@ -360,10 +379,20 @@ func isFaceDetectionRequiredInDB(meetingID uuid.UUID) (bool, error) {
 	return count > 0, nil
 }
 
-// pipe in all user video chunks from the database
-func PipeAllUserVideoChunksFromDB(meetingID uuid.UUID, userID uint, pipeIn io.Writer) error {
-	rows, err := db.Model(&UserVideoChunk{}).
-		Where("meeting_id = ? AND user_id = ?", meetingID, userID).
+// pipe in all user video chunks created between maxTime and minTime from the database,
+// including minTime and excluding maxTime.
+// if minTime or maxTime are zero, they are ignored.
+func PipeUserVideoChunksBetweenFromDB(meetingID uuid.UUID, userID uint, minTime time.Time, maxTime time.Time, pipeIn io.Writer) error {
+	query := db.Model(&UserVideoChunk{}).
+		Where("meeting_id = ? AND user_id = ?", meetingID, userID)
+	if !minTime.IsZero() {
+		query = query.Where("created_at >= ?", minTime)
+	}
+	if !maxTime.IsZero() {
+		query = query.Where("created_at < ?", maxTime)
+	}
+
+	rows, err := query.
 		Order("chunk_number ASC").
 		Rows()
 	if err != nil {
@@ -388,7 +417,7 @@ func GetAllMeetingParticipantIDsFromDB(meetingID uuid.UUID) ([]uint, error) {
 	participantJoinedEvent := GetStringFromConfig("database.meeting_events.participant_joined")
 	err := db.
 		Model(&MeetingEvent{}).
-		Where("meeting_id = ? AND event = '"+participantJoinedEvent+"'", meetingID).
+		Where("meeting_id = ? AND event = ?", meetingID, participantJoinedEvent).
 		Distinct().
 		Pluck("user_id", &meetingParticipants).Error
 	return meetingParticipants, err
