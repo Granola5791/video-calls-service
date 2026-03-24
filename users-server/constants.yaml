@@ -95,6 +95,7 @@ ai_server:
       offset_name: "offset"
     face_detection_path: "/face-detection"
     transcription_path: "/transcription"
+    summary_path: "/summary"
 
 face_detection:
   min_frames_with_face_percentage: 50

@@ -14,6 +14,7 @@ import ssl
 import os
 from dotenv import load_dotenv
 import faster_whisper
+import summarization
 
 load_dotenv()
 
@@ -93,6 +94,23 @@ async def transcribe(request: Request, offset: float = 0):
     finally:
         if os.path.exists(temp_video.name):
             os.remove(temp_video.name)
+
+@app.post("/summary")
+async def summary(request: Request):
+    try:
+        text = await request.body()
+        text = text.decode("utf-8")
+        summary = summarization.summarize(text, os.getenv("SUMMARY_MODEL"))
+        print(summary)
+        translation = summarization.translate(summary)
+        print(translation)
+        return translation
+    except Exception as e:
+        print(e)
+        raise HTTPException(
+            status_code=500,
+            detail="Failed to summarize audio",
+        )
 
 
 if __name__ == "__main__":

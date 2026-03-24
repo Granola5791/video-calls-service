@@ -31,6 +31,7 @@ type Meeting struct {
 	HostID                  uint   `gorm:"not null"`
 	IsFaceDetectionRequired bool   `gorm:"not null;default:false"`
 	BannedUsers             []User `gorm:"many2many:meeting_banned_users;"`
+	Summary                 string `gorm:"not null;default:''"`
 }
 
 type MeetingParticipant struct {
@@ -459,4 +460,11 @@ func GetUsernameFromDB(userID uint) (string, error) {
 		Where("id = ?", userID).
 		Take(&username).Error
 	return username, err
+}
+
+func UpdateSummaryToDB(meetingID uuid.UUID, summary string) error {
+	return db.
+		Model(&Meeting{}).
+		Where("id = ?", meetingID).
+		Update("summary", summary).Error
 }

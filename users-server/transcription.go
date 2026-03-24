@@ -26,6 +26,9 @@ func HandleTranscription(meetingID uuid.UUID) {
 		return
 	}
 
+	summaryCh := make(chan string)
+	go HandleTranscriptSummary(meetingID, len(meetingParticipants), summaryCh)
+
 	offsets, err := GetOffsetsOfUsers(meetingID, meetingParticipants)
 	if err != nil {
 		log.Println(err)
@@ -55,6 +58,7 @@ func HandleTranscription(meetingID uuid.UUID) {
 			fullTranscription = append(fullTranscription, res...)
 		}
 		standardizedText := StandardizeTranscriptionText(fullTranscription)
+		summaryCh <- standardizedText
 		err = InsertTranscriptionToDB(meetingID, participant, standardizedText)
 		if err != nil {
 			log.Println(err)
