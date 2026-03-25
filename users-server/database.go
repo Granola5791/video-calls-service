@@ -487,3 +487,13 @@ func GetSummaryFromDB(meetingID uuid.UUID) (string, error) {
 		Take(&summary).Error
 	return summary, err
 }
+
+func GetMeetingTranscriptsFromDB(meetingID uuid.UUID) ([]ParticipantTranscription, error) {
+	var transcripts []ParticipantTranscription
+	err := db.
+		Model(&ParticipantTranscription{}).
+		Preload("User").
+		Where("meeting_id = ?", meetingID).
+		Find(&transcripts).Error
+	return transcripts, err
+}

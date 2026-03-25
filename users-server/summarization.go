@@ -10,13 +10,15 @@ import (
 	"github.com/google/uuid"
 )
 
-func HandleTranscriptSummary(meetingID uuid.UUID, numOfUsers int, ch chan string) {
-	transcriptions := make([]string, numOfUsers)
-	for i := range numOfUsers {
-		transcriptions[i] = <-ch
+func HandleTranscriptSummary(meetingID uuid.UUID) {
+
+	transcripts, err := GetMeetingTranscriptsFromDB(meetingID)
+	if err != nil {
+		log.Println(err)
+		return
 	}
 
-	summary, err := GetSummary(transcriptions)
+	summary, err := GetSummary(transcripts)
 	if err != nil {
 		log.Println(err)
 		return
@@ -29,13 +31,13 @@ func HandleTranscriptSummary(meetingID uuid.UUID, numOfUsers int, ch chan string
 	}
 }
 
-func GetSummary(transcriptions []string) (string, error) {
+func GetSummary(transcriptions []ParticipantTranscription) (string, error) {
 	reader, writer := io.Pipe()
 
 	go func() {
 		defer writer.Close()
-		for i, tr := range transcriptions {
-			fmt.Fprintf(writer, "User%d:\n%s\n", i, tr)
+		for _, tr := range transcriptions {
+			fmt.Fprintf(writer, "User \"{%s}\":\n%s\n", tr.User.Username, tr.Transcript)
 		}
 	}()
 
