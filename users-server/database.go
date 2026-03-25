@@ -90,6 +90,13 @@ type UserInfo struct {
 	Role     string `json:"role"`
 }
 
+type MeetingInfo struct {
+	UuidModel
+	HostID                  uint   `json:"host_id"`
+	HostUsername            string `json:"host_username"`
+	IsFaceDetectionRequired bool   `json:"is_face_detection_required"`
+}
+
 var db *gorm.DB
 
 func InitDatabaseConnection() error {
@@ -433,13 +440,13 @@ func InsertTranscriptionToDB(meetingID uuid.UUID, userID uint, transcription str
 		}).Error
 }
 
-func GetAllMeetingInfosFromDB(from time.Time, to time.Time) ([]Meeting, error) {
-	var meetings []Meeting
-	err := db.
-		Model(&Meeting{}).
-		Where("created_at >= ? AND created_at < ?", from, to).
-		Order("created_at DESC").
-		Find(&meetings).Error
+func GetAllMeetingInfosFromDB(from time.Time, to time.Time) ([]MeetingInfo, error) {
+	var meetings []MeetingInfo
+	err := db.Model(&Meeting{}).
+		Select("meetings.id, meetings.created_at, meetings.deleted_at, meetings.updated_at, meetings.is_face_detection_required, meetings.host_id, users.username as host_username").
+		Joins("left join users on users.id = meetings.host_id").
+		Where("meetings.created_at BETWEEN ? AND ?", from, to).
+		Scan(&meetings).Error
 	return meetings, err
 }
 

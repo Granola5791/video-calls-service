@@ -8,6 +8,7 @@ const MeetingInfoHead = () => {
                 <TableCell align='right'>{MeetingInfoText.id}</TableCell>
                 <TableCell align='right'>{MeetingInfoText.name}</TableCell>
                 <TableCell align='right'>{MeetingInfoText.date}</TableCell>
+                <TableCell align='right'>{MeetingInfoText.hostName}</TableCell>
                 <TableCell align='right'>{MeetingInfoText.transcript}</TableCell>
                 <TableCell align='right'>{MeetingInfoText.summary}</TableCell>
             </TableRow>

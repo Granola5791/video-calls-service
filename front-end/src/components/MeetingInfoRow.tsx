@@ -15,6 +15,7 @@ const MeetingInfoRow = ({ meetingInfo, onTranscriptClick, onSummaryClick }: Meet
             <TableCell align='right'>{meetingInfo.id}</TableCell>
             <TableCell align='right'>{meetingInfo.name}</TableCell>
             <TableCell align='right'>{meetingInfo.date}</TableCell>
+            <TableCell align='right'>{meetingInfo.hostName}</TableCell>
             <TableCell align='right' onClick={() => onTranscriptClick(meetingInfo.id)}><ClickableP>{MeetingInfoText.transcript}</ClickableP></TableCell>
             <TableCell align='right' onClick={() => onSummaryClick(meetingInfo.id)}><ClickableP>{MeetingInfoText.summary}</ClickableP></TableCell>
         </TableRow>

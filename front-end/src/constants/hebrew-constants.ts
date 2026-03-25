@@ -101,6 +101,7 @@ export const MeetingInfoText = {
     id: "מזהה",
     name: "שם",
     date: "תאריך",
+    hostName: "שם המארח",
     fromDate: "מתאריך:",
     toDate: "עד תאריך:",
     search: "חפש",

@@ -46,7 +46,7 @@ const MeetingInfoPage = () => {
             credentials: 'include',
         });
         const data = await response.json();
-        const receivedMeetings = Array.from(data, (meeting: any) => ({ id: meeting.id, name: "placeholder", date: meeting.created_at } as MeetingInfo));
+        const receivedMeetings = Array.from(data, (meeting: any) => ({ id: meeting.id, name: "placeholder", date: meeting.created_at, hostName: meeting.host_username } as MeetingInfo));
         return receivedMeetings;
     };
 
