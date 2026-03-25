@@ -5,7 +5,7 @@ import { MeetingInfoText } from '../constants/hebrew-constants';
 import { CenteredColumn } from '../styled-components/StyledBoxes';
 
 const SplitLines = (text: string): string[] => {
-    return text.split('\\n');
+    return text.split('\n');
 }
 
 const SummaryPage = () => {
@@ -29,7 +29,11 @@ const SummaryPage = () => {
         <CenteredColumn>
             <h1>{MeetingInfoText.summary}</h1>
             <div>
-                {summaryLines.map((line, index) => <p key={index}>{line}</p>)}
+                {summaryLines.map((line, index) =>
+                    <p key={index}>
+                        {line.trim() || '\u00a0'}
+                    </p>
+                )}
             </div>
         </ CenteredColumn>
     )
