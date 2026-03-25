@@ -41,7 +41,6 @@ const MeetingInfoPage = () => {
             {key: UsersServer.api.queryParams.to, value: toDate.toISOString()},
             {key: UsersServer.api.queryParams.host_username, value: hostName},
         ] as QueryParam[]
-        console.log(fromDate.toISOString(), toDate.toISOString());
         let url = UsersServer.httpAddress + UsersServer.api.getMeetingInfos
         url = AddQueryParams(url, queryParams)
         const response = await fetch(url, {

@@ -1,16 +1,42 @@
 import { TableCell, TableHead, TableRow } from '@mui/material'
 import { MeetingInfoText } from '../constants/hebrew-constants'
+import { useState } from 'react';
+import { StyledTableSortLabel } from '../styled-components/StyledTable';
+import type { MeetingInfo } from '../types/meetingInfo';
 
-const MeetingInfoHead = () => {
+interface MeetingInfoHeadProps {
+    colIDs: (keyof MeetingInfo)[],
+    onSort: (id: keyof MeetingInfo, direction: 'asc' | 'desc') => void
+}
+
+const MeetingInfoHead = ({ colIDs, onSort }: MeetingInfoHeadProps) => {
+    const [sortedColumn, setSortedColumn] = useState<string | null>(null);
+    const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+
+    const handleSort = (id: keyof MeetingInfo) => {
+        if (sortedColumn === id) {
+            const newSortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
+            setSortDirection(newSortDirection);
+            onSort(id, newSortDirection);
+        } else {
+            setSortedColumn(id);
+            setSortDirection('asc');
+            onSort(id, 'asc');
+        }
+    };
+
     return (
         <TableHead>
             <TableRow>
-                <TableCell align='right'>{MeetingInfoText.id}</TableCell>
-                <TableCell align='right'>{MeetingInfoText.name}</TableCell>
-                <TableCell align='right'>{MeetingInfoText.date}</TableCell>
-                <TableCell align='right'>{MeetingInfoText.hostName}</TableCell>
-                <TableCell align='right'>{MeetingInfoText.transcript}</TableCell>
-                <TableCell align='right'>{MeetingInfoText.summary}</TableCell>
+                {colIDs.map((id) => <TableCell align='right' key={id}>
+                    <StyledTableSortLabel
+                        active={id === sortedColumn}
+                        direction={sortDirection}
+                        onClick={() => handleSort(id)}
+                    >
+                        {MeetingInfoText[id as keyof typeof MeetingInfoText]}
+                    </StyledTableSortLabel>
+                </TableCell>)}
             </TableRow>
         </TableHead>
     )

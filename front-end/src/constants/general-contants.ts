@@ -70,5 +70,6 @@ export const Roles = {
 }
 
 export const MeetingInfoGeneral = {
+    colIDs: ['id', 'name', 'date', 'hostName', 'transcript', 'summary'],
     rowsPerPageOptions: [5, 10, 25],
 }
