@@ -102,7 +102,7 @@ async def summary(request: Request):
         text = text.decode("utf-8")
         summary = summarization.summarize(text, os.getenv("SUMMARY_MODEL"))
         print(summary)
-        translation = summarization.translate(summary)
+        translation = summarization.translate(summary, os.getenv("TRANSLATION_MODEL"))
         print(translation)
         return translation
     except Exception as e:
