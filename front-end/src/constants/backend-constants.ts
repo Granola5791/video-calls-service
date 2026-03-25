@@ -18,6 +18,7 @@ export const UsersServer = {
         queryParams: {
             from: "from",
             to: "to",
+            host_username: "host_username",
         },
         signUp: "/signup",
         logIn: "/login",

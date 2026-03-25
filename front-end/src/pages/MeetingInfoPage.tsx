@@ -11,6 +11,7 @@ import { MediumButtonFilled } from '../styled-components/StyledButtons';
 import dayjs, { Dayjs } from 'dayjs';
 import type { QueryParam } from '../types/queryParam';
 import { useState } from 'react';
+import { StyledTextField } from '../styled-components/StyledTextFields';
 
 
 const MeetingInfoPage = () => {
@@ -28,6 +29,7 @@ const MeetingInfoPage = () => {
     const [meetings, setMeetings] = useState<MeetingInfo[]>([]);
     const [fromDate, setFromDate] = useState<Dayjs>(dayjs('2023-01-01T00:00:00.000Z'));
     const [toDate, setToDate] = useState<Dayjs>(dayjs(Date.now()));
+    const [hostName, setHostName] = useState<string>('');
     const {
         goToMeetingTranscript,
         goToSummary,
@@ -37,6 +39,7 @@ const MeetingInfoPage = () => {
         const queryParams = [
             {key: UsersServer.api.queryParams.from, value: fromDate.toISOString()},
             {key: UsersServer.api.queryParams.to, value: toDate.toISOString()},
+            {key: UsersServer.api.queryParams.host_username, value: hostName},
         ] as QueryParam[]
         console.log(fromDate.toISOString(), toDate.toISOString());
         let url = UsersServer.httpAddress + UsersServer.api.getMeetingInfos
@@ -57,6 +60,10 @@ const MeetingInfoPage = () => {
     return (
         <CenteredColumn>
             <h1>{MeetingInfoText.title}</h1>
+            <StyledTextField
+                label={MeetingInfoText.hostName}
+                onChange={(e) => setHostName(e.target.value)}
+            />
             <CenteredRow>
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                     <DateTimePicker

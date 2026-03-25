@@ -27,6 +27,7 @@ server:
     query_params:
       from_name: "from"
       to_name: "to"
+      host_name: "host_username"
 
     check_login_path: /check-login
     check_admin_path: /check-admin

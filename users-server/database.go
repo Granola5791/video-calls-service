@@ -440,12 +440,13 @@ func InsertTranscriptionToDB(meetingID uuid.UUID, userID uint, transcription str
 		}).Error
 }
 
-func GetAllMeetingInfosFromDB(from time.Time, to time.Time) ([]MeetingInfo, error) {
+func GetAllMeetingInfosFromDB(from time.Time, to time.Time, hostName string) ([]MeetingInfo, error) {
 	var meetings []MeetingInfo
 	err := db.Model(&Meeting{}).
 		Select("meetings.id, meetings.created_at, meetings.deleted_at, meetings.updated_at, meetings.is_face_detection_required, meetings.host_id, users.username as host_username").
 		Joins("left join users on users.id = meetings.host_id").
 		Where("meetings.created_at BETWEEN ? AND ?", from, to).
+		Where("users.username ILIKE ?", "%"+hostName+"%").
 		Scan(&meetings).Error
 	return meetings, err
 }
