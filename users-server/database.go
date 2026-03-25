@@ -32,6 +32,7 @@ type Meeting struct {
 	IsFaceDetectionRequired bool   `gorm:"not null;default:false" json:"is_face_detection_required"`
 	BannedUsers             []User `gorm:"many2many:meeting_banned_users;" json:"banned_users"`
 	Summary                 string `gorm:"not null;default:''" json:"summary"`
+	Name                    string `gorm:"not null;default:'none'" json:"name"`
 }
 
 type MeetingParticipant struct {
@@ -95,6 +96,7 @@ type MeetingInfo struct {
 	HostID                  uint   `json:"host_id"`
 	HostUsername            string `json:"host_username"`
 	IsFaceDetectionRequired bool   `json:"is_face_detection_required"`
+	Name                    string `json:"name"`
 }
 
 var db *gorm.DB
@@ -443,7 +445,7 @@ func InsertTranscriptionToDB(meetingID uuid.UUID, userID uint, transcription str
 func GetAllMeetingInfosFromDB(from time.Time, to time.Time, hostName string) ([]MeetingInfo, error) {
 	var meetings []MeetingInfo
 	err := db.Model(&Meeting{}).
-		Select("meetings.id, meetings.created_at, meetings.deleted_at, meetings.updated_at, meetings.is_face_detection_required, meetings.host_id, users.username as host_username").
+		Select("meetings.id, meetings.created_at, meetings.deleted_at, meetings.updated_at, meetings.name, meetings.is_face_detection_required, meetings.host_id, users.username as host_username").
 		Joins("left join users on users.id = meetings.host_id").
 		Where("meetings.created_at BETWEEN ? AND ?", from, to).
 		Where("users.username ILIKE ?", "%"+hostName+"%").
@@ -496,4 +498,11 @@ func GetMeetingTranscriptsFromDB(meetingID uuid.UUID) ([]ParticipantTranscriptio
 		Where("meeting_id = ?", meetingID).
 		Find(&transcripts).Error
 	return transcripts, err
+}
+
+func UpdateMeetingNameToDB(meetingID uuid.UUID, meetingName string) error {
+	return db.
+		Model(&Meeting{}).
+		Where("id = ?", meetingID).
+		Update("name", meetingName).Error
 }

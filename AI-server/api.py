@@ -104,7 +104,11 @@ async def summary(request: Request):
         print(summary)
         translation = summarization.translate(summary, os.getenv("TRANSLATION_MODEL"))
         print(translation)
-        return translation
+        name = summarization.generate_name(summary, os.getenv("NAME_MODEL"))
+        print(name)
+        translated_name = summarization.translate(name, os.getenv("TRANSLATION_MODEL"))
+        print(translated_name)
+        return {"meeting_name": translated_name, "summary": translation}
     except Exception as e:
         print(e)
         raise HTTPException(

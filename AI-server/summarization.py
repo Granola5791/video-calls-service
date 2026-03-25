@@ -1,11 +1,4 @@
 import ollama
-# from transformers import pipeline
-
-# pipe = pipeline(
-#     "text-generation",
-#     model="dicta-il/DictaLM-3.0-1.7B-Instruct",
-#     device_map="cpu",
-# )
 
 
 def summarize(text, model):
@@ -59,3 +52,14 @@ def translate(text, model):
         },
     )
     return response["response"].strip()
+
+
+def generate_name(summery: str, model: str):
+    response = ollama.generate(
+        model=model,
+        system="You are a professional assistant. Your task is to name meetings Based on their summary. "
+        "Provide only the title. Use 5 words or less. No preamble.",
+        prompt=f"Summary: {summery}",
+        options={"temperature": 0.3},
+    )
+    return " ".join(response["response"].strip().split(" ")[:5])
