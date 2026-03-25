@@ -44,7 +44,7 @@ server:
     get_meeting_infos_path: /get-meeting-infos
     get_transcript_path: "/get-transcript/:meeting_id/:participant_id"
     get_all_meeting_participants_path: "/get-all-meeting-participants/:meeting_id"
-    get_summary_path: "/summary/:meeting_id"
+    get_summary_path: "/get-summary/:meeting_id"
 
 jwt:
   token_cookie_name: "auth_token"
