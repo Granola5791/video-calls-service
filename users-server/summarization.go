@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 )
 
@@ -62,4 +63,17 @@ func GetSummary(transcriptions []string) (string, error) {
 	}
 
 	return string(body), nil
+}
+
+func HandleTranscriptSummaryRequest(c *gin.Context) {
+	meetingID := uuid.MustParse(c.Param(GetStringFromConfig("server.api.params.meeting_id_name")))
+
+	summary, err := GetSummaryFromDB(meetingID)
+	if err != nil {
+		log.Println(err)
+		c.AbortWithStatus(http.StatusInternalServerError)
+		return
+	}
+
+	c.JSON(http.StatusOK, summary)
 }

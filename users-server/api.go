@@ -38,9 +38,10 @@ func InitRouter() {
 	router.GET(GetStringFromConfig("server.api.check_admin_path"), RequireAuthentication, RequireAdmin)
 	router.GET(GetStringFromConfig("server.api.get_call_notifications_path"), RequireAuthentication, HandleGetCallNotifications)
 	router.GET(GetStringFromConfig("server.api.is_able_to_join_meeting_path"), RequireAuthentication, RequireMeetingExists, RequireNotBanned)
-	router.GET(GetStringFromConfig("server.api.get_transcription_meetings_path"), RequireAuthentication, RequireAdmin, HandleGetTranscriptionMeetings)
+	router.GET(GetStringFromConfig("server.api.get_meeting_infos_path"), RequireAuthentication, RequireAdmin, HandleGetMeetingInfos)
 	router.GET(GetStringFromConfig("server.api.get_transcript_path"), RequireAuthentication, RequireAdmin, HandleGetTranscript)
 	router.GET(GetStringFromConfig("server.api.get_all_meeting_participants_path"), RequireAuthentication, RequireAdmin, HandleGetAllMeetingParticipants)
+	router.GET(GetStringFromConfig("server.api.get_summary_path"), RequireAuthentication, RequireAdmin, HandleTranscriptSummaryRequest)
 
 	router.POST(GetStringFromConfig("server.api.signup_path"), HandleSignup)
 	router.POST(GetStringFromConfig("server.api.login_path"), HandleLogin)

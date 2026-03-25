@@ -55,15 +55,20 @@ export const ErrorMsgs = {
 
 export const RouterPaths = {
     home: '/',
-    transcripts: 'transcripts',
+    meetingInfo: 'meeting-info',
     landing: '/landing',
     meetingTranscript: 'transcript/:meetingID',
     login: '/login',
     signup: '/signup',
     meeting: '/meeting/:meetingID',
+    summary: 'summary/:meetingID',
 }
 
 export const Roles = {
     user: 'user',
     admin: 'admin',
+}
+
+export const MeetingInfoGeneral = {
+    rowsPerPageOptions: [5, 10, 25],
 }

@@ -5,6 +5,7 @@ import { Outlet } from 'react-router-dom'
 import { LocalStorage } from '../constants/general-contants'
 import { useNavigation } from '../utils/navigation'
 import { IsAdmin } from '../utils/roles'
+import { MediumScreen } from '../styled-components/StyledBoxes'
 
 const Layout = () => {
     const {
@@ -12,7 +13,7 @@ const Layout = () => {
     } = useNavigation();
     const role = localStorage.getItem(LocalStorage.role);
     const username = localStorage.getItem(LocalStorage.username);
-    const adminOptions = [{ text: MenuOptions.admin.transcripts, onClick: goToTranscripts }];
+    const adminOptions = [{ text: MenuOptions.admin.meetingInfos, onClick: goToTranscripts }];
     const userOptions = [] as { text: string, onClick: () => void }[];
     const logoutOption = [{ text: MenuOptions.disconnect, onClick: LogOut }];
     const options = userOptions.concat(IsAdmin(role) ? adminOptions : []);
@@ -23,8 +24,11 @@ const Layout = () => {
                 topButtons={options}
                 bottomButtons={logoutOption}
             />
+
             <main>
-                <Outlet />
+                <MediumScreen>
+                    <Outlet />
+                </MediumScreen>
             </main>
         </>
     )

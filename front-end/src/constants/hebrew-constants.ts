@@ -90,6 +90,18 @@ export const MenuOptions = {
     title: "שלום, ",
     disconnect: "התנתק",
     admin: {
-        transcripts: "תמלולים",
+        meetingInfos: "מידע על פגישות",
     }
+}
+
+export const MeetingInfoText = {
+    title: "מידע על פגישות",
+    transcript: "תמלול",
+    summary: "סיכום",
+    id: "מזהה",
+    name: "שם",
+    date: "תאריך",
+    fromDate: "מתאריך:",
+    toDate: "עד תאריך:",
+    search: "חפש",
 }

@@ -6,13 +6,14 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import LoginPage from './pages/LoginPage.tsx'
 import SignupPage from './pages/SignupPage.tsx'
 import HomePage from './pages/HomePage.tsx'
-import { CheckLoginLoader } from './utils/check-login.ts'
+import { CheckAdminLoader, CheckLoginLoader } from './utils/check-login.ts'
 import TestPage from './pages/TestPage.tsx'
 import MeetingPage from './pages/MeetingPage.tsx'
-import TranscriptsPage from './pages/TranscriptsPage.tsx'
+import MeetingInfoPage from './pages/MeetingInfoPage.tsx'
 import MeetingTranscriptPage from './pages/MeetingTranscriptPage.tsx'
 import Layout from './components/Layout.tsx'
 import { RouterPaths } from './constants/general-contants.ts'
+import SummaryPage from './pages/SummaryPage.tsx'
 
 const router = createBrowserRouter([
     {
@@ -25,15 +26,20 @@ const router = createBrowserRouter([
                 loader: CheckLoginLoader,
             },
             {
-                path: RouterPaths.transcripts,
-                element: <TranscriptsPage/>,
-                loader: CheckLoginLoader,
+                path: RouterPaths.meetingInfo,
+                element: <MeetingInfoPage/>,
+                loader: CheckAdminLoader,
             },
             {
                 path: RouterPaths.meetingTranscript,
                 element: <MeetingTranscriptPage/>,
-                loader: CheckLoginLoader,
+                loader: CheckAdminLoader,
             },
+            {
+                path: RouterPaths.summary,
+                element: <SummaryPage/>,
+                loader: CheckAdminLoader,
+            }
         ]
     },
     {

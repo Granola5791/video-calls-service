@@ -23,6 +23,10 @@ server:
       user_to_kick_name: "user_to_kick"
       is_face_detection_required_name: "is_face_detection_required"
       participant_id_name: "participant_id"
+    
+    query_params:
+      from_name: "from"
+      to_name: "to"
 
     check_login_path: /check-login
     check_admin_path: /check-admin
@@ -36,9 +40,10 @@ server:
     keep_alive_path: /keep-alive/:meeting_id
     kick_participant_path: "kick-participant/:meeting_id/:user_to_kick"
     is_able_to_join_meeting_path: /is-able-to-join-meeting/:meeting_id
-    get_transcription_meetings_path: /get-transcription-meetings
+    get_meeting_infos_path: /get-meeting-infos
     get_transcript_path: "/get-transcript/:meeting_id/:participant_id"
     get_all_meeting_participants_path: "/get-all-meeting-participants/:meeting_id"
+    get_summary_path: "/summary/:meeting_id"
 
 jwt:
   token_cookie_name: "auth_token"

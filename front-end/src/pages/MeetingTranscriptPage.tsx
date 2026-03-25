@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { SetUrlParams, UsersServer } from '../constants/backend-constants';
 import { useParams } from 'react-router-dom';
+import { CenteredColumn } from '../styled-components/StyledBoxes';
+import { MeetingInfoText } from '../constants/hebrew-constants';
 
 type TranscriptSegment = {
     text: string,
@@ -52,8 +54,8 @@ const MeetingTranscriptPage = () => {
                 credentials: 'include',
             });
             const data = await response.json();
-            const {transcript, username} = data; 
-            return {segments: NormalizeTranscript(transcript), username: username};
+            const { transcript, username } = data;
+            return { segments: NormalizeTranscript(transcript), username: username };
         };
 
         const fetchMeetingParticipantsIDs = async () => {
@@ -76,22 +78,25 @@ const MeetingTranscriptPage = () => {
     }, []);
 
     return (
-        <div>
-            {orderedIndices.map((index) => (
-                <span style={{ display: 'flex', flexDirection: 'row', gap: '5px' }}>
-                    <b>{transcript[index.y].username}:</b>
-                    <b style={{color: 'green'}}>
-                        [{transcript[index.y].segments[index.x].start}]
-                    </b>
-                    <div>
-                        {transcript[index.y].segments[index.x].text}
-                    </div>
-                    <b style={{color: 'red'}}>
-                        [{transcript[index.y].segments[index.x].end}]
-                    </b>
-                </span>
-            ))}
-        </div>
+        <CenteredColumn>
+            <h1>{MeetingInfoText.transcript}</h1>
+            <div>
+                {orderedIndices.map((index) => (
+                    <span style={{ display: 'flex', flexDirection: 'row', gap: '5px' }}>
+                        <b>{transcript[index.y].username}:</b>
+                        <b style={{ color: 'green' }}>
+                            [{transcript[index.y].segments[index.x].start}]
+                        </b>
+                        <div>
+                            {transcript[index.y].segments[index.x].text}
+                        </div>
+                        <b style={{ color: 'red' }}>
+                            [{transcript[index.y].segments[index.x].end}]
+                        </b>
+                    </span>
+                ))}
+            </div>
+        </CenteredColumn>
     )
 }
 

@@ -36,3 +36,11 @@ export const NameTag = styled.p ({
     margin: '0px',
     padding: '1%',
 });
+
+export const ClickableP = styled.p ({
+    cursor: 'pointer',
+    color: Colors.primary,
+    '&:hover': {
+        color: Colors.primaryHover,
+    }
+})

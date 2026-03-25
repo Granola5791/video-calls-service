@@ -12,10 +12,10 @@ import (
 )
 
 type UuidModel struct {
-	ID        uuid.UUID `gorm:"type:uuid;default:gen_random_uuid();primaryKey"`
-	CreatedAt time.Time
-	UpdatedAt time.Time
-	DeletedAt gorm.DeletedAt `gorm:"index"`
+	ID        uuid.UUID      `gorm:"type:uuid;default:gen_random_uuid();primaryKey" json:"id"`
+	CreatedAt time.Time      `json:"created_at"`
+	UpdatedAt time.Time      `json:"updated_at"`
+	DeletedAt gorm.DeletedAt `gorm:"index" json:"deleted_at"`
 }
 
 type User struct {
@@ -28,10 +28,10 @@ type User struct {
 
 type Meeting struct {
 	UuidModel
-	HostID                  uint   `gorm:"not null"`
-	IsFaceDetectionRequired bool   `gorm:"not null;default:false"`
-	BannedUsers             []User `gorm:"many2many:meeting_banned_users;"`
-	Summary                 string `gorm:"not null;default:''"`
+	HostID                  uint   `gorm:"not null" json:"host_id"`
+	IsFaceDetectionRequired bool   `gorm:"not null;default:false" json:"is_face_detection_required"`
+	BannedUsers             []User `gorm:"many2many:meeting_banned_users;" json:"banned_users"`
+	Summary                 string `gorm:"not null;default:''" json:"summary"`
 }
 
 type MeetingParticipant struct {
@@ -433,13 +433,14 @@ func InsertTranscriptionToDB(meetingID uuid.UUID, userID uint, transcription str
 		}).Error
 }
 
-func GetTranscriptionMeetingsFromDB() ([]string, error) {
-	var meetingIDs []string
+func GetAllMeetingInfosFromDB(from time.Time, to time.Time) ([]Meeting, error) {
+	var meetings []Meeting
 	err := db.
-		Model(&ParticipantTranscription{}).
-		Distinct().
-		Pluck("meeting_id", &meetingIDs).Error
-	return meetingIDs, err
+		Model(&Meeting{}).
+		Where("created_at >= ? AND created_at < ?", from, to).
+		Order("created_at DESC").
+		Find(&meetings).Error
+	return meetings, err
 }
 
 func GetTranscriptFromDB(meetingID uuid.UUID, userID uint) (string, error) {
@@ -467,4 +468,14 @@ func UpdateSummaryToDB(meetingID uuid.UUID, summary string) error {
 		Model(&Meeting{}).
 		Where("id = ?", meetingID).
 		Update("summary", summary).Error
+}
+
+func GetSummaryFromDB(meetingID uuid.UUID) (string, error) {
+	var summary string
+	err := db.
+		Model(&Meeting{}).
+		Select("summary").
+		Where("id = ?", meetingID).
+		Take(&summary).Error
+	return summary, err
 }

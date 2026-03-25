@@ -165,8 +165,27 @@ func MinTimeInOffsets(offsets [][]Offset) time.Time {
 	return minTime
 }
 
-func HandleGetTranscriptionMeetings(c *gin.Context) {
-	meetingIDs, err := GetTranscriptionMeetingsFromDB()
+func HandleGetMeetingInfos(c *gin.Context) {
+	from, err := time.Parse(
+		time.RFC3339,
+		c.Query(GetStringFromConfig("server.api.query_params.from_name")),
+	)
+	if err != nil {
+		log.Println(err)
+		c.AbortWithStatus(http.StatusBadRequest)
+		return
+	}
+	to, err := time.Parse(
+		time.RFC3339,
+		c.Query(GetStringFromConfig("server.api.query_params.to_name")),
+	)
+	if err != nil {
+		log.Println(err)
+		c.AbortWithStatus(http.StatusBadRequest)
+		return
+	}
+
+	meetingIDs, err := GetAllMeetingInfosFromDB(from, to)
 	if err != nil {
 		log.Println(err)
 		c.AbortWithStatus(http.StatusInternalServerError)

@@ -1,3 +1,5 @@
+import type { QueryParam } from "../types/queryParam";
+
 export const DasherServer = {
     httpAddress: "https://dasherserver.local.my:8082",
     wsAddress: "wss://dasherserver.local.my:8082",
@@ -13,6 +15,10 @@ export const UsersServer = {
     httpAddress: "https://usersserver.local.my:8081",
     wsAddress: "wss://usersserver.local.my:8081",
     api: {
+        queryParams: {
+            from: "from",
+            to: "to",
+        },
         signUp: "/signup",
         logIn: "/login",
         logOut: "/logout",
@@ -26,9 +32,10 @@ export const UsersServer = {
         keepAlive: "/keep-alive/{meeting_id}",
         kickParticipant: "/kick-participant/{meeting_id}/{participant_id}",
         isAbleToJoinMeeting: "/is-able-to-join-meeting/{meeting_id}",
-        getTranscriptionMeetings: "/get-transcription-meetings",
+        getMeetingInfos: "/get-meeting-infos",
         getTranscript: "/get-transcript/{meeting_id}/{participant_id}",
         getAllMeetingParticipants: "/get-all-meeting-participants/{meeting_id}",
+        getSummary: "/get-summary/{meeting_id}",
     },
 }
 
@@ -73,5 +80,13 @@ export const SetUrlParams = (url: string, ...params: any[]): string => {
         return '';
     });
 
+    return result;
+}
+
+export const AddQueryParams = (url: string, params: QueryParam[]): string => {
+    let result = url + '?';
+    for (let i = 0; i < params.length; i++) {
+        result += `${params[i].key}=${params[i].value}&`;
+    }
     return result;
 }
