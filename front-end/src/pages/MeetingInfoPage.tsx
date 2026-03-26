@@ -1,5 +1,4 @@
 import { AddQueryParams, UsersServer } from '../constants/backend-constants';
-import { useNavigation } from '../utils/navigation';
 import type { MeetingInfo } from '../types/meetingInfo';
 import MeetingInfoTable from '../components/MeetingInfoTable';
 import { CenteredColumn, CenteredRow } from '../styled-components/StyledBoxes';
@@ -12,6 +11,9 @@ import dayjs, { Dayjs } from 'dayjs';
 import type { QueryParam } from '../types/queryParam';
 import { useState } from 'react';
 import { StyledTextField } from '../styled-components/StyledTextFields';
+import OneButtonPopUp from '../components/OneButtonPopUp';
+import MeetingTranscriptPage from './MeetingTranscriptPage';
+import SummaryPage from './SummaryPage';
 
 
 const MeetingInfoPage = () => {
@@ -30,16 +32,14 @@ const MeetingInfoPage = () => {
     const [fromDate, setFromDate] = useState<Dayjs>(dayjs('2023-01-01T00:00:00.000Z'));
     const [toDate, setToDate] = useState<Dayjs>(dayjs(Date.now()));
     const [hostName, setHostName] = useState<string>('');
-    const {
-        goToMeetingTranscript,
-        goToSummary,
-    } = useNavigation();
+    const [pickedMeetingId, setPickedMeetingId] = useState<string | null>(null);
+    const [whatToDisplay, setWhatToDisplay] = useState<'summary' | 'transcript' | null>(null);
 
     const fetchMeetings = async (fromDate: Dayjs, toDate: Dayjs): Promise<MeetingInfo[]> => {
         const queryParams = [
-            {key: UsersServer.api.queryParams.from, value: fromDate.toISOString()},
-            {key: UsersServer.api.queryParams.to, value: toDate.toISOString()},
-            {key: UsersServer.api.queryParams.host_username, value: hostName},
+            { key: UsersServer.api.queryParams.from, value: fromDate.toISOString() },
+            { key: UsersServer.api.queryParams.to, value: toDate.toISOString() },
+            { key: UsersServer.api.queryParams.host_username, value: hostName },
         ] as QueryParam[]
         let url = UsersServer.httpAddress + UsersServer.api.getMeetingInfos
         url = AddQueryParams(url, queryParams)
@@ -80,7 +80,26 @@ const MeetingInfoPage = () => {
                     <MediumButtonFilled onClick={OnSearch}>{MeetingInfoText.search}</MediumButtonFilled>
                 </LocalizationProvider>
             </CenteredRow>
-            {meetings.length > 0 && <MeetingInfoTable meetings={meetings} onTranscriptClick={goToMeetingTranscript} onSummaryClick={goToSummary} />}
+            {meetings.length > 0 && <MeetingInfoTable
+                meetings={meetings}
+                onTranscriptClick={(meetingID) => { setPickedMeetingId(meetingID); setWhatToDisplay('transcript'); }}
+                onSummaryClick={(meetingID) => { setPickedMeetingId(meetingID); setWhatToDisplay('summary'); }}
+            />}
+            <OneButtonPopUp
+                open={pickedMeetingId !== null}
+                onButtonClick={() => setPickedMeetingId(null)}
+            >
+                {(() => {
+                    switch (whatToDisplay) {
+                        case 'summary':
+                            return <SummaryPage meetingID={pickedMeetingId ?? ''} />;
+                        case 'transcript':
+                            return <MeetingTranscriptPage meetingID={pickedMeetingId ?? ''} />;
+                        default:
+                            return null;
+                    }
+                })()}
+            </OneButtonPopUp>
         </CenteredColumn>
     )
 }

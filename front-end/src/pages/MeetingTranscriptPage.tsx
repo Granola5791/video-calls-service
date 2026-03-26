@@ -1,23 +1,11 @@
 import { useEffect, useState } from 'react'
 import { SetUrlParams, UsersServer } from '../constants/backend-constants';
-import { useParams } from 'react-router-dom';
 import { CenteredColumn } from '../styled-components/StyledBoxes';
 import { MeetingInfoText } from '../constants/hebrew-constants';
+import type { UserTranscript, TranscriptSegment, Index2D } from '../types/transcripts';
 
-type TranscriptSegment = {
-    text: string,
-    start: number,
-    end: number
-}
-
-type UserTranscript = {
-    username: string,
-    segments: TranscriptSegment[]
-}
-
-type Index2D = {
-    x: number,
-    y: number
+interface MeetingTranscriptPageProps {
+    meetingID: string;
 }
 
 const NormalizeTranscript = (transcript: string): TranscriptSegment[] => {
@@ -42,8 +30,7 @@ const NormalizeTranscriptSegment = (line: string): TranscriptSegment => {
 
 const GetIndices = (arr: UserTranscript[]) => arr.flatMap((row, y) => row.segments.map((_, x) => ({ x, y })));
 
-const MeetingTranscriptPage = () => {
-    const { meetingID } = useParams();
+const MeetingTranscriptPage = ({ meetingID }: MeetingTranscriptPageProps) => {
     const [transcript, setTranscript] = useState<UserTranscript[]>([]);
     const [orderedIndices, setOrderedIndices] = useState<Index2D[]>([]);
 

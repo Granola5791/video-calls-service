@@ -4,12 +4,15 @@ import { SetUrlParams, UsersServer } from '../constants/backend-constants';
 import { MeetingInfoText } from '../constants/hebrew-constants';
 import { CenteredColumn } from '../styled-components/StyledBoxes';
 
+interface SummaryPageProps {
+    meetingID: string
+}
+
 const SplitLines = (text: string): string[] => {
     return text.split('\n');
 }
 
-const SummaryPage = () => {
-    const { meetingID } = useParams();
+const SummaryPage = ({ meetingID }: SummaryPageProps) => {
     const [summaryLines, setSummaryLines] = useState<string[]>([]);
 
     useEffect(() => {
