@@ -32,14 +32,16 @@ const MeetingInfoPage = () => {
     const [fromDate, setFromDate] = useState<Dayjs>(dayjs('2023-01-01T00:00:00.000Z'));
     const [toDate, setToDate] = useState<Dayjs>(dayjs(Date.now()));
     const [hostName, setHostName] = useState<string>('');
+    const [meetingName, setMeetingName] = useState<string>('');
     const [pickedMeetingId, setPickedMeetingId] = useState<string | null>(null);
     const [whatToDisplay, setWhatToDisplay] = useState<'summary' | 'transcript' | null>(null);
 
-    const fetchMeetings = async (fromDate: Dayjs, toDate: Dayjs): Promise<MeetingInfo[]> => {
+    const fetchMeetings = async (fromDate: Dayjs, toDate: Dayjs, hostName: string, meetingName: string): Promise<MeetingInfo[]> => {
         const queryParams = [
             { key: UsersServer.api.queryParams.from, value: fromDate.toISOString() },
             { key: UsersServer.api.queryParams.to, value: toDate.toISOString() },
-            { key: UsersServer.api.queryParams.host_username, value: hostName },
+            { key: UsersServer.api.queryParams.hostUsername, value: hostName },
+            { key: UsersServer.api.queryParams.meetingName, value: meetingName },
         ] as QueryParam[]
         let url = UsersServer.httpAddress + UsersServer.api.getMeetingInfos
         url = AddQueryParams(url, queryParams)
@@ -48,21 +50,32 @@ const MeetingInfoPage = () => {
             credentials: 'include',
         });
         const data = await response.json();
-        const receivedMeetings = Array.from(data, (meeting: any) => ({ id: meeting.id, name: meeting.name, date: meeting.created_at, hostName: meeting.host_username } as MeetingInfo));
+        const receivedMeetings = Array.from(data, (meeting: any) => ({
+            id: meeting.id,
+            name: meeting.name,
+            date: meeting.created_at,
+            hostName: meeting.host_username,
+        } as MeetingInfo));
         return receivedMeetings;
     };
 
     const OnSearch = async () => {
-        setMeetings(await fetchMeetings(fromDate, toDate));
+        setMeetings(await fetchMeetings(fromDate, toDate, hostName, meetingName));
     }
 
     return (
         <CenteredColumn>
             <h1>{MeetingInfoText.title}</h1>
-            <StyledTextField
-                label={MeetingInfoText.hostName}
-                onChange={(e) => setHostName(e.target.value)}
-            />
+            <CenteredRow>
+                <StyledTextField
+                    label={MeetingInfoText.hostName}
+                    onChange={(e) => setHostName(e.target.value)}
+                />
+                <StyledTextField
+                    label={MeetingInfoText.meetingName}
+                    onChange={(e) => setMeetingName(e.target.value)}
+                />
+            </CenteredRow>
             <CenteredRow>
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                     <DateTimePicker

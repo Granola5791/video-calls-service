@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/google/uuid"
@@ -442,13 +443,24 @@ func InsertTranscriptionToDB(meetingID uuid.UUID, userID uint, transcription str
 		}).Error
 }
 
-func GetAllMeetingInfosFromDB(from time.Time, to time.Time, hostName string) ([]MeetingInfo, error) {
+// get meeting infos from the database, filtering by the given parameters.
+// hostName and meetingName can be either a name or an id.
+func GetMeetingInfosFromDB(from time.Time, to time.Time, hostName string, meetingName string) ([]MeetingInfo, error) {
 	var meetings []MeetingInfo
-	err := db.Model(&Meeting{}).
+	hostId, err := strconv.ParseUint(hostName, 10, 32)
+	if err != nil {
+		hostId = 0
+	}
+	meetingID, err := uuid.Parse(meetingName)
+	if err != nil {
+		meetingID = uuid.Nil
+	}
+	err = db.Model(&Meeting{}).
 		Select("meetings.id, meetings.created_at, meetings.deleted_at, meetings.updated_at, meetings.name, meetings.is_face_detection_required, meetings.host_id, users.username as host_username").
 		Joins("left join users on users.id = meetings.host_id").
 		Where("meetings.created_at BETWEEN ? AND ?", from, to).
-		Where("users.username ILIKE ?", "%"+hostName+"%").
+		Where("users.username ILIKE ? OR users.id = ?", "%"+hostName+"%", hostId).
+		Where("meetings.name ILIKE ? OR meetings.id = ?", "%"+meetingName+"%", meetingID).
 		Scan(&meetings).Error
 	return meetings, err
 }

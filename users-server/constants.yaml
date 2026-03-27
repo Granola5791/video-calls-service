@@ -28,6 +28,7 @@ server:
       from_name: "from"
       to_name: "to"
       host_name: "host_username"
+      meeting_name: "meeting_name"
 
     check_login_path: /check-login
     check_admin_path: /check-admin

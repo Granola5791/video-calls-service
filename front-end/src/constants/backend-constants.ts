@@ -18,7 +18,8 @@ export const UsersServer = {
         queryParams: {
             from: "from",
             to: "to",
-            host_username: "host_username",
+            hostUsername: "host_username",
+            meetingName: "meeting_name",
         },
         signUp: "/signup",
         logIn: "/login",

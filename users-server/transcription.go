@@ -182,8 +182,9 @@ func HandleGetMeetingInfos(c *gin.Context) {
 		return
 	}
 	hostName := c.Query(GetStringFromConfig("server.api.query_params.host_name"))
+	meetingName := c.Query(GetStringFromConfig("server.api.query_params.meeting_name"))
 
-	meetingIDs, err := GetAllMeetingInfosFromDB(from, to, hostName)
+	meetingIDs, err := GetMeetingInfosFromDB(from, to, hostName, meetingName)
 	if err != nil {
 		log.Println(err)
 		c.AbortWithStatus(http.StatusInternalServerError)
