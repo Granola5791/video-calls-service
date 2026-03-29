@@ -17,6 +17,11 @@ import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import { cacheRtl } from './theme/cache';
 import { theme } from './theme/theme';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import 'dayjs/locale/he';
+
+
 
 const router = createBrowserRouter([
     {
@@ -62,10 +67,12 @@ createRoot(document.getElementById('root')!).render(
     <StrictMode>
         <CacheProvider value={cacheRtl}>
             <ThemeProvider theme={theme}>
-                <CssBaseline />
-                <div dir="rtl" style={{ minHeight: '100vh' }}>
-                    <RouterProvider router={router} />
-                </div>
+                <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale='he'>
+                    <CssBaseline />
+                    <div dir="rtl" style={{ minHeight: '100vh' }}>
+                        <RouterProvider router={router} />
+                    </div>
+                </LocalizationProvider>
             </ThemeProvider>
         </CacheProvider>
     </StrictMode>,

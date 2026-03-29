@@ -107,4 +107,8 @@ export const MeetingInfoText = {
     fromDate: "מתאריך:",
     toDate: "עד תאריך:",
     search: "חפש",
+    hebrewPickerLabels: {
+        okButtonLabel: 'אישור',
+        cancelButtonLabel: 'ביטול',
+    },
 }

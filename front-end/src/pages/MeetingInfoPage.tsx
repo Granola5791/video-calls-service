@@ -2,8 +2,6 @@ import { AddQueryParams, UsersServer } from '../constants/backend-constants';
 import type { MeetingInfo } from '../types/meetingInfo';
 import MeetingInfoTable from '../components/MeetingInfoTable';
 import { CenteredColumn, CenteredRow } from '../styled-components/StyledBoxes';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { MeetingInfoText } from '../constants/hebrew-constants';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { MediumButtonFilled } from '../styled-components/StyledButtons';
@@ -14,7 +12,6 @@ import { StyledTextField } from '../styled-components/StyledTextFields';
 import OneButtonPopUp from '../components/OneButtonPopUp';
 import MeetingTranscriptPage from './MeetingTranscriptPage';
 import SummaryPage from './SummaryPage';
-
 
 const MeetingInfoPage = () => {
     const datePickerSlotProps = {
@@ -77,21 +74,21 @@ const MeetingInfoPage = () => {
                 />
             </CenteredRow>
             <CenteredRow>
-                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                    <DateTimePicker
-                        label={MeetingInfoText.fromDate}
-                        slotProps={datePickerSlotProps as any}
-                        onChange={(value) => value?.isValid() && setFromDate(value)}
-                        defaultValue={fromDate}
-                    />
-                    <DateTimePicker
-                        label={MeetingInfoText.toDate}
-                        slotProps={datePickerSlotProps as any}
-                        onChange={(value) => value?.isValid() && setToDate(value)}
-                        defaultValue={toDate}
-                    />
-                    <MediumButtonFilled onClick={OnSearch}>{MeetingInfoText.search}</MediumButtonFilled>
-                </LocalizationProvider>
+                <DateTimePicker
+                    label={MeetingInfoText.fromDate}
+                    slotProps={datePickerSlotProps as any}
+                    onChange={(value) => value?.isValid() && setFromDate(value)}
+                    defaultValue={fromDate}
+                    localeText={MeetingInfoText.hebrewPickerLabels}
+                />
+                <DateTimePicker
+                    label={MeetingInfoText.toDate}
+                    slotProps={datePickerSlotProps as any}
+                    onChange={(value) => value?.isValid() && setToDate(value)}
+                    defaultValue={toDate}
+                    localeText={MeetingInfoText.hebrewPickerLabels}
+                />
+                <MediumButtonFilled onClick={OnSearch}>{MeetingInfoText.search}</MediumButtonFilled>
             </CenteredRow>
             {meetings.length > 0 && <MeetingInfoTable
                 meetings={meetings}
