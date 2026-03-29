@@ -14,17 +14,6 @@ import MeetingTranscriptPage from './MeetingTranscriptPage';
 import SummaryPage from './SummaryPage';
 
 const MeetingInfoPage = () => {
-    const datePickerSlotProps = {
-        textField: {
-            variant: 'filled',
-            InputLabelProps: {
-                sx: {
-                    width: '100%',
-                    textAlign: 'right',
-                },
-            },
-        },
-    }
     const [meetings, setMeetings] = useState<MeetingInfo[]>([]);
     const [fromDate, setFromDate] = useState<Dayjs>(dayjs('2023-01-01T00:00:00.000Z'));
     const [toDate, setToDate] = useState<Dayjs>(dayjs(Date.now()));
@@ -76,14 +65,12 @@ const MeetingInfoPage = () => {
             <CenteredRow>
                 <DateTimePicker
                     label={MeetingInfoText.fromDate}
-                    slotProps={datePickerSlotProps as any}
                     onChange={(value) => value?.isValid() && setFromDate(value)}
                     defaultValue={fromDate}
                     localeText={MeetingInfoText.hebrewPickerLabels}
                 />
                 <DateTimePicker
                     label={MeetingInfoText.toDate}
-                    slotProps={datePickerSlotProps as any}
                     onChange={(value) => value?.isValid() && setToDate(value)}
                     defaultValue={toDate}
                     localeText={MeetingInfoText.hebrewPickerLabels}
