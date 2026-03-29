@@ -1,7 +1,24 @@
 import styled from "@emotion/styled";
+import { keyframes } from "@emotion/react";
 import { Colors } from "../constants/general-contants.ts";
 
-export const StyledTitle = styled.h1 ({
+const dotAnimation = keyframes`
+  0%, 100% { content: "."; }
+  33% { content: ".."; }
+  66% { content: "..."; }
+`;
+
+export const LoadingText = styled.span({
+  '&::after': {
+    display: 'inline-block',
+    content: '"."',
+    animation: `${dotAnimation} 1.5s steps(1, end) infinite`,
+    width: '1em',
+    textAlign: 'right',
+  },
+});
+
+export const StyledTitle = styled.h1({
     fontSize: '5rem',
     fontWeight: 'bold',
     color: Colors.primary,
@@ -9,20 +26,20 @@ export const StyledTitle = styled.h1 ({
     margin: '0px',
 });
 
-export const BoldText = styled.p ({
+export const BoldText = styled.p({
     fontWeight: 'bold',
 });
 
-export const StyledH1 = styled.h1 ({
+export const StyledH1 = styled.h1({
     color: Colors.primary,
 });
 
-export const StyledP = styled.p ({
+export const StyledP = styled.p({
     color: Colors.primary,
     margin: '0px',
 });
 
-export const MeetingID = styled.p ({
+export const MeetingID = styled.p({
     position: 'absolute',
     right: '10px',
     color: 'gray',
@@ -30,7 +47,7 @@ export const MeetingID = styled.p ({
     fontSize: '0.9rem',
 });
 
-export const NameTag = styled.p ({
+export const NameTag = styled.p({
     position: 'absolute',
     right: '0px',
     top: '0px',
@@ -43,7 +60,7 @@ export const NameTag = styled.p ({
     padding: '1%',
 });
 
-export const ClickableP = styled.p ({
+export const ClickableP = styled.p({
     cursor: 'pointer',
     color: Colors.primary,
     '&:hover': {

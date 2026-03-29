@@ -5,7 +5,7 @@ export const General = {
 };
 
 export const Auth = {
-    wait: "רגע...",
+    wait: "רגע",
     username: "שם משתמש",
     password: "סיסמה",
     rePassword: "אימות סיסמה",
