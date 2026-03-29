@@ -5,7 +5,7 @@ export const Colors = {
     },
     background: {
         default: 'white',
-        paper: '#f0f0f0',
+        drawer: '#f0f0f0',
         dark: '#111',
     },
     error: {

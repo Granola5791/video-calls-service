@@ -13,7 +13,7 @@ declare module '@mui/material/styles' {
 
     interface TypeBackground {
         dark: string;
-        primary: string;
+        drawer: string;
     }
 }
 

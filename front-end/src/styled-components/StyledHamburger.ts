@@ -5,7 +5,7 @@ export const HamburgerDrawerContainer = styled('div')(({ theme }) => ({
     width: "20vw",
     height: "100vh",
     border: "1px solid black",
-    backgroundColor: theme.palette.background.paper,
+    backgroundColor: theme.palette.background.drawer,
 }));
 
 export const HamburgerMenuTitle = styled('h1')(({ theme }) => ({
