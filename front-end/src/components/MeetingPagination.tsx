@@ -12,16 +12,25 @@ const MeetingPagination = ({ hasNext, hasPrev, onNextClick, onPrevClick }: Meeti
 
     return (
         <PaginationContainer>
-            {hasPrev &&
-                <StyledPrevPaginationButton className="meeting-pagination-btn" color="inherit" onClick={onPrevClick}>
-                    <StyledPrevArrow />
-                </StyledPrevPaginationButton>
-            }
-            {hasNext &&
-                <StyledNextPaginationButton className="meeting-pagination-btn" color="inherit" onClick={onNextClick}>
-                    <StyledNextArrow />
-                </StyledNextPaginationButton>
-            }
+
+            <StyledPrevPaginationButton
+                className="meeting-pagination-btn"
+                color="inherit"
+                onClick={onPrevClick}
+                disabled={!hasPrev}
+            >
+                <StyledPrevArrow className="meeting-pagination-arrow" />
+            </StyledPrevPaginationButton>
+
+            <StyledNextPaginationButton
+                className="meeting-pagination-btn"
+                color="inherit"
+                onClick={onNextClick}
+                disabled={!hasNext}
+            >
+                <StyledNextArrow className="meeting-pagination-arrow" />
+            </StyledNextPaginationButton>
+
         </PaginationContainer>
     )
 }

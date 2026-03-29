@@ -10,6 +10,9 @@ const BasePaginationButton = styled(IconButton)({
     transition: "opacity 0.3s ease-in-out",
     pointerEvents: "none",
     backgroundColor: "rgba(0, 0, 0, 0.5)",
+    ":disabled .meeting-pagination-arrow": {
+        opacity: 0.4,
+    },
 });
 
 export const StyledPrevPaginationButton = styled(BasePaginationButton)({

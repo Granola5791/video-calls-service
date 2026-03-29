@@ -11,6 +11,7 @@ import { HostOptions, MeetingExitText, StartMeetingText } from '../constants/heb
 import { StyledMeetingFooter } from '../styled-components/StyledFooters';
 import { LongButtonFilled } from '../styled-components/StyledButtons';
 import { StyledTitle } from '../styled-components/StyledText';
+import MeetingPagination from '../components/MeetingPagination';
 
 type Participant = {
     id: string;
@@ -43,6 +44,8 @@ const MeetingPage = () => {
     const leaveMeetingTimeoutIDRef = React.useRef(0);
     const [isHost, setIsHost] = React.useState(false);
     const [dangerSignOn, setDangerSignOn] = React.useState(false);
+    const [page, setPage] = React.useState(0);
+    const [participantsToDisplay, setParticipantsToDisplay] = React.useState<Participant[]>([]);
     const [hostOptions, setHostOptions] = React.useState<{ label: string, onClick: (userID: string) => void }[]>([]);
     const {
         goToHome,
@@ -64,6 +67,10 @@ const MeetingPage = () => {
             }
         };
     }, []);
+
+    useEffect(() => {
+        UpdateParticipantsToDisplay();
+    }, [participants])
 
     const CheckIfAbleToJoinMeeting = async (meetingID: string) => {
         const res = await fetch(UsersServer.httpAddress + SetUrlParams(UsersServer.api.isAbleToJoinMeeting, meetingID), {
@@ -312,6 +319,29 @@ const MeetingPage = () => {
         }
     };
 
+    const NextPage = () => {
+        setParticipantsToDisplay(participants.slice(
+            (page + 1) * MeetingConfig.pagination.participantsPerPage - 1,
+            (page + 2) * MeetingConfig.pagination.participantsPerPage - 1
+        ));
+        setPage((prev) => prev + 1);
+    };
+
+    const PrevPage = () => {
+        setParticipantsToDisplay(participants.slice(
+            page == 1 ? 0 : (page - 1) * MeetingConfig.pagination.participantsPerPage - 1,
+            page * MeetingConfig.pagination.participantsPerPage - 1
+        ));
+        setPage((prev) => prev - 1);
+    };
+
+    const UpdateParticipantsToDisplay = () => {
+        setParticipantsToDisplay(participants.slice(
+            page == 0 ? 0 : page * MeetingConfig.pagination.participantsPerPage - 1,
+            (page + 1) * MeetingConfig.pagination.participantsPerPage - 1
+        ));
+    }
+
     const GetExitText = () => {
         let title = '';
         switch (meetingState) {
@@ -394,7 +424,7 @@ const MeetingPage = () => {
                     </StyledMeetingGridTile>
                 }
                 {
-                    participants.map((participant) => (
+                    participantsToDisplay.map((participant) => (
                         <StyledMeetingGridTile key={participant.id}>
                             <DashPlayer
                                 userID={participant.id}
@@ -405,6 +435,12 @@ const MeetingPage = () => {
                         </StyledMeetingGridTile>
                     ))
                 }
+                <MeetingPagination
+                    hasNext={(page + 1) * MeetingConfig.pagination.participantsPerPage - 1 < participants.length}
+                    hasPrev={page > 0}
+                    onNextClick={NextPage}
+                    onPrevClick={PrevPage}
+                />
             </StyledMeetingGrid>
 
             <StyledMeetingFooter

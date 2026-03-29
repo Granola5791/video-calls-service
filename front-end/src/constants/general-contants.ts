@@ -45,6 +45,9 @@ export const MeetingConfig = {
         left: 5,
         kicked: 6,
         banned: 7,
+    },
+    pagination: {
+        participantsPerPage: 8,
     }
 }
 
