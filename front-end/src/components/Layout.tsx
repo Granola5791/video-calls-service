@@ -16,7 +16,7 @@ const Layout = () => {
     const role = localStorage.getItem(LocalStorage.role);
     const username = localStorage.getItem(LocalStorage.username);
     const adminOptions = [{ text: MenuOptions.admin.meetingInfos, onClick: goToTranscripts }];
-    const userOptions = [] as MenuOption[];
+    const userOptions = [{ text: MenuOptions.home, onClick: goToHome }] as MenuOption[];
     const logoutOption = [{ text: MenuOptions.disconnect, onClick: LogOut }] as MenuOption[];
     const options = userOptions.concat(IsAdmin(role) ? adminOptions : []);
     return (

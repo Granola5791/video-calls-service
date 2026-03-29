@@ -89,6 +89,7 @@ export const MeetingFooterText = {
 export const MenuOptions = {
     title: "שלום, ",
     disconnect: "התנתק",
+    home: "דף הבית",
     admin: {
         meetingInfos: "מידע על פגישות",
     }
