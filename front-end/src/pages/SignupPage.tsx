@@ -2,7 +2,7 @@ import React from 'react'
 import { General, Auth, Errors, SuccessMessages } from "../constants/hebrew-constants"
 import { CenteredColumn, CenteredFilledScreen } from "../styled-components/StyledBoxes"
 import { LongButtonFilled } from "../styled-components/StyledButtons"
-import { BoldText, StyledTitle } from "../styled-components/StyledText"
+import { BoldText, LoadingText, StyledTitle } from "../styled-components/StyledText"
 import { StyledTextField } from "../styled-components/StyledTextFields"
 import { UsersServer, HttpStatusCodes } from '../constants/backend-constants'
 import { ErrorText } from '../styled-components/StyledErrors'
@@ -19,6 +19,7 @@ const SignupPage = () => {
     const [password, setPassword] = React.useState<string>('');
     const [rePassword, setRePassword] = React.useState<string>('');
     const [response, setResponse] = React.useState<string>('');
+    const [isLoading, setIsLoading] = React.useState<boolean>(false);
     const [openSuccessPopUp, setOpenSuccessPopUp] = React.useState<boolean>(false);
 
     const { goToLogIn: GoToLogin } = useNavigation();
@@ -38,7 +39,6 @@ const SignupPage = () => {
     }
 
     const HandleSignup = async () => {
-        setResponse(Auth.wait);
         if (!IsUsernameValid(username)) {
             setResponse(Errors.invalidUsername);
             return;
@@ -52,24 +52,32 @@ const SignupPage = () => {
             return;
         }
 
-        const res = await fetch(UsersServer.httpAddress + UsersServer.api.signUp, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username, password })
-        })
-        switch (res.status) {
-            case HttpStatusCodes.Created:
-                setResponse('');
-                setOpenSuccessPopUp(true);
-                break;
-            case HttpStatusCodes.Conflict:
-                setResponse(Errors.usernameAlreadyExists);
-                break;
-            case HttpStatusCodes.BadRequest:
-                setResponse(Errors.invalidPasswordFormat);
-                break;
-            default:
-                setResponse(Errors.genericError);
+        setIsLoading(true);
+        setResponse(Auth.wait);
+        try {
+            const res = await fetch(UsersServer.httpAddress + UsersServer.api.signUp, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            })
+            setIsLoading(true);
+            switch (res.status) {
+                case HttpStatusCodes.Created:
+                    setResponse('');
+                    setOpenSuccessPopUp(true);
+                    break;
+                case HttpStatusCodes.Conflict:
+                    setResponse(Errors.usernameAlreadyExists);
+                    break;
+                case HttpStatusCodes.BadRequest:
+                    setResponse(Errors.invalidPasswordFormat);
+                    break;
+                default:
+                    setResponse(Errors.genericError);
+            }
+        } catch (error) {
+            setIsLoading(false);
+            setResponse(Errors.genericError);
         }
     }
 
@@ -105,7 +113,11 @@ const SignupPage = () => {
                         onChange={(e) => setRePassword(e.target.value)}
                     />
                     <LongButtonFilled onClick={HandleSignup}>{Auth.signUpButton}</LongButtonFilled>
-                    <ErrorText>{response}</ErrorText>
+                    {isLoading ?
+                        <LoadingText>{response}</LoadingText>
+                        :
+                        <ErrorText>{response}</ErrorText>
+                    }
                 </ CenteredColumn>
             </CenteredColumn>
 

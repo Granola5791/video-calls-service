@@ -17,12 +17,12 @@ const LoginPage = () => {
     const [response, setResponse] = useState<string>('');
     const [username, setUsername] = useState<string>('');
     const [password, setPassword] = useState<string>('');
-    const [isError, setIsError] = useState<boolean>(true);
+    const [isLoading, setIsLoading] = useState<boolean>(false);
 
     const { goToHome: GoToHome } = useNavigation();
 
     const handleLogin = async (username: string, password: string) => {
-        setIsError(false);
+        setIsLoading(true);
         setResponse(Auth.wait);
         try {
             const res = await fetch(UsersServer.httpAddress + UsersServer.api.logIn, {
@@ -31,6 +31,7 @@ const LoginPage = () => {
                 body: JSON.stringify({ username, password }),
                 credentials: 'include'
             })
+            setIsLoading(false);
             switch (res.status) {
                 case HttpStatusCodes.OK:
                     const data = await res.json();
@@ -40,15 +41,13 @@ const LoginPage = () => {
                     GoToHome();
                     break;
                 case HttpStatusCodes.Unauthorized:
-                    setIsError(true);
                     setResponse(Errors.invalidAuthInput);
                     break;
                 default:
-                    setIsError(true);
                     setResponse(Errors.genericError);
             }
         } catch (error) {
-            setIsError(true);
+            setIsLoading(false);
             setResponse(Errors.genericError);
         }
     }
@@ -82,10 +81,10 @@ const LoginPage = () => {
 
                     <LongButtonFilled onClick={() => handleLogin(username, password)}>{Auth.loginButton}</LongButtonFilled>
 
-                    {isError ?
-                        <ErrorText>{response}</ErrorText>
-                        :
+                    {isLoading ?
                         <LoadingText>{response}</LoadingText>
+                        :
+                        <ErrorText>{response}</ErrorText>
                     }
                 </ CenteredColumn>
             </CenteredColumn>
