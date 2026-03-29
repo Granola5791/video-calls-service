@@ -12,20 +12,25 @@ import MeetingPage from './pages/MeetingPage.tsx'
 import MeetingInfoPage from './pages/MeetingInfoPage.tsx'
 import Layout from './components/Layout.tsx'
 import { RouterPaths } from './constants/general-contants.ts'
+import { CacheProvider } from '@emotion/react';
+import { ThemeProvider } from '@mui/material/styles';
+import CssBaseline from '@mui/material/CssBaseline';
+import { cacheRtl } from './theme/cache';
+import { theme } from './theme/theme';
 
 const router = createBrowserRouter([
     {
         path: "/",
-        element: <Layout/>,
+        element: <Layout />,
         children: [
             {
                 index: true,
-                element: <HomePage/>,
+                element: <HomePage />,
                 loader: CheckLoginLoader,
             },
             {
                 path: RouterPaths.meetingInfo,
-                element: <MeetingInfoPage/>,
+                element: <MeetingInfoPage />,
                 loader: CheckAdminLoader,
             },
         ]
@@ -33,7 +38,7 @@ const router = createBrowserRouter([
     {
         path: RouterPaths.landing,
         element: <LandingPage />
-    },  
+    },
     {
         path: RouterPaths.login,
         element: <LoginPage />
@@ -55,6 +60,13 @@ const router = createBrowserRouter([
 
 createRoot(document.getElementById('root')!).render(
     <StrictMode>
-        <RouterProvider router={router} />
+        <CacheProvider value={cacheRtl}>
+            <ThemeProvider theme={theme}>
+                <CssBaseline />
+                <div dir="rtl" style={{ minHeight: '100vh' }}>
+                    <RouterProvider router={router} />
+                </div>
+            </ThemeProvider>
+        </CacheProvider>
     </StrictMode>,
 )
