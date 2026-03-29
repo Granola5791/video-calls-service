@@ -59,11 +59,9 @@ export const RouterPaths = {
     home: '/',
     meetingInfo: 'meeting-info',
     landing: '/landing',
-    meetingTranscript: 'transcript/:meetingID',
     login: '/login',
     signup: '/signup',
     meeting: '/meeting/:meetingID',
-    summary: 'summary/:meetingID',
 }
 
 export const Roles = {

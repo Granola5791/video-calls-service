@@ -10,10 +10,8 @@ import { CheckAdminLoader, CheckLoginLoader } from './utils/check-login.ts'
 import TestPage from './pages/TestPage.tsx'
 import MeetingPage from './pages/MeetingPage.tsx'
 import MeetingInfoPage from './pages/MeetingInfoPage.tsx'
-import MeetingTranscriptPage from './pages/MeetingTranscriptPage.tsx'
 import Layout from './components/Layout.tsx'
 import { RouterPaths } from './constants/general-contants.ts'
-import SummaryPage from './pages/SummaryPage.tsx'
 
 const router = createBrowserRouter([
     {
@@ -30,16 +28,6 @@ const router = createBrowserRouter([
                 element: <MeetingInfoPage/>,
                 loader: CheckAdminLoader,
             },
-            {
-                path: RouterPaths.meetingTranscript,
-                element: <MeetingTranscriptPage/>,
-                loader: CheckAdminLoader,
-            },
-            {
-                path: RouterPaths.summary,
-                element: <SummaryPage/>,
-                loader: CheckAdminLoader,
-            }
         ]
     },
     {
