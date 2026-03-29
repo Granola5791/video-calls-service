@@ -11,6 +11,7 @@ import { Typography } from "@mui/material"
 import { Link } from "react-router-dom"
 import { LocalStorage, RouterPaths } from "../constants/general-contants"
 import { StyledLogo, StyledLogoContainer } from "../styled-components/StyledLogo"
+import PasswordField from "../components/PasswordField"
 
 const LoginPage = () => {
 
@@ -72,9 +73,8 @@ const LoginPage = () => {
                         variant="filled"
                         onChange={(e) => setUsername(e.target.value)}
                     />
-                    <StyledTextField
+                    <PasswordField
                         label={Auth.password}
-                        type="password"
                         variant="filled"
                         onChange={(e) => setPassword(e.target.value)}
                     />

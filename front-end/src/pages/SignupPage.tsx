@@ -12,6 +12,7 @@ import { Link } from 'react-router-dom'
 import OneButtonPopUp from '../components/OneButtonPopUp'
 import { useNavigation } from '../utils/navigation'
 import { StyledLogoContainer, StyledLogo } from '../styled-components/StyledLogo'
+import PasswordField from '../components/PasswordField'
 
 const SignupPage = () => {
 
@@ -100,15 +101,13 @@ const SignupPage = () => {
                         variant="filled"
                         onChange={(e) => setUsername(e.target.value)}
                     />
-                    <StyledTextField
+                    <PasswordField
                         label={Auth.password}
-                        type="password"
                         variant="filled"
                         onChange={(e) => setPassword(e.target.value)}
                     />
-                    <StyledTextField
+                    <PasswordField
                         label={Auth.rePassword}
-                        type="password"
                         variant="filled"
                         onChange={(e) => setRePassword(e.target.value)}
                     />
