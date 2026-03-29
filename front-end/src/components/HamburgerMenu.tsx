@@ -11,9 +11,10 @@ interface HamburgerMenuProps {
     topButtons?: MenuOption[],
     bottomButtons?: MenuOption[],
     title?: string
+    closeOnClick?: boolean;
 }
 
-const HamburgerMenu = ({ onClose, onOpen, topButtons, bottomButtons, title}: HamburgerMenuProps) => {
+const HamburgerMenu = ({ onClose, onOpen, topButtons, bottomButtons, title, closeOnClick}: HamburgerMenuProps) => {
 
     const [open, setOpen] = useState(false);
 
@@ -31,6 +32,13 @@ const HamburgerMenu = ({ onClose, onOpen, topButtons, bottomButtons, title}: Ham
         }
     };
 
+    const handleButtonClick = (button: MenuOption) => {
+        if (closeOnClick) {
+            handleClose();
+        }
+        button.onClick();
+    };
+
     return (
         <div style={{width: 'fit-content', border: '1px solid black'}}>
             <HamburgerMenuButton onClick={handleOpen}>
@@ -42,7 +50,7 @@ const HamburgerMenu = ({ onClose, onOpen, topButtons, bottomButtons, title}: Ham
                     <List>
                         {topButtons && topButtons.map((button, index) => (
                             <ListItem key={index} disablePadding>
-                                <ListItemButton onClick={button.onClick}>
+                                <ListItemButton onClick={() => handleButtonClick(button)}>
                                     {button.text}
                                 </ListItemButton>
                             </ListItem>
@@ -52,7 +60,7 @@ const HamburgerMenu = ({ onClose, onOpen, topButtons, bottomButtons, title}: Ham
                     <List>
                         {bottomButtons && bottomButtons.map((button, index) => (
                             <ListItem key={index} disablePadding>
-                                <ListItemButton onClick={button.onClick}>
+                                <ListItemButton onClick={() => handleButtonClick(button)}>
                                     {button.text}
                                 </ListItemButton>
                             </ListItem>

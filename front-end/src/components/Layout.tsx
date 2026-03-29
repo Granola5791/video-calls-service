@@ -25,6 +25,7 @@ const Layout = () => {
                 title={MenuOptions.title + username}
                 topButtons={options}
                 bottomButtons={logoutOption}
+                closeOnClick
             />
 
             <main>
