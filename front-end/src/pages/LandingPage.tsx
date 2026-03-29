@@ -1,9 +1,9 @@
-import React from 'react'
 import { StyledTitle } from '../styled-components/StyledText'
 import { CenteredColumn, CenteredFilledScreen } from '../styled-components/StyledBoxes'
 import { LongButton, LongButtonFilled } from '../styled-components/StyledButtons'
 import { useNavigation } from '../utils/navigation'
 import { General, LandingPageText } from '../constants/hebrew-constants'
+import { StyledLogo, StyledLogoContainer } from '../styled-components/StyledLogo'
 
 const LandingPage = () => {
 
@@ -16,7 +16,10 @@ const LandingPage = () => {
         <CenteredFilledScreen>
             <CenteredColumn >
                 <CenteredColumn>
-                    <StyledTitle>{General.appName}</StyledTitle>
+                    <StyledLogoContainer>
+                        <StyledLogo src="/assets/logo.jpg" alt="Logo" />
+                        <StyledTitle>{General.appName}</StyledTitle>
+                    </StyledLogoContainer>
                 </CenteredColumn>
                 <CenteredColumn>
                     <LongButtonFilled onClick={GoToLogIn}>{LandingPageText.logInButton}</LongButtonFilled>

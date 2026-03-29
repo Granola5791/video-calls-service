@@ -11,7 +11,7 @@ export const StyledLogoContainer = styled.div({
     justifyContent: 'center',
     alignItems: 'center',
     margin: 'auto',
-    marginBottom: '30px',
+    marginBottom: '0px',
     flexDirection: 'row',
     gap: '10px',
     backgroundColor: 'white',

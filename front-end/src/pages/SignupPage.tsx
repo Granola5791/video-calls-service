@@ -11,6 +11,7 @@ import { AuthRequirements } from '../constants/general-contants'
 import { Link } from 'react-router-dom'
 import OneButtonPopUp from '../components/OneButtonPopUp'
 import { useNavigation } from '../utils/navigation'
+import { StyledLogoContainer, StyledLogo } from '../styled-components/StyledLogo'
 
 const SignupPage = () => {
 
@@ -75,7 +76,10 @@ const SignupPage = () => {
     return (
         <CenteredFilledScreen>
             <CenteredColumn >
-                <StyledTitle>{General.appName}</StyledTitle>
+                <StyledLogoContainer>
+                    <StyledLogo src="/assets/logo.jpg" alt="Logo" />
+                    <StyledTitle>{General.appName}</StyledTitle>
+                </StyledLogoContainer>
 
                 <CenteredColumn>
                     <Typography>

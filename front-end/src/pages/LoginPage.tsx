@@ -10,6 +10,7 @@ import { useNavigation } from "../utils/navigation"
 import { Typography } from "@mui/material"
 import { Link } from "react-router-dom"
 import { LocalStorage } from "../constants/general-contants"
+import { StyledLogo, StyledLogoContainer } from "../styled-components/StyledLogo"
 
 const LoginPage = () => {
 
@@ -48,7 +49,10 @@ const LoginPage = () => {
 
         <CenteredFilledScreen>
             <CenteredColumn >
-                <StyledTitle>{General.appName}</StyledTitle>
+                <StyledLogoContainer>
+                    <StyledLogo src="/assets/logo.jpg" alt="Logo" />
+                    <StyledTitle>{General.appName}</StyledTitle>
+                </StyledLogoContainer>
 
                 <CenteredColumn>
                     <Typography>
