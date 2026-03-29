@@ -6,16 +6,18 @@ import { LocalStorage } from '../constants/general-contants'
 import { useNavigation } from '../utils/navigation'
 import { IsAdmin } from '../utils/roles'
 import { MediumScreen } from '../styled-components/StyledBoxes'
+import type { MenuOption } from '../types/menuOptions'
 
 const Layout = () => {
     const {
-        goToTranscripts,
+        goToMeetingInfo: goToTranscripts,
+        goToHome,
     } = useNavigation();
     const role = localStorage.getItem(LocalStorage.role);
     const username = localStorage.getItem(LocalStorage.username);
     const adminOptions = [{ text: MenuOptions.admin.meetingInfos, onClick: goToTranscripts }];
-    const userOptions = [] as { text: string, onClick: () => void }[];
-    const logoutOption = [{ text: MenuOptions.disconnect, onClick: LogOut }];
+    const userOptions = [] as MenuOption[];
+    const logoutOption = [{ text: MenuOptions.disconnect, onClick: LogOut }] as MenuOption[];
     const options = userOptions.concat(IsAdmin(role) ? adminOptions : []);
     return (
         <>

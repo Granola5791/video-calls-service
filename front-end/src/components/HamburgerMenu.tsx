@@ -3,12 +3,13 @@ import { Divider, Drawer, List, ListItem, ListItemButton } from '@mui/material';
 import { HamburgerMenuButton } from "../styled-components/StyledButtons";
 import { HamburgerMenuContainer } from "../styled-components/StyledBoxes";
 import { HamburgerMenuIcon } from "../styled-components/StyledIcons";
+import type { MenuOption } from '../types/menuOptions'
 
 interface HamburgerMenuProps {
     onClose?: () => void,
     onOpen?: () => void,
-    topButtons?: { text: string, onClick: () => void }[],
-    bottomButtons?: { text: string, onClick: () => void }[],
+    topButtons?: MenuOption[],
+    bottomButtons?: MenuOption[],
     title?: string
 }
 
