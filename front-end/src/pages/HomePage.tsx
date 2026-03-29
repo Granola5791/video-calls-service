@@ -10,6 +10,7 @@ import { Colors } from '../constants/general-contants'
 import { StyledTitle } from '../styled-components/StyledText'
 import Checkbox from '@mui/material/Checkbox';
 import { FormControlLabel } from '@mui/material'
+import { StyledLogo, StyledLogoContainer } from '../styled-components/StyledLogo'
 
 const HomePage = () => {
     const [meetingID, setMeetingID] = useState('');
@@ -46,9 +47,13 @@ const HomePage = () => {
 
     return (
         <CenteredScreen>
-            <CenteredColumn>
 
-                <StyledTitle>{General.appName}</StyledTitle>
+            <CenteredColumn >
+                <StyledLogoContainer>
+                    <StyledLogo src="/assets/logo.jpg" alt="Logo" />
+
+                    <StyledTitle>{General.appName}</StyledTitle>
+                </StyledLogoContainer>
                 <CenteredColumn>
                     <LongButtonFilled onClick={() => setOpenCreateMeetingPopUp(true)}>{HomePageText.createMeetingButton}</LongButtonFilled>
                     <LongButton onClick={() => setOpenJoinMeetingPopUp(true)}>{HomePageText.joinMeetingButton}</LongButton>
@@ -61,10 +66,10 @@ const HomePage = () => {
                         buttonText2={HomePageText.cancelMeetingIDButton}
                         buttonColor1={Colors.primary}
                     >
-                            <FormControlLabel
-                                label={HomePageText.requireFaceLabel}
-                                control={<Checkbox onChange={() => {setRequireFace(!requireFace)}}/>}
-                            />
+                        <FormControlLabel
+                            label={HomePageText.requireFaceLabel}
+                            control={<Checkbox onChange={() => { setRequireFace(!requireFace) }} />}
+                        />
                     </TwoButtonPopUp>
 
                     <TwoButtonPopUp
