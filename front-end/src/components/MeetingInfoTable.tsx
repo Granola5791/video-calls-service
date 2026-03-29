@@ -1,11 +1,10 @@
-import { Table, TableBody, TableContainer, TablePagination, TableRow } from '@mui/material'
+import { Table, TableBody, TableContainer, TableFooter, TablePagination, TableRow } from '@mui/material'
 import MeetingInfoHead from './MeetingInfoHead'
 import type { MeetingInfo } from '../types/meetingInfo'
 import MeetingInfoRow from './MeetingInfoRow'
 import Paper from '@mui/material/Paper';
 import { useEffect, useState } from 'react';
 import { MeetingInfoGeneral } from '../constants/general-contants';
-import { StyledTableFooter } from '../styled-components/StyledTable';
 
 interface MeetingInfoTableProps {
     meetings: MeetingInfo[]
@@ -53,18 +52,18 @@ const MeetingInfoTable = ({ meetings, onTranscriptClick, onSummaryClick }: Meeti
                         />
                     ))}
                 </TableBody>
-                <StyledTableFooter>
+                <TableFooter>
                     <TableRow>
                         <TablePagination
                             rowsPerPageOptions={MeetingInfoGeneral.rowsPerPageOptions}
                             rowsPerPage={rowsPerPage}
                             count={meetings.length}
                             page={page}
-                            onPageChange={(event, newPage) => setPage(newPage)}
+                            onPageChange={(_event, newPage) => setPage(newPage)}
                             onRowsPerPageChange={(event) => { setRowsPerPage(parseInt(event.target.value, 10)); setPage(0) }}
                         />
                     </TableRow>
-                </StyledTableFooter>
+                </TableFooter>
             </Table>
         </TableContainer>
     )

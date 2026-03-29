@@ -5,19 +5,19 @@ import { ClickableP } from '../styled-components/StyledText'
 
 interface MeetingInfoRowProps {
     meetingInfo: MeetingInfo
-    onTranscriptClick: (id : string) => void
-    onSummaryClick: (id : string) => void
+    onTranscriptClick: (id: string) => void
+    onSummaryClick: (id: string) => void
 }
 
 const MeetingInfoRow = ({ meetingInfo, onTranscriptClick, onSummaryClick }: MeetingInfoRowProps) => {
     return (
         <TableRow>
-            <TableCell align='right'>{meetingInfo.id}</TableCell>
-            <TableCell align='right'>{meetingInfo.name}</TableCell>
-            <TableCell align='right'>{meetingInfo.date}</TableCell>
-            <TableCell align='right'>{meetingInfo.hostName}</TableCell>
-            <TableCell align='right' onClick={() => onTranscriptClick(meetingInfo.id)}><ClickableP>{MeetingInfoText.transcript}</ClickableP></TableCell>
-            <TableCell align='right' onClick={() => onSummaryClick(meetingInfo.id)}><ClickableP>{MeetingInfoText.summary}</ClickableP></TableCell>
+            <TableCell>{meetingInfo.id}</TableCell>
+            <TableCell >{meetingInfo.name}</TableCell>
+            <TableCell >{meetingInfo.date}</TableCell>
+            <TableCell >{meetingInfo.hostName}</TableCell>
+            <TableCell onClick={() => onTranscriptClick(meetingInfo.id)}><ClickableP>{MeetingInfoText.transcript}</ClickableP></TableCell>
+            <TableCell onClick={() => onSummaryClick(meetingInfo.id)}><ClickableP>{MeetingInfoText.summary}</ClickableP></TableCell>
         </TableRow>
     )
 }

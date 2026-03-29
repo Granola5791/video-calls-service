@@ -1,7 +1,6 @@
-import { TableCell, TableHead, TableRow } from '@mui/material'
+import { TableCell, TableHead, TableRow, TableSortLabel } from '@mui/material'
 import { MeetingInfoText } from '../constants/hebrew-constants'
 import { useState } from 'react';
-import { StyledTableSortLabel } from '../styled-components/StyledTable';
 import type { MeetingInfo } from '../types/meetingInfo';
 
 interface MeetingInfoHeadProps {
@@ -28,14 +27,14 @@ const MeetingInfoHead = ({ colIDs, onSort }: MeetingInfoHeadProps) => {
     return (
         <TableHead>
             <TableRow>
-                {colIDs.map((id) => <TableCell align='right' key={id}>
-                    <StyledTableSortLabel
+                {colIDs.map((id) => <TableCell key={id}>
+                    <TableSortLabel
                         active={id === sortedColumn}
                         direction={sortDirection}
                         onClick={() => handleSort(id)}
                     >
                         {MeetingInfoText[id as keyof typeof MeetingInfoText]}
-                    </StyledTableSortLabel>
+                    </TableSortLabel>
                 </TableCell>)}
             </TableRow>
         </TableHead>
