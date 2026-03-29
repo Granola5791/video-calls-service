@@ -9,8 +9,8 @@ export function useNavigation() {
         goToLogIn: () => navigate(RouterPaths.login),
         goToHome: () => navigate(RouterPaths.home),
         goToMeeting: (meetingID: string) => navigate(`/meeting/${meetingID}`),
-        goToMeetingTranscript: (meetingID: string) => navigate(`/transcript/${meetingID}`),
-        goToTranscripts: () => navigate(RouterPaths.meetingInfo),
+        goToTranscript: (meetingID: string) => navigate(`/transcript/${meetingID}`),
+        goToMeetingInfo: () => navigate(RouterPaths.meetingInfo),
         goToSummary: (meetingID: string) => navigate(`/summary/${meetingID}`),
     };
 }
