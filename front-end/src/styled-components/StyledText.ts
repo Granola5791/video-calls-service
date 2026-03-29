@@ -39,7 +39,7 @@ export const StyledP = styled('p')(({ theme }) => ({
 
 export const MeetingID = styled('p')({
     position: 'absolute',
-    right: '10px',
+    left: '10px',
     color: 'gray',
     width: '30%',
     fontSize: '0.9rem',

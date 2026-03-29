@@ -3,7 +3,7 @@ export const Colors = {
         main: '#02c78f',
         hover: '#02c78fd3',
     },
-    backGround: {
+    background: {
         default: 'white',
         paper: '#f0f0f0',
         dark: '#111',
