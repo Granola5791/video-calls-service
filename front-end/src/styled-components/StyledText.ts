@@ -17,6 +17,11 @@ export const StyledH1 = styled.h1 ({
     color: Colors.primary,
 });
 
+export const StyledP = styled.p ({
+    color: Colors.primary,
+    margin: '0px',
+});
+
 export const MeetingID = styled.p ({
     position: 'absolute',
     right: '10px',

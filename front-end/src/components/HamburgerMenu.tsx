@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { Divider, Drawer, List, ListItem, ListItemButton } from '@mui/material';
 import { HamburgerMenuButton } from "../styled-components/StyledButtons";
-import { HamburgerMenuContainer } from "../styled-components/StyledBoxes";
 import { HamburgerMenuIcon } from "../styled-components/StyledIcons";
 import type { MenuOption } from '../types/menuOptions'
+import { HamburgerDrawerContainer, HamburgerMenuTitle } from "../styled-components/StyledHamburger";
+import { StyledP } from "../styled-components/StyledText";
 
 interface HamburgerMenuProps {
     onClose?: () => void,
@@ -14,8 +15,7 @@ interface HamburgerMenuProps {
     closeOnClick?: boolean;
 }
 
-const HamburgerMenu = ({ onClose, onOpen, topButtons, bottomButtons, title, closeOnClick}: HamburgerMenuProps) => {
-
+const HamburgerMenu = ({ onClose, onOpen, topButtons = [], bottomButtons = [], title, closeOnClick }: HamburgerMenuProps) => {
     const [open, setOpen] = useState(false);
 
     const handleOpen = () => {
@@ -40,35 +40,39 @@ const HamburgerMenu = ({ onClose, onOpen, topButtons, bottomButtons, title, clos
     };
 
     return (
-        <div style={{width: 'fit-content', border: '1px solid black'}}>
+        <>
             <HamburgerMenuButton onClick={handleOpen}>
                 <HamburgerMenuIcon />
             </HamburgerMenuButton>
             <Drawer anchor='right' open={open} onClose={handleClose}>
-                <HamburgerMenuContainer>
-                    {title && <h4 style={{textAlign: 'center'}}>{title}</h4>}
+                <HamburgerDrawerContainer>
+                    <HamburgerMenuTitle>{title}</HamburgerMenuTitle>
                     <List>
-                        {topButtons && topButtons.map((button, index) => (
+                        {topButtons.map((button, index) => (
                             <ListItem key={index} disablePadding>
                                 <ListItemButton onClick={() => handleButtonClick(button)}>
-                                    {button.text}
+                                    <StyledP>
+                                        {button.text}
+                                    </StyledP>
                                 </ListItemButton>
                             </ListItem>
                         ))}
                     </List>
                     <Divider />
                     <List>
-                        {bottomButtons && bottomButtons.map((button, index) => (
+                        {bottomButtons.map((button, index) => (
                             <ListItem key={index} disablePadding>
                                 <ListItemButton onClick={() => handleButtonClick(button)}>
-                                    {button.text}
+                                    <StyledP>
+                                        {button.text}
+                                    </StyledP>
                                 </ListItemButton>
                             </ListItem>
                         ))}
                     </List>
-                </HamburgerMenuContainer>
+                </HamburgerDrawerContainer>
             </Drawer>
-        </div>
+        </>
     )
 }
 

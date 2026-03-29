@@ -4,6 +4,8 @@ export const Colors = {
     meetingBackground: '#111',
     danger: 'rgb(255, 0, 0)',
     dangerHover: 'rgb(255, 60, 60)',
+    background: 'white',
+    drawerBackground: '#f0f0f0',
 };
 
 export const AuthRequirements = {
