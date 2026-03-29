@@ -1,8 +1,7 @@
-import styled from "@emotion/styled";
-import { Colors } from "../constants/general-contants";
+import { styled } from "@mui/material";
 
 
-export const CenteredColumn = styled.div({
+export const CenteredColumn = styled('div')({
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
@@ -14,7 +13,7 @@ export const CenteredColumn = styled.div({
     borderRadius: '10px',
 })
 
-export const CenteredRow = styled.div({
+export const CenteredRow = styled('div')({
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
@@ -26,7 +25,7 @@ export const CenteredRow = styled.div({
     borderRadius: '10px',
 })
 
-export const CenteredScreen = styled.div({
+export const CenteredScreen = styled('div')({
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
@@ -37,17 +36,17 @@ export const CenteredScreen = styled.div({
     gap: '20px',
 })
 
-export const MediumScreen = styled.div({
+export const MediumScreen = styled('div')({
     padding: '0px',
     maxWidth: '80vw',
     margin: 'auto',
 })
 
-export const CenteredFilledScreen = styled(CenteredScreen)({
-    backgroundColor: Colors.primary,
-})
+export const CenteredFilledScreen = styled(CenteredScreen)(({ theme }) => ({
+    backgroundColor: theme.palette.primary.main,
+}));
 
-export const StyledMeetingGrid = styled.div({
+export const StyledMeetingGrid = styled('div')(({ theme }) => ({
     display: "grid",
     position: "fixed",
     gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
@@ -60,6 +59,6 @@ export const StyledMeetingGrid = styled.div({
     bottom: "0px",
     padding: "8px",
     boxSizing: "border-box",
-    backgroundColor: Colors.meetingBackground,
+    backgroundColor: theme.palette.background.dark,
     overflow: "hidden",
-});
+}));

@@ -1,12 +1,12 @@
-import styled from "@emotion/styled";
-import { Colors } from "../constants/general-contants";
-export const StyledLogo = styled.img({
+import { styled } from "@mui/material";
+
+export const StyledLogo = styled('img')({
     width: 'auto',
     height: '80px',
 });
 
 
-export const StyledLogoContainer = styled.div({
+export const StyledLogoContainer = styled('div')({
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
@@ -30,8 +30,8 @@ export const CornerLogo = styled(StyledLogo)({
     height: '60px',
 });
 
-export const LogoTitle = styled.h1({
+export const LogoTitle = styled('h1')(({ theme }) => ({
     fontSize: '3rem',
-    color: Colors.primary,
+    color: theme.palette.primary.main,
     margin: '0',
-});
+}));

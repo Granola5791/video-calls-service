@@ -1,15 +1,14 @@
-import styled from "@emotion/styled";
-import { Colors } from "../constants/general-contants";
+import { styled } from "@mui/material";
 
-export const HamburgerDrawerContainer = styled.div({
+export const HamburgerDrawerContainer = styled('div')(({ theme }) => ({
     position: "fixed",
     width: "20vw",
     height: "100vh",
     border: "1px solid black",
-    backgroundColor: Colors.drawerBackground,
-});
+    backgroundColor: theme.palette.background.paper,
+}));
 
-export const HamburgerMenuTitle = styled.h4({
+export const HamburgerMenuTitle = styled('h1')(({ theme }) => ({
     textAlign: 'center',
-    color: Colors.primary,
-});
+    color: theme.palette.primary.main,
+}));

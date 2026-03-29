@@ -1,11 +1,17 @@
 export const Colors = {
-    primary: '#02c78f',
-    primaryHover: '#02c78fd3',
-    meetingBackground: '#111',
-    danger: 'rgb(255, 0, 0)',
-    dangerHover: 'rgb(255, 60, 60)',
-    background: 'white',
-    drawerBackground: '#f0f0f0',
+    primary: {
+        main: '#02c78f',
+        hover: '#02c78fd3',
+    },
+    backGround: {
+        default: 'white',
+        paper: '#f0f0f0',
+        dark: '#111',
+    },
+    error: {
+        main: 'rgb(255, 0, 0)',
+        hover: 'rgb(255, 60, 60)',
+    },
 };
 
 export const AuthRequirements = {
@@ -43,7 +49,7 @@ export const MeetingConfig = {
 }
 
 export const LocalStorage = {
-    id : 'id',
+    id: 'id',
     role: 'role',
     username: 'username',
 }

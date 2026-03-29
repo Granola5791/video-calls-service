@@ -1,6 +1,4 @@
-import styled from "@emotion/styled";
-import { Button, IconButton } from "@mui/material";
-import { Colors } from "../constants/general-contants.ts";
+import { Button, IconButton, styled } from "@mui/material";
 
 export const LongButton = styled(Button)({
     width: "300px",
@@ -12,14 +10,14 @@ export const LongButton = styled(Button)({
     color: "gray",
 });
 
-export const LongButtonFilled = styled(LongButton)({
+export const LongButtonFilled = styled(LongButton)(({ theme }) => ({
     color: "white",
-    backgroundColor: Colors.primary,
-    border: `2px solid ${Colors.primaryHover}`,
+    backgroundColor: theme.palette.primary.main,
+    border: `2px solid ${theme.palette.primary.hover}`,
     "&:hover": {
-        backgroundColor: Colors.primaryHover,
+        backgroundColor: theme.palette.primary.hover,
     },
-});
+}));
 
 export const MediumButton = styled(Button)({
     width: "200px",
@@ -52,41 +50,41 @@ export const AdaptiveButton = styled(Button)({
     padding: '15px 20px',
 })
 
-export const AdaptiveButtonFilled = styled(AdaptiveButton)({
+export const AdaptiveButtonFilled = styled(AdaptiveButton)(({ theme }) => ({
     color: "white",
-    backgroundColor: Colors.primary,
-    border: `2px solid ${Colors.primaryHover}`,
+    backgroundColor: theme.palette.primary.main,
+    border: `2px solid ${theme.palette.primary.hover}`,
     "&:hover": {
-        backgroundColor: Colors.primaryHover,
+        backgroundColor: theme.palette.primary.hover,
     },
-})
+}));
 
-export const SmallButtonFilled = styled(SmallButton)({
+export const SmallButtonFilled = styled(SmallButton)(({ theme }) => ({
     color: "white",
-    backgroundColor: Colors.primary,
-    border: `2px solid ${Colors.primaryHover}`,
+    backgroundColor: theme.palette.primary.main,
+    border: `2px solid ${theme.palette.primary.hover}`,
     "&:hover": {
-        backgroundColor: Colors.primaryHover,
+        backgroundColor: theme.palette.primary.hover,
     },
-});
+}));
 
-export const MediumButtonFilled = styled(MediumButton)({
+export const MediumButtonFilled = styled(MediumButton)(({ theme }) => ({
     color: "white",
-    backgroundColor: Colors.primary,
-    border: `2px solid ${Colors.primaryHover}`,
+    backgroundColor: theme.palette.primary.main,
+    border: `2px solid ${theme.palette.primary.hover}`,
     "&:hover": {
-        backgroundColor: Colors.primaryHover,
+        backgroundColor: theme.palette.primary.hover,
     },
-});
+}));
 
-export const LeaveMeetingButton = styled(MediumButton)({
+export const LeaveMeetingButton = styled(MediumButton)(({ theme }) => ({
     color: "white",
-    backgroundColor: Colors.danger,
-    border: `2px solid ${Colors.dangerHover}`,
+    backgroundColor: theme.palette.error.main,
+    border: `2px solid ${theme.palette.error.hover}`,
     "&:hover": {
-        backgroundColor: Colors.dangerHover,
+        backgroundColor: theme.palette.error.hover,
     },
-});
+}));
 
 export const HamburgerMenuButton = styled(IconButton)({
     position: "fixed",
