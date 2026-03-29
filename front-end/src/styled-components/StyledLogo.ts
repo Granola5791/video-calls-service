@@ -22,7 +22,7 @@ export const StyledLogoContainer = styled.div({
 export const CornerLogoContainer = styled(StyledLogoContainer)({
     position: 'absolute',
     top: '12px',
-    left: '20px',
+    right: '20px',
     cursor: 'pointer',
 });
 

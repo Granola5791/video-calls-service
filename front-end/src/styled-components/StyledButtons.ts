@@ -92,7 +92,7 @@ export const HamburgerMenuButton = styled(IconButton)({
     position: "fixed",
     backgroundColor: "transparent",
     border: "none",
-    right: "4%",
+    left: "4%",
     top: "4%",
 });
 

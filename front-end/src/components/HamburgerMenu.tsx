@@ -44,7 +44,7 @@ const HamburgerMenu = ({ onClose, onOpen, topButtons = [], bottomButtons = [], t
             <HamburgerMenuButton onClick={handleOpen}>
                 <HamburgerMenuIcon />
             </HamburgerMenuButton>
-            <Drawer anchor='right' open={open} onClose={handleClose}>
+            <Drawer anchor='left' open={open} onClose={handleClose}>
                 <HamburgerDrawerContainer>
                     <HamburgerMenuTitle>{title}</HamburgerMenuTitle>
                     <List>
