@@ -14,7 +14,6 @@ export const LoadingText = styled.span({
     content: '"."',
     animation: `${dotAnimation} 1.5s steps(1, end) infinite`,
     width: '1em',
-    textAlign: 'right',
   },
 });
 
