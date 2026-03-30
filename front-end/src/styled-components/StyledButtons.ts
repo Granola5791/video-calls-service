@@ -101,7 +101,8 @@ export const MuteButton = styled(IconButton)({
 
 export const SmallMuteButton = styled(IconButton)({
     position: "absolute",
-    right: "3%",
+    left: "3%",
     top: "5%",
     padding: "0",
+    zIndex: 1,
 });
