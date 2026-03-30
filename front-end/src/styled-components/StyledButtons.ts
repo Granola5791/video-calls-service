@@ -104,5 +104,4 @@ export const SmallMuteButton = styled(IconButton)({
     left: "3%",
     top: "5%",
     padding: "0",
-    zIndex: 1,
 });
