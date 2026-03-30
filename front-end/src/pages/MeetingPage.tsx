@@ -11,19 +11,11 @@ import { HostOptions, MeetingExitText, StartMeetingText } from '../constants/heb
 import { StyledMeetingFooter } from '../styled-components/StyledFooters';
 import { LongButtonFilled } from '../styled-components/StyledButtons';
 import { StyledTitle } from '../styled-components/StyledText';
+import { NormalizeArray } from '../utils/array';
 
 type Participant = {
     id: string;
     name: string;
-}
-
-/**
- * Normalize an array to return an empty array if it's not an array.
- * @param arr - The array to normalize.
- * @returns An empty array if arr is not an array, arr otherwise.
- */
-const NormalizeArray = (arr: unknown) => {
-    return Array.isArray(arr) ? arr : [];
 }
 
 const MeetingPage = () => {
