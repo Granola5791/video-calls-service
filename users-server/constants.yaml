@@ -13,6 +13,7 @@ database:
     participant_joined: "Participant joined"
     participant_timeout: "Participant timeout"
     participant_kicked_by_host: "Participant kicked by host"
+    participant_kicked_by_face_detection: "Participant kicked by face detection"
 
 server:
   listen_addr: "usersserver.local.my:8081"
