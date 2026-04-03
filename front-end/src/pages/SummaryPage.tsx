@@ -3,6 +3,7 @@ import { SetUrlParams, UsersServer } from '../constants/backend-constants';
 import { MeetingInfoText } from '../constants/hebrew-constants';
 import { CenteredColumn, CenteredRow } from '../styled-components/StyledBoxes';
 import DownloadButton from '../components/DownloadButton';
+import { FileNames } from '../constants/general-contants';
 
 interface SummaryPageProps {
     meetingID: string
@@ -32,7 +33,7 @@ const SummaryPage = ({ meetingID }: SummaryPageProps) => {
         <CenteredColumn>
             <CenteredRow>
                 <h1>{MeetingInfoText.summary}</h1>
-                <DownloadButton fileName="summary.txt" putTextOnClick={() => summaryLines.join('\n')} />
+                <DownloadButton fileName={FileNames.meetingSummary} putTextOnClick={() => summaryLines.join('\n')} />
             </CenteredRow>
             <div>
                 {summaryLines.map((line, index) =>
