@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react'
 import { SetUrlParams, UsersServer } from '../constants/backend-constants';
-import { CenteredColumn } from '../styled-components/StyledBoxes';
+import { CenteredColumn, CenteredRow } from '../styled-components/StyledBoxes';
 import { MeetingInfoText } from '../constants/hebrew-constants';
 import type { UserTranscript, TranscriptSegment, Index2D } from '../types/transcripts';
+import DownloadButton from '../components/DownloadButton';
+import { FileNames } from '../constants/general-contants';
 
 interface MeetingTranscriptPageProps {
     meetingID: string;
@@ -64,9 +66,19 @@ const MeetingTranscriptPage = ({ meetingID }: MeetingTranscriptPageProps) => {
         fetchMeetingParticipantsIDs();
     }, []);
 
+    const GenerateTranscriptText = (): string => {
+        const lines = orderedIndices.map((index) => {
+            return `${transcript[index.y].username}: [${transcript[index.y].segments[index.x].start}] ${transcript[index.y].segments[index.x].text} [${transcript[index.y].segments[index.x].end}]`;
+        })
+        return lines.join('\n');
+    };
+
     return (
         <CenteredColumn>
-            <h1>{MeetingInfoText.transcript}</h1>
+            <CenteredRow>
+                <h1>{MeetingInfoText.transcript}</h1>
+                <DownloadButton fileName={FileNames.meetingTranscript} putTextOnClick={GenerateTranscriptText} />
+            </CenteredRow>
             <div>
                 {orderedIndices.map((index) => (
                     <span style={{ display: 'flex', flexDirection: 'row', gap: '5px' }}>

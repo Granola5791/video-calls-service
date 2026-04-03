@@ -82,3 +82,8 @@ export const MeetingInfoGeneral = {
     colIDs: ['id', 'name', 'date', 'hostName', 'transcript', 'summary'],
     rowsPerPageOptions: [5, 10, 25],
 }
+
+export const FileNames = {
+    meetingTranscript: 'transcript.txt',
+    meetingSummary: 'summary.txt',
+}
