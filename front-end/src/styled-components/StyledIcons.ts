@@ -11,7 +11,7 @@ export const HamburgerMenuIcon = styled(MenuIcon)({
 export const WatchingIcon = styled(VisibilityIcon)({
     color: "red",
     position: "absolute",
-    right: "10%",
+    right: "15%",
     fontSize: "250%",
 });
 

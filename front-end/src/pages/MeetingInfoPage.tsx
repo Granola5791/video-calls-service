@@ -12,6 +12,7 @@ import { StyledTextField } from '../styled-components/StyledTextFields';
 import OneButtonPopUp from '../components/OneButtonPopUp';
 import MeetingTranscriptPage from './MeetingTranscriptPage';
 import SummaryPage from './SummaryPage';
+import { NormalizeArray } from '../utils/array';
 
 const MeetingInfoPage = () => {
     const [meetings, setMeetings] = useState<MeetingInfo[]>([]);
@@ -35,7 +36,7 @@ const MeetingInfoPage = () => {
             method: 'GET',
             credentials: 'include',
         });
-        const data = await response.json();
+        const data = NormalizeArray(await response.json());
         const receivedMeetings = Array.from(data, (meeting: any) => ({
             id: meeting.id,
             name: meeting.name,

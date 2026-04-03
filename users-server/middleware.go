@@ -213,6 +213,8 @@ func RequireFaceDetection(c *gin.Context) {
 
 	if !PassedFaceDetectionThreshold(framesWithFace, totalFrames) {
 		KickParticipantFromMeeting(meetingID, uint(userID))
+		LogEventToDB(meetingID, uint(userID), GetStringFromConfig("database.meeting_events.participant_kicked_by_face_detection"))
+		SendDangerPeriodNotification(meetingID, uint(userID))
 		c.AbortWithStatus(http.StatusUnauthorized)
 	}
 }
