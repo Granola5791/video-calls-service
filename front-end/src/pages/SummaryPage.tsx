@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom';
 import { SetUrlParams, UsersServer } from '../constants/backend-constants';
 import { MeetingInfoText } from '../constants/hebrew-constants';
-import { CenteredColumn } from '../styled-components/StyledBoxes';
+import { CenteredColumn, CenteredRow } from '../styled-components/StyledBoxes';
+import DownloadButton from '../components/DownloadButton';
 
 interface SummaryPageProps {
     meetingID: string
@@ -30,7 +30,10 @@ const SummaryPage = ({ meetingID }: SummaryPageProps) => {
 
     return (
         <CenteredColumn>
-            <h1>{MeetingInfoText.summary}</h1>
+            <CenteredRow>
+                <h1>{MeetingInfoText.summary}</h1>
+                <DownloadButton fileName="summary.txt" putTextOnClick={() => summaryLines.join('\n')} />
+            </CenteredRow>
             <div>
                 {summaryLines.map((line, index) =>
                     <p key={index}>
