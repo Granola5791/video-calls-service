@@ -1,10 +1,11 @@
-package main
+package logger
 
 import (
 	"bufio"
 	"log"
 	"os"
 	"os/exec"
+	"github.com/Granola5791/video-calls-service/internal/config"
 )
 
 var ffmpegLogger *log.Logger
@@ -15,7 +16,7 @@ func InitLogger() {
 }
 
 func InitFfmpegLogger() {
-	file, err := os.Create(GetStringFromConfig("logger.ffmpeg_log_file"))
+	file, err := os.Create(config.GetStringFromConfig("logger.ffmpeg_log_file"))
 	if err != nil {
 		log.Fatal(err)
 	}

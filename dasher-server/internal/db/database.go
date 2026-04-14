@@ -1,4 +1,4 @@
-package main
+package db
 
 import (
 	"fmt"
@@ -8,6 +8,7 @@ import (
 	"github.com/google/uuid"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"github.com/Granola5791/video-calls-service/internal/config"
 )
 
 type UuidModel struct {
@@ -53,8 +54,8 @@ func InitDatabaseConnection() error {
 		os.Getenv("DB_PASSWORD"),
 		os.Getenv("DB_NAME"),
 		os.Getenv("DB_PORT"),
-		GetStringFromConfig("database.sslmode"),
-		GetStringFromConfig("database.timezone"),
+		config.GetStringFromConfig("database.sslmode"),
+		config.GetStringFromConfig("database.timezone"),
 	)
 
 	db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})

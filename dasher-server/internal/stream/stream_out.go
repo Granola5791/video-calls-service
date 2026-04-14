@@ -1,4 +1,4 @@
-package main
+package stream
 
 import (
 	"net/http"
@@ -6,11 +6,12 @@ import (
 	"path/filepath"
 
 	"github.com/gin-gonic/gin"
+	"github.com/Granola5791/video-calls-service/internal/config"
 )
 
 func HandleStreamToClient(c *gin.Context) {
 	path := filepath.Join(
-		GetStringFromConfig("meeting.dir_path"),
+		config.GetStringFromConfig("meeting.dir_path"),
 		c.Params[0].Value,
 		c.Params[1].Value,
 		c.Params[2].Value,
@@ -20,7 +21,7 @@ func HandleStreamToClient(c *gin.Context) {
 
 func HandleCheckStreamAvailable(c *gin.Context) {
 	path := filepath.Join(
-		GetStringFromConfig("meeting.dir_path"),
+		config.GetStringFromConfig("meeting.dir_path"),
 		c.Params[0].Value,
 		c.Params[1].Value,
 		c.Params[2].Value,
