@@ -7,17 +7,17 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Granola5791/video-calls-service/internal/auth"
+	"github.com/Granola5791/video-calls-service/internal/config"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
-	"github.com/Granola5791/video-calls-service/internal/config"
-	"github.com/Granola5791/video-calls-service/internal/auth"
 )
 
 func RequireAuthentication(c *gin.Context) {
 
 	// get cookie
-	tokenName := config.GetStringFromConfig("auth_jwt.token_cookie_name")
+	tokenName := config.GetString("auth_jwt.token_cookie_name")
 	tokenString, err := c.Cookie(tokenName)
 	if err != nil {
 		log.Println(err)
@@ -46,7 +46,7 @@ func RequireAuthentication(c *gin.Context) {
 		return
 	}
 
-	c.Set(config.GetStringFromConfig("auth_jwt.user_id_name"), int(claims[config.GetStringFromConfig("auth_jwt.user_id_name")].(float64)))
+	c.Set(config.GetString("auth_jwt.user_id_name"), int(claims[config.GetString("auth_jwt.user_id_name")].(float64)))
 	c.Set("role", claims["role"].(string))
 
 	c.Next()
@@ -54,7 +54,7 @@ func RequireAuthentication(c *gin.Context) {
 
 func RequireAuthorizedMeeting(c *gin.Context) {
 	// get cookie
-	tokenName := config.GetStringFromConfig("meeting.token_name")
+	tokenName := config.GetString("meeting.token_name")
 	tokenString, err := c.Cookie(tokenName)
 	if err != nil {
 		c.AbortWithStatus(http.StatusUnauthorized)
@@ -81,21 +81,21 @@ func RequireAuthorizedMeeting(c *gin.Context) {
 		return
 	}
 
-	c.Set(config.GetStringFromConfig("meeting.meeting_id_name"), claims[config.GetStringFromConfig("meeting.meeting_id_name")])
+	c.Set(config.GetString("meeting.meeting_id_name"), claims[config.GetString("meeting.meeting_id_name")])
 
 	c.Next()
 }
 
 func RequireKeepAliveToken(c *gin.Context) {
 	// check route
-	if strings.HasPrefix(c.Request.URL.Path, "/"+config.GetStringFromConfig("server.api.create_meeting_path")) {
+	if strings.HasPrefix(c.Request.URL.Path, "/"+config.GetString("server.api.create_meeting_path")) {
 		return
 	}
 
-	meetingID := uuid.MustParse(c.Param(config.GetStringFromConfig("server.api.params.meeting_id_name")))
+	meetingID := uuid.MustParse(c.Param(config.GetString("server.api.params.meeting_id_name")))
 
 	// get cookie
-	tokenName := config.GetStringFromConfig("keep_alive.token_cookie_name")
+	tokenName := config.GetString("keep_alive.token_cookie_name")
 	tokenString, err := c.Cookie(tokenName)
 	if err != nil {
 		c.AbortWithStatus(http.StatusUnauthorized)
@@ -118,13 +118,13 @@ func RequireKeepAliveToken(c *gin.Context) {
 	}
 
 	// check if token is for the correct meeting
-	if claims[config.GetStringFromConfig("jwt.meeting_id_name")].(string) != meetingID.String() {
+	if claims[config.GetString("jwt.meeting_id_name")].(string) != meetingID.String() {
 		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
 
 	// check if token is expired
-	if claims[config.GetStringFromConfig("jwt.exp_name")].(float64) < float64(time.Now().Unix()) {
+	if claims[config.GetString("jwt.exp_name")].(float64) < float64(time.Now().Unix()) {
 		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
@@ -134,7 +134,7 @@ func RequireKeepAliveToken(c *gin.Context) {
 
 func RequireSameOrigin(c *gin.Context) {
 	origin := c.Request.Header.Get("Origin")
-	if origin != config.GetStringFromConfig("server.frontend_addr") {
+	if origin != config.GetString("server.frontend_addr") {
 		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}

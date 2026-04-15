@@ -6,14 +6,14 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/gin-gonic/gin"
 	"github.com/Granola5791/video-calls-service/internal/config"
+	"github.com/gin-gonic/gin"
 )
 
 func HandleCreateMeeting(c *gin.Context) {
-	meetingID, _ := c.Get(config.GetStringFromConfig("meeting.meeting_id_name"))
+	meetingID, _ := c.Get(config.GetString("meeting.meeting_id_name"))
 
-	err := os.MkdirAll(fmt.Sprintf("%s/%s", config.GetStringFromConfig("meeting.dir_path"), meetingID), os.FileMode(config.GetIntFromConfig("meeting.dir_perms")))
+	err := os.MkdirAll(fmt.Sprintf("%s/%s", config.GetString("meeting.dir_path"), meetingID), os.FileMode(config.GetInt("meeting.dir_perms")))
 	if err != nil {
 		c.AbortWithStatus(http.StatusInternalServerError)
 		log.Println(err)
@@ -24,8 +24,8 @@ func HandleCreateMeeting(c *gin.Context) {
 }
 
 func JoinMeeting(meetingID string, userID int) error {
-	path := fmt.Sprintf("%s/%s/%d", config.GetStringFromConfig("meeting.dir_path"), meetingID, userID)
-	err := os.Mkdir(path, os.FileMode(config.GetIntFromConfig("meeting.dir_perms")))
+	path := fmt.Sprintf("%s/%s/%d", config.GetString("meeting.dir_path"), meetingID, userID)
+	err := os.Mkdir(path, os.FileMode(config.GetInt("meeting.dir_perms")))
 	if err != nil {
 		return err
 	}
@@ -33,8 +33,8 @@ func JoinMeeting(meetingID string, userID int) error {
 }
 
 func HandleJoinMeeting(c *gin.Context) {
-	userID, _ := c.Get(config.GetStringFromConfig("auth_jwt.user_id_name"))
-	meetingID := c.Param(config.GetStringFromConfig("meeting.meeting_id_name"))
+	userID, _ := c.Get(config.GetString("auth_jwt.user_id_name"))
+	meetingID := c.Param(config.GetString("meeting.meeting_id_name"))
 
 	err := JoinMeeting(meetingID, userID.(int))
 	if err != nil {

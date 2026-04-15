@@ -11,42 +11,42 @@ func InitConfig() error {
 	return viper.ReadInConfig()
 }
 
-func GetIntFromConfig(key string) int {
+func GetInt(key string) int {
 	if viper.IsSet(key) {
 		return viper.GetInt(key)
 	}
 	panic(viper.GetString("error.missing_config") + key)
 }
 
-func GetStringFromConfig(key string) string {
+func GetString(key string) string {
 	if viper.IsSet(key) {
 		return viper.GetString(key)
 	}
 	panic(viper.GetString("error.missing_config") + key)
 }
 
-func GetBoolFromConfig(key string) bool {
+func GetBool(key string) bool {
 	if viper.IsSet(key) {
 		return viper.GetBool(key)
 	}
 	panic(viper.GetString("error.missing_config") + key)
 }
 
-func GetFloat64FromConfig(key string) float64 {
+func GetFloat64(key string) float64 {
 	if viper.IsSet(key) {
 		return viper.GetFloat64(key)
 	}
 	panic(viper.GetString("error.missing_config") + key)
 }
 
-func GetUint32FromConfig(key string) uint32 {
+func GetUint32(key string) uint32 {
 	if viper.IsSet(key) {
 		return viper.GetUint32(key)
 	}
 	panic(viper.GetString("error.missing_config") + key)
 }
 
-func GetUint8FromConfig(key string) uint8 {
+func GetUint8(key string) uint8 {
 	if viper.IsSet(key) {
 		return viper.GetUint8(key)
 	}

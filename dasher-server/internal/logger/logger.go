@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
+
 	"github.com/Granola5791/video-calls-service/internal/config"
 )
 
@@ -16,7 +17,7 @@ func InitLogger() {
 }
 
 func InitFfmpegLogger() {
-	file, err := os.Create(config.GetStringFromConfig("logger.ffmpeg_log_file"))
+	file, err := os.Create(config.GetString("logger.ffmpeg_log_file"))
 	if err != nil {
 		log.Fatal(err)
 	}

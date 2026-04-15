@@ -6,36 +6,36 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/Granola5791/video-calls-service/internal/config"
+	"github.com/Granola5791/video-calls-service/internal/dash"
+	"github.com/Granola5791/video-calls-service/internal/db"
+	"github.com/Granola5791/video-calls-service/internal/mywebsocket"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/gorilla/websocket"
-	"github.com/Granola5791/video-calls-service/internal/config"
-	"github.com/Granola5791/video-calls-service/internal/dash"
-	"github.com/Granola5791/video-calls-service/internal/mywebsocket"
-	"github.com/Granola5791/video-calls-service/internal/db"
 )
 
 func HandleStream(c *gin.Context) {
-	meetingID := uuid.MustParse(c.Param(config.GetStringFromConfig("meeting.meeting_id_name")))
-	userID := c.GetInt(config.GetStringFromConfig("auth_jwt.user_id_name"))
+	meetingID := uuid.MustParse(c.Param(config.GetString("meeting.meeting_id_name")))
+	userID := c.GetInt(config.GetString("auth_jwt.user_id_name"))
 
 	ws, err := mywebsocket.UpgradeToWebsocket(c.Writer, c.Request, nil)
 	if err != nil {
 		log.Println(err)
-		c.String(http.StatusForbidden, config.GetStringFromConfig("error.forbidden"))
+		c.String(http.StatusForbidden, config.GetString("error.forbidden"))
 		return
 	}
 	defer ws.Close()
 
 	cmd, stdin, err := dash.InitMpegDash(meetingID.String(), uint(userID))
 	if err != nil {
-		c.String(http.StatusInternalServerError, config.GetStringFromConfig("error.internal"))
+		c.String(http.StatusInternalServerError, config.GetString("error.internal"))
 		return
 	}
-	err = ws.WriteMessage(websocket.TextMessage, []byte(config.GetStringFromConfig("stream.ready_msg")))
+	err = ws.WriteMessage(websocket.TextMessage, []byte(config.GetString("stream.ready_msg")))
 	if err != nil {
 		log.Println(err)
-		c.String(http.StatusInternalServerError, config.GetStringFromConfig("error.internal"))
+		c.String(http.StatusInternalServerError, config.GetString("error.internal"))
 		return
 	}
 
@@ -64,7 +64,7 @@ func HandleStream(c *gin.Context) {
 		log.Println(err)
 	}
 
-	err = os.RemoveAll(fmt.Sprintf("%s/%s/%d", config.GetStringFromConfig("meeting.dir_path"), meetingID, userID))
+	err = os.RemoveAll(fmt.Sprintf("%s/%s/%d", config.GetString("meeting.dir_path"), meetingID, userID))
 	if err != nil {
 		log.Println(err)
 	}

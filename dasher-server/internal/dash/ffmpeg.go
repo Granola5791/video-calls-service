@@ -6,8 +6,8 @@ import (
 	"log"
 	"os/exec"
 
-	"github.com/Granola5791/video-calls-service/internal/logger"
 	"github.com/Granola5791/video-calls-service/internal/config"
+	"github.com/Granola5791/video-calls-service/internal/logger"
 )
 
 func InitMpegDash(meetingID string, userID uint) (*exec.Cmd, io.WriteCloser, error) {
@@ -68,7 +68,7 @@ func InitMpegDash(meetingID string, userID uint) (*exec.Cmd, io.WriteCloser, err
 		// "-adaptation_sets", "id=0,streams=0,1,2 id=1,streams=3",
 		"-adaptation_sets", "id=0,streams=0 id=1,streams=1",
 		"-remove_at_exit", "0",
-		fmt.Sprintf("%s/%s/%d/stream.mpd", config.GetStringFromConfig("meeting.dir_path"), meetingID, userID),
+		fmt.Sprintf("%s/%s/%d/stream.mpd", config.GetString("meeting.dir_path"), meetingID, userID),
 	)
 
 	stdin, err := cmd.StdinPipe()

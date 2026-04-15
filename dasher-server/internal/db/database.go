@@ -5,10 +5,10 @@ import (
 	"os"
 	"time"
 
+	"github.com/Granola5791/video-calls-service/internal/config"
 	"github.com/google/uuid"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	"github.com/Granola5791/video-calls-service/internal/config"
 )
 
 type UuidModel struct {
@@ -54,8 +54,8 @@ func InitDatabaseConnection() error {
 		os.Getenv("DB_PASSWORD"),
 		os.Getenv("DB_NAME"),
 		os.Getenv("DB_PORT"),
-		config.GetStringFromConfig("database.sslmode"),
-		config.GetStringFromConfig("database.timezone"),
+		config.GetString("database.sslmode"),
+		config.GetString("database.timezone"),
 	)
 
 	db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
