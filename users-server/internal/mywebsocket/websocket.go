@@ -11,8 +11,8 @@ var wsUpgrader websocket.Upgrader
 
 func InitWsUpgrader() {
 	wsUpgrader = websocket.Upgrader{
-		ReadBufferSize:  config.GetInt("stream.read_buffer_size"),
-		WriteBufferSize: config.GetInt("stream.write_buffer_size"),
+		ReadBufferSize:  config.GetInt("websocket.read_buffer_size"),
+		WriteBufferSize: config.GetInt("websocket.write_buffer_size"),
 		CheckOrigin: func(r *http.Request) bool {
 			return r.Header.Get("Origin") == config.GetString("server.frontend_addr")
 		},
