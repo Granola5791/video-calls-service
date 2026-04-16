@@ -49,8 +49,8 @@ func PassedFaceDetectionThreshold(framesWithFace, totalFrames int) bool {
 	if framesWithFace == 0 || totalFrames == 0 { // to avoid division by zero
 		return false
 	}
-	minTotalFrames := config.GetIntFromConfig("face_detection.min_total_frames")
-	minFaceFramesPercentage := config.GetIntFromConfig("face_detection.min_frames_with_face_percentage")
+	minTotalFrames := config.GetInt("face_detection.min_total_frames")
+	minFaceFramesPercentage := config.GetInt("face_detection.min_frames_with_face_percentage")
 	FaceFramePercentage := 100 * framesWithFace / totalFrames
 	return totalFrames >= minTotalFrames && FaceFramePercentage >= minFaceFramesPercentage
 }

@@ -7,10 +7,10 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/Granola5791/video-calls-service/internal/config"
 	"github.com/google/uuid"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	"github.com/Granola5791/video-calls-service/internal/config"
 )
 
 type ParticipantInfo struct {
@@ -42,8 +42,8 @@ func InitDatabaseConnection() error {
 		os.Getenv("DB_PASSWORD"),
 		os.Getenv("DB_NAME"),
 		os.Getenv("DB_PORT"),
-		config.GetStringFromConfig("database.sslmode"),
-		config.GetStringFromConfig("database.timezone"),
+		config.GetString("database.sslmode"),
+		config.GetString("database.timezone"),
 	)
 
 	db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
@@ -68,7 +68,7 @@ func InitDatabaseConnection() error {
 	return nil
 }
 
-func UserExistsInDB(username string) (bool, error) {
+func UserExists(username string) (bool, error) {
 	var count int64
 	err := db.Model(&User{}).
 		Where("username = ?", username).
@@ -79,16 +79,16 @@ func UserExistsInDB(username string) (bool, error) {
 	return count > 0, nil
 }
 
-func InsertUserToDB(useranme string, hashedPassword string, salt string) error {
+func InsertUser(username string, hashedPassword string, salt string) error {
 	user := User{
-		Username:       useranme,
+		Username:       username,
 		HashedPassword: hashedPassword,
 		Salt:           salt,
 	}
 	return db.Create(&user).Error
 }
 
-func GetUserAuthFromDB(username string) (string, string, error) {
+func GetUserAuth(username string) (string, string, error) {
 	var userAuth UserAuth
 	err := db.Model(&User{}).
 		Where("username = ?", username).
@@ -99,7 +99,7 @@ func GetUserAuthFromDB(username string) (string, string, error) {
 	return userAuth.HashedPassword, userAuth.Salt, nil
 }
 
-func GetUserInfoFromDB(username string) (UserInfo, error) {
+func GetUserInfo(username string) (UserInfo, error) {
 	var user User
 	err := db.Model(&User{}).
 		Where("username = ?", username).
@@ -115,7 +115,7 @@ func GetUserInfoFromDB(username string) (UserInfo, error) {
 	return ret, nil
 }
 
-func CreateMeetingInDB(hostID uint, isFaceDetectionRequired bool) (uuid.UUID, error) {
+func CreateMeeting(hostID uint, isFaceDetectionRequired bool) (uuid.UUID, error) {
 	meeting := Meeting{
 		HostID:                  hostID,
 		IsFaceDetectionRequired: isFaceDetectionRequired,
@@ -127,7 +127,7 @@ func CreateMeetingInDB(hostID uint, isFaceDetectionRequired bool) (uuid.UUID, er
 	return meeting.ID, nil
 }
 
-func AddParticipantToMeetingInDB(meetingID uuid.UUID, userID uint) error {
+func AddParticipantToMeeting(meetingID uuid.UUID, userID uint) error {
 	meetingParticipant := MeetingParticipant{
 		UserID:    userID,
 		MeetingID: meetingID,
@@ -135,14 +135,14 @@ func AddParticipantToMeetingInDB(meetingID uuid.UUID, userID uint) error {
 	return db.Create(&meetingParticipant).Error
 }
 
-func RemoveParticipantFromMeetingInDB(meetingID uuid.UUID, userID uint) error {
+func RemoveParticipantFromMeeting(meetingID uuid.UUID, userID uint) error {
 	return db.
 		Unscoped().
 		Where("meeting_id = ? AND user_id = ?", meetingID, userID).
 		Delete(&MeetingParticipant{}).Error
 }
 
-func IsParticipantInMeetingInDB(meetingID uuid.UUID, userID uint) (bool, error) {
+func IsParticipantInMeeting(meetingID uuid.UUID, userID uint) (bool, error) {
 	var count int64
 	err := db.Model(&MeetingParticipant{}).
 		Where("meeting_id = ?", meetingID).
@@ -154,11 +154,11 @@ func IsParticipantInMeetingInDB(meetingID uuid.UUID, userID uint) (bool, error) 
 	return count > 0, nil
 }
 
-// GetParticipantsInMeetingFromDB retrieves the participants currently in a meeting from the database.
+// GetParticipantsInMeeting retrieves the participants currently in a meeting from the database.
 // The function takes a meeting ID and an optional list of user IDs to ignore.
 // It returns a slice of ParticipantInfo structs containing the user ID and username of each participant.
 // If an error occurs while querying the database, it is returned along with a nil result.
-func GetParticipantsInMeetingFromDB(meetingID uuid.UUID, usersToIgnore ...uint) ([]ParticipantInfo, error) {
+func GetParticipantsInMeeting(meetingID uuid.UUID, usersToIgnore ...uint) ([]ParticipantInfo, error) {
 	var results []ParticipantInfo
 
 	// Start the query joining the users table to get the name
@@ -180,7 +180,7 @@ func GetParticipantsInMeetingFromDB(meetingID uuid.UUID, usersToIgnore ...uint) 
 	return results, nil
 }
 
-func MeetingExistsInDB(meetingID uuid.UUID) (bool, error) {
+func MeetingExists(meetingID uuid.UUID) (bool, error) {
 	var count int64
 	err := db.Model(&Meeting{}).
 		Where("id = ?", meetingID).
@@ -191,7 +191,7 @@ func MeetingExistsInDB(meetingID uuid.UUID) (bool, error) {
 	return count > 0, nil
 }
 
-func GetParticipantCountInMeetingInDB(meetingID uuid.UUID) (int64, error) {
+func GetParticipantCountInMeeting(meetingID uuid.UUID) (int64, error) {
 	var count int64
 	err := db.Model(&MeetingParticipant{}).
 		Where("meeting_id = ?", meetingID).
@@ -202,22 +202,22 @@ func GetParticipantCountInMeetingInDB(meetingID uuid.UUID) (int64, error) {
 	return count, nil
 }
 
-func IsMeetingEmptyInDB(meetingID uuid.UUID) (bool, error) {
-	participantCount, err := GetParticipantCountInMeetingInDB(meetingID)
+func IsMeetingEmpty(meetingID uuid.UUID) (bool, error) {
+	participantCount, err := GetParticipantCountInMeeting(meetingID)
 	if err != nil {
 		return false, err
 	}
 	return participantCount == 0, nil
 }
 
-func RemoveAllMeetingParticipantsFromDB(meetingID uuid.UUID) error {
+func RemoveAllMeetingParticipants(meetingID uuid.UUID) error {
 	return db.
 		Unscoped().
 		Where("meeting_id = ?", meetingID).
 		Delete(&MeetingParticipant{}).Error
 }
 
-func LogEventToDB(meetingID uuid.UUID, userID uint, event string) error {
+func LogEvent(meetingID uuid.UUID, userID uint, event string) error {
 	meetingEvent := MeetingEvent{
 		MeetingID: meetingID,
 		UserID:    userID,
@@ -226,7 +226,7 @@ func LogEventToDB(meetingID uuid.UUID, userID uint, event string) error {
 	return db.Create(&meetingEvent).Error
 }
 
-func IsHostOfMeetingInDB(meetingID uuid.UUID, userID uint) (bool, error) {
+func IsHostOfMeeting(meetingID uuid.UUID, userID uint) (bool, error) {
 	var count int64
 	err := db.Model(&Meeting{}).
 		Where("id = ?", meetingID).
@@ -238,7 +238,7 @@ func IsHostOfMeetingInDB(meetingID uuid.UUID, userID uint) (bool, error) {
 	return count > 0, nil
 }
 
-func BanUserFromMeetingInDB(meetingID uuid.UUID, userID uint) error {
+func BanUserFromMeeting(meetingID uuid.UUID, userID uint) error {
 	meeting := Meeting{UuidModel: UuidModel{ID: meetingID}}
 	user := User{Model: gorm.Model{ID: userID}}
 	err := db.
@@ -248,7 +248,7 @@ func BanUserFromMeetingInDB(meetingID uuid.UUID, userID uint) error {
 	return err
 }
 
-func IsBannedFromMeetingInDB(meetingID uuid.UUID, userID uint) (bool, error) {
+func IsBannedFromMeeting(meetingID uuid.UUID, userID uint) (bool, error) {
 	var count int64
 
 	err := db.Table("meeting_banned_users").
@@ -262,7 +262,7 @@ func IsBannedFromMeetingInDB(meetingID uuid.UUID, userID uint) (bool, error) {
 	return count > 0, nil
 }
 
-func GetUserVideoChunksFromDB(meetingID uuid.UUID, userID uint) ([]UserVideoChunk, error) {
+func GetUserVideoChunks(meetingID uuid.UUID, userID uint) ([]UserVideoChunk, error) {
 	var userVideoChunks []UserVideoChunk
 
 	err := db.
@@ -274,14 +274,14 @@ func GetUserVideoChunksFromDB(meetingID uuid.UUID, userID uint) ([]UserVideoChun
 }
 
 // mark user video chunks in the range [minChunkNumber, maxChunkNumber] inclusive as visited
-func MarkUserVideoChunksAsVisitedInDB(meetingID uuid.UUID, userID uint, minChunkNumber uint, maxChunkNumber uint) error {
+func MarkUserVideoChunksAsVisited(meetingID uuid.UUID, userID uint, minChunkNumber uint, maxChunkNumber uint) error {
 	return db.
 		Model(&UserVideoChunk{}).
 		Where("meeting_id = ? AND user_id = ? AND chunk_number >= ? AND chunk_number <= ?", meetingID, userID, minChunkNumber, maxChunkNumber).
 		Update("visited", true).Error
 }
 
-func GetLatestStartChunkFromDB(meetingID uuid.UUID, userID uint) (*UserVideoChunk, error) {
+func GetLatestStartChunk(meetingID uuid.UUID, userID uint) (*UserVideoChunk, error) {
 	var userVideoChunk UserVideoChunk
 	err := db.
 		Where("meeting_id = ? AND user_id = ? AND chunk_number = 0", meetingID, userID).
@@ -291,7 +291,7 @@ func GetLatestStartChunkFromDB(meetingID uuid.UUID, userID uint) (*UserVideoChun
 	return &userVideoChunk, err
 }
 
-func GetKthStartChunkFromDB(meetingID uuid.UUID, userID uint, k int) (*UserVideoChunk, error) {
+func GetKthStartChunk(meetingID uuid.UUID, userID uint, k int) (*UserVideoChunk, error) {
 	var userVideoChunk UserVideoChunk
 	err := db.
 		Where("meeting_id = ? AND user_id = ? AND chunk_number = 0", meetingID, userID).
@@ -302,7 +302,7 @@ func GetKthStartChunkFromDB(meetingID uuid.UUID, userID uint, k int) (*UserVideo
 	return &userVideoChunk, err
 }
 
-func CountStartChunksFromDB(meetingID uuid.UUID, userID uint) (int64, error) {
+func CountStartChunks(meetingID uuid.UUID, userID uint) (int64, error) {
 	var count int64
 	err := db.Model(&UserVideoChunk{}).
 		Where("meeting_id = ? AND user_id = ? AND chunk_number = 0", meetingID, userID).
@@ -310,7 +310,7 @@ func CountStartChunksFromDB(meetingID uuid.UUID, userID uint) (int64, error) {
 	return count, err
 }
 
-func IsFaceDetectionRequiredInDB(meetingID uuid.UUID) (bool, error) {
+func IsFaceDetectionRequired(meetingID uuid.UUID) (bool, error) {
 	var count int64
 	err := db.Model(&Meeting{}).
 		Where("id = ?", meetingID).
@@ -325,7 +325,7 @@ func IsFaceDetectionRequiredInDB(meetingID uuid.UUID) (bool, error) {
 // pipe in all user video chunks created between maxTime and minTime from the database,
 // including minTime and excluding maxTime.
 // if minTime or maxTime are zero, they are ignored.
-func PipeUserVideoChunksBetweenFromDB(meetingID uuid.UUID, userID uint, minTime time.Time, maxTime time.Time, pipeIn io.Writer) error {
+func PipeUserVideoChunksBetween(meetingID uuid.UUID, userID uint, minTime time.Time, maxTime time.Time, pipeIn io.Writer) error {
 	query := db.Model(&UserVideoChunk{}).
 		Where("meeting_id = ? AND user_id = ?", meetingID, userID)
 	if !minTime.IsZero() {
@@ -355,9 +355,9 @@ func PipeUserVideoChunksBetweenFromDB(meetingID uuid.UUID, userID uint, minTime 
 
 // get ids of all participants who joined the meeting
 // including participants who left the meeting
-func GetAllMeetingParticipantIDsFromDB(meetingID uuid.UUID) ([]uint, error) {
+func GetAllMeetingParticipantIDs(meetingID uuid.UUID) ([]uint, error) {
 	var meetingParticipants []uint
-	participantJoinedEvent := config.GetStringFromConfig("database.meeting_events.participant_joined")
+	participantJoinedEvent := config.GetString("database.meeting_events.participant_joined")
 	err := db.
 		Model(&MeetingEvent{}).
 		Where("meeting_id = ? AND event = ?", meetingID, participantJoinedEvent).
@@ -366,7 +366,7 @@ func GetAllMeetingParticipantIDsFromDB(meetingID uuid.UUID) ([]uint, error) {
 	return meetingParticipants, err
 }
 
-func InsertTranscriptionToDB(meetingID uuid.UUID, userID uint, transcription string) error {
+func InsertTranscription(meetingID uuid.UUID, userID uint, transcription string) error {
 	return db.
 		Create(&ParticipantTranscription{
 			MeetingID:  meetingID,
@@ -375,9 +375,9 @@ func InsertTranscriptionToDB(meetingID uuid.UUID, userID uint, transcription str
 		}).Error
 }
 
-// get meeting infos from the database, filtering by the given parameters.
+// get meetings infos from the database, filtering by the given parameters.
 // hostName and meetingName can be either a name or an id.
-func GetMeetingInfosFromDB(from time.Time, to time.Time, hostName string, meetingName string) ([]MeetingInfo, error) {
+func GetMeetingsInfo(from time.Time, to time.Time, hostName string, meetingName string) ([]MeetingInfo, error) {
 	var meetings []MeetingInfo
 	hostId, err := strconv.ParseUint(hostName, 10, 32)
 	if err != nil {
@@ -397,7 +397,7 @@ func GetMeetingInfosFromDB(from time.Time, to time.Time, hostName string, meetin
 	return meetings, err
 }
 
-func GetTranscriptFromDB(meetingID uuid.UUID, userID uint) (string, error) {
+func GetTranscript(meetingID uuid.UUID, userID uint) (string, error) {
 	var transcript string
 	err := db.
 		Model(&ParticipantTranscription{}).
@@ -407,7 +407,7 @@ func GetTranscriptFromDB(meetingID uuid.UUID, userID uint) (string, error) {
 	return transcript, err
 }
 
-func GetUsernameFromDB(userID uint) (string, error) {
+func GetUsername(userID uint) (string, error) {
 	var username string
 	err := db.
 		Model(&User{}).
@@ -417,14 +417,14 @@ func GetUsernameFromDB(userID uint) (string, error) {
 	return username, err
 }
 
-func UpdateSummaryToDB(meetingID uuid.UUID, summary string) error {
+func UpdateSummary(meetingID uuid.UUID, summary string) error {
 	return db.
 		Model(&Meeting{}).
 		Where("id = ?", meetingID).
 		Update("summary", summary).Error
 }
 
-func GetSummaryFromDB(meetingID uuid.UUID) (string, error) {
+func GetSummary(meetingID uuid.UUID) (string, error) {
 	var summary string
 	err := db.
 		Model(&Meeting{}).
@@ -434,7 +434,7 @@ func GetSummaryFromDB(meetingID uuid.UUID) (string, error) {
 	return summary, err
 }
 
-func GetMeetingTranscriptsFromDB(meetingID uuid.UUID) ([]ParticipantTranscription, error) {
+func GetMeetingTranscripts(meetingID uuid.UUID) ([]ParticipantTranscription, error) {
 	var transcripts []ParticipantTranscription
 	err := db.
 		Model(&ParticipantTranscription{}).
@@ -444,7 +444,7 @@ func GetMeetingTranscriptsFromDB(meetingID uuid.UUID) ([]ParticipantTranscriptio
 	return transcripts, err
 }
 
-func UpdateMeetingNameToDB(meetingID uuid.UUID, meetingName string) error {
+func UpdateMeetingName(meetingID uuid.UUID, meetingName string) error {
 	return db.
 		Model(&Meeting{}).
 		Where("id = ?", meetingID).

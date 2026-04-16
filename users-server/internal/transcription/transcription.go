@@ -19,8 +19,8 @@ type Offset struct {
 	Time   time.Time `json:"time"`
 }
 
-func HandleTranscription(meetingID uuid.UUID) error {
-	meetingParticipants, err := db.GetAllMeetingParticipantIDsFromDB(meetingID)
+func MakeMeetingTranscription(meetingID uuid.UUID) error {
+	meetingParticipants, err := db.GetAllMeetingParticipantIDs(meetingID)
 	if err != nil {
 		return err
 	}
@@ -43,7 +43,7 @@ func HandleTranscription(meetingID uuid.UUID) error {
 				maxTime = offsets[i][j+1].Time
 			}
 
-			transcription, err := GetTranscription(meetingID, participant, offsets[i][j].Offset, minTime, maxTime)
+			transcription, err := GetParticipantTranscription(meetingID, participant, offsets[i][j].Offset, minTime, maxTime)
 			if err != nil {
 				return err
 			}
@@ -52,7 +52,7 @@ func HandleTranscription(meetingID uuid.UUID) error {
 			fullTranscription = append(fullTranscription, res...)
 		}
 		standardizedText := StandardizeTranscriptionText(fullTranscription)
-		err = db.InsertTranscriptionToDB(meetingID, participant, standardizedText)
+		err = db.InsertTranscription(meetingID, participant, standardizedText)
 		if err != nil {
 			return err
 		}
@@ -60,13 +60,13 @@ func HandleTranscription(meetingID uuid.UUID) error {
 	return nil
 }
 
-func GetTranscription(meetingID uuid.UUID, userID uint, offset float64, minTime time.Time, maxTime time.Time) ([]byte, error) {
+func GetParticipantTranscription(meetingID uuid.UUID, userID uint, offset float64, minTime time.Time, maxTime time.Time) ([]byte, error) {
 	reader, writer := io.Pipe()
 
 	url := fmt.Sprintf("%s%s?%s=%f",
-		config.GetStringFromConfig("ai_server.url"),
-		config.GetStringFromConfig("ai_server.api.transcription_path"),
-		config.GetStringFromConfig("ai_server.api.query_params.offset_name"),
+		config.GetString("ai_server.url"),
+		config.GetString("ai_server.api.transcription_path"),
+		config.GetString("ai_server.api.query_params.offset_name"),
 		offset,
 	)
 	req, err := http.NewRequest("POST", url, reader)
@@ -77,7 +77,7 @@ func GetTranscription(meetingID uuid.UUID, userID uint, offset float64, minTime 
 
 	go func() {
 		defer writer.Close()
-		err := db.PipeUserVideoChunksBetweenFromDB(meetingID, userID, minTime, maxTime, writer)
+		err := db.PipeUserVideoChunksBetween(meetingID, userID, minTime, maxTime, writer)
 		if err != nil {
 			log.Println(err)
 		}

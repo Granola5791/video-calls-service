@@ -12,16 +12,16 @@ func HashPassword(password string, salt string) string {
 	hash := argon2.IDKey(
 		[]byte(password),
 		[]byte(salt),
-		config.GetUint32FromConfig("hash.time"),
-		config.GetUint32FromConfig("hash.memory"),
-		config.GetUint8FromConfig("hash.threads"),
-		config.GetUint32FromConfig("hash.keyLen"),
+		config.GetUint32("hash.time"),
+		config.GetUint32("hash.memory"),
+		config.GetUint8("hash.threads"),
+		config.GetUint32("hash.keyLen"),
 	)
 	return base64.RawStdEncoding.EncodeToString(hash)
 }
 
 func GenerateSalt() (string, error) {
-	salt := make([]byte, config.GetIntFromConfig("hash.saltLen"))
+	salt := make([]byte, config.GetInt("hash.saltLen"))
 	_, err := rand.Read(salt)
 	if err != nil {
 		return "", err

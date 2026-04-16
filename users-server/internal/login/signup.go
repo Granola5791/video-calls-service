@@ -15,13 +15,13 @@ type UserSignupInput struct {
 }
 
 func IsValidPassword(password string) bool {
-	return len(password) >= config.GetIntFromConfig("signup.min_password_length") &&
-		len(password) <= config.GetIntFromConfig("signup.max_password_length")
+	return len(password) >= config.GetInt("signup.min_password_length") &&
+		len(password) <= config.GetInt("signup.max_password_length")
 }
 
 func IsValidUsername(username string) bool {
-	return len(username) >= config.GetIntFromConfig("signup.min_username_length") &&
-		len(username) <= config.GetIntFromConfig("signup.max_username_length")
+	return len(username) >= config.GetInt("signup.min_username_length") &&
+		len(username) <= config.GetInt("signup.max_username_length")
 }
 
 func SignupUser(username string, password string) error {
@@ -29,7 +29,7 @@ func SignupUser(username string, password string) error {
 	if err != nil {
 		return err
 	}
-	err = db.InsertUserToDB(username, hashedPassword, salt)
+	err = db.InsertUser(username, hashedPassword, salt)
 	if err != nil {
 		return err
 	}
@@ -42,30 +42,30 @@ func HandleSignup(c *gin.Context) {
 
 	err := c.ShouldBindJSON(&input)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": config.GetStringFromConfig("errors.invalid_input")})
+		c.JSON(http.StatusBadRequest, gin.H{"error": config.GetString("errors.invalid_input")})
 		return
 	}
 
 	if !IsValidUsername(input.Username) || !IsValidPassword(input.Password) {
-		c.JSON(http.StatusBadRequest, gin.H{"error": config.GetStringFromConfig("errors.invalid_input")})
+		c.JSON(http.StatusBadRequest, gin.H{"error": config.GetString("errors.invalid_input")})
 		return
 	}
 
-	userExists, err := db.UserExistsInDB(input.Username)
+	userExists, err := db.UserExists(input.Username)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": config.GetStringFromConfig("errors.internal_server_error")})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": config.GetString("errors.internal_server_error")})
 		return
 	}
 	if userExists {
-		c.JSON(http.StatusConflict, gin.H{"error": config.GetStringFromConfig("errors.user_exists")})
+		c.JSON(http.StatusConflict, gin.H{"error": config.GetString("errors.user_exists")})
 		return
 	}
 
 	err = SignupUser(input.Username, input.Password)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": config.GetStringFromConfig("errors.internal_server_error")})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": config.GetString("errors.internal_server_error")})
 		return
 	}
 
-	c.JSON(http.StatusCreated, gin.H{"success": config.GetStringFromConfig("success.user_created")})
+	c.JSON(http.StatusCreated, gin.H{"success": config.GetString("success.user_created")})
 }

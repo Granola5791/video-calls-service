@@ -20,7 +20,7 @@ import (
 func RequireAuthentication(c *gin.Context) {
 
 	// get cookie
-	tokenName := config.GetStringFromConfig("jwt.token_cookie_name")
+	tokenName := config.GetString("jwt.token_cookie_name")
 	tokenString, err := c.Cookie(tokenName)
 	if err != nil {
 		log.Println(err)
@@ -44,27 +44,27 @@ func RequireAuthentication(c *gin.Context) {
 	}
 
 	// check if token is expired
-	if claims[config.GetStringFromConfig("jwt.exp_name")].(float64) < float64(time.Now().Unix()) {
+	if claims[config.GetString("jwt.exp_name")].(float64) < float64(time.Now().Unix()) {
 		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
 
-	c.Set(config.GetStringFromConfig("jwt.user_id_name"), int(claims[config.GetStringFromConfig("jwt.user_id_name")].(float64)))
-	c.Set(config.GetStringFromConfig("jwt.username_name"), claims[config.GetStringFromConfig("jwt.username_name")].(string))
-	c.Set(config.GetStringFromConfig("jwt.role_name"), claims[config.GetStringFromConfig("jwt.role_name")].(string))
+	c.Set(config.GetString("jwt.user_id_name"), int(claims[config.GetString("jwt.user_id_name")].(float64)))
+	c.Set(config.GetString("jwt.username_name"), claims[config.GetString("jwt.username_name")].(string))
+	c.Set(config.GetString("jwt.role_name"), claims[config.GetString("jwt.role_name")].(string))
 
 	c.Next()
 }
 
 // can only be called after RequireAuthentication
 func RequireAdmin(c *gin.Context) {
-	role, _ := c.Get(config.GetStringFromConfig("jwt.role_name"))
+	role, _ := c.Get(config.GetString("jwt.role_name"))
 	roleString, ok := role.(string)
 	if !ok {
 		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
-	if !strings.Contains(roleString, config.GetStringFromConfig("jwt.admin_role")) {
+	if !strings.Contains(roleString, config.GetString("jwt.admin_role")) {
 		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
@@ -73,10 +73,10 @@ func RequireAdmin(c *gin.Context) {
 }
 
 func RequireKeepAliveToken(c *gin.Context) {
-	meetingID := uuid.MustParse(c.Param(config.GetStringFromConfig("server.api.params.meeting_id_name")))
+	meetingID := uuid.MustParse(c.Param(config.GetString("server.api.params.meeting_id_name")))
 
 	// get cookie
-	tokenName := config.GetStringFromConfig("keep_alive.token_cookie_name")
+	tokenName := config.GetString("keep_alive.token_cookie_name")
 	tokenString, err := c.Cookie(tokenName)
 	if err != nil {
 		c.AbortWithStatus(http.StatusUnauthorized)
@@ -99,13 +99,13 @@ func RequireKeepAliveToken(c *gin.Context) {
 	}
 
 	// check if token is for the correct meeting
-	if claims[config.GetStringFromConfig("jwt.meeting_id_name")].(string) != meetingID.String() {
+	if claims[config.GetString("jwt.meeting_id_name")].(string) != meetingID.String() {
 		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
 
 	// check if token is expired
-	if claims[config.GetStringFromConfig("jwt.exp_name")].(float64) < float64(time.Now().Unix()) {
+	if claims[config.GetString("jwt.exp_name")].(float64) < float64(time.Now().Unix()) {
 		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
@@ -115,9 +115,9 @@ func RequireKeepAliveToken(c *gin.Context) {
 
 // can only be called after RequireAuthentication
 func RequireHost(c *gin.Context) {
-	meetingID := uuid.MustParse(c.Param(config.GetStringFromConfig("server.api.params.meeting_id_name")))
-	userID := c.GetInt(config.GetStringFromConfig("jwt.user_id_name"))
-	isHost, err := db.IsHostOfMeetingInDB(meetingID, uint(userID))
+	meetingID := uuid.MustParse(c.Param(config.GetString("server.api.params.meeting_id_name")))
+	userID := c.GetInt(config.GetString("jwt.user_id_name"))
+	isHost, err := db.IsHostOfMeeting(meetingID, uint(userID))
 	if err != nil {
 		c.AbortWithStatus(http.StatusInternalServerError)
 		return
@@ -129,9 +129,9 @@ func RequireHost(c *gin.Context) {
 }
 
 func RequireNotBanned(c *gin.Context) {
-	meetingID := uuid.MustParse(c.Param(config.GetStringFromConfig("server.api.params.meeting_id_name")))
-	userID := c.GetInt(config.GetStringFromConfig("jwt.user_id_name"))
-	isBanned, err := db.IsBannedFromMeetingInDB(meetingID, uint(userID))
+	meetingID := uuid.MustParse(c.Param(config.GetString("server.api.params.meeting_id_name")))
+	userID := c.GetInt(config.GetString("jwt.user_id_name"))
+	isBanned, err := db.IsBannedFromMeeting(meetingID, uint(userID))
 	if err != nil {
 		c.AbortWithStatus(http.StatusInternalServerError)
 		return
@@ -143,12 +143,12 @@ func RequireNotBanned(c *gin.Context) {
 }
 
 func RequireMeetingExists(c *gin.Context) {
-	meetingID, err := uuid.Parse(c.Param(config.GetStringFromConfig("server.api.params.meeting_id_name")))
+	meetingID, err := uuid.Parse(c.Param(config.GetString("server.api.params.meeting_id_name")))
 	if err != nil {
 		c.AbortWithStatus(http.StatusNotFound)
 		return
 	}
-	exists, err := db.MeetingExistsInDB(meetingID)
+	exists, err := db.MeetingExists(meetingID)
 	if err != nil {
 		c.AbortWithStatus(http.StatusInternalServerError)
 		return
@@ -161,18 +161,18 @@ func RequireMeetingExists(c *gin.Context) {
 
 func RequireSameOrigin(c *gin.Context) {
 	origin := c.Request.Header.Get("Origin")
-	if origin != config.GetStringFromConfig("server.frontend_addr") {
+	if origin != config.GetString("server.frontend_addr") {
 		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
 }
 
 func RequireFaceDetection(c *gin.Context) {
-	meetingID := uuid.MustParse(c.Param(config.GetStringFromConfig("server.api.params.meeting_id_name")))
-	userID := c.GetInt(config.GetStringFromConfig("jwt.user_id_name"))
+	meetingID := uuid.MustParse(c.Param(config.GetString("server.api.params.meeting_id_name")))
+	userID := c.GetInt(config.GetString("jwt.user_id_name"))
 
 	// check if face detection is required
-	required, err := db.IsFaceDetectionRequiredInDB(meetingID)
+	required, err := db.IsFaceDetectionRequired(meetingID)
 	if err != nil {
 		log.Println(err)
 		c.AbortWithStatus(http.StatusInternalServerError)
@@ -182,7 +182,7 @@ func RequireFaceDetection(c *gin.Context) {
 		return
 	}
 
-	videoChunks, err := db.GetUserVideoChunksFromDB(meetingID, uint(userID))
+	videoChunks, err := db.GetUserVideoChunks(meetingID, uint(userID))
 	if err != nil {
 		log.Println(err)
 		c.AbortWithStatus(http.StatusInternalServerError)
@@ -192,7 +192,7 @@ func RequireFaceDetection(c *gin.Context) {
 		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
-	go db.MarkUserVideoChunksAsVisitedInDB(
+	go db.MarkUserVideoChunksAsVisited(
 		meetingID,
 		uint(userID),
 		videoChunks[0].ChunkNumber,
@@ -208,7 +208,7 @@ func RequireFaceDetection(c *gin.Context) {
 
 	defer outputPipeRead.Close()
 
-	url := config.GetStringFromConfig("ai_server.url") + config.GetStringFromConfig("ai_server.api.face_detection_path")
+	url := config.GetString("ai_server.url") + config.GetString("ai_server.api.face_detection_path")
 	framesWithFace, totalFrames, err := face_detection.SendvideoToFaceDetector(url, outputPipeRead)
 	if err != nil {
 		log.Println(err)
@@ -218,7 +218,7 @@ func RequireFaceDetection(c *gin.Context) {
 
 	if !face_detection.PassedFaceDetectionThreshold(framesWithFace, totalFrames) {
 		meeting.KickParticipantFromMeeting(meetingID, uint(userID))
-		db.LogEventToDB(meetingID, uint(userID), config.GetStringFromConfig("database.meeting_events.participant_kicked_by_face_detection"))
+		db.LogEvent(meetingID, uint(userID), config.GetString("database.meeting_events.participant_kicked_by_face_detection"))
 		meeting.SendDangerPeriodNotification(meetingID, uint(userID))
 		c.AbortWithStatus(http.StatusUnauthorized)
 	}

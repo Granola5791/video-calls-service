@@ -13,13 +13,12 @@ import (
 )
 
 type SummaryResponse struct {
-	Summary string `json:"summary"`
+	Summary     string `json:"summary"`
 	MeetingName string `json:"meeting_name"`
 }
 
-func HandleTranscriptSummary(meetingID uuid.UUID) {
-
-	transcripts, err := db.GetMeetingTranscriptsFromDB(meetingID)
+func MakeTranscriptSummary(meetingID uuid.UUID) {
+	transcripts, err := db.GetMeetingTranscripts(meetingID)
 	if err != nil {
 		log.Println(err)
 		return
@@ -31,13 +30,13 @@ func HandleTranscriptSummary(meetingID uuid.UUID) {
 		return
 	}
 
-	err = db.UpdateMeetingNameToDB(meetingID, response.MeetingName)
+	err = db.UpdateMeetingName(meetingID, response.MeetingName)
 	if err != nil {
 		log.Println(err)
 		return
 	}
 
-	err = db.UpdateSummaryToDB(meetingID, response.Summary)
+	err = db.UpdateSummary(meetingID, response.Summary)
 	if err != nil {
 		log.Println(err)
 		return
@@ -55,8 +54,8 @@ func GetSummary(transcriptions []db.ParticipantTranscription) (SummaryResponse, 
 	}()
 
 	url := fmt.Sprintf("%s%s",
-		config.GetStringFromConfig("ai_server.url"),
-		config.GetStringFromConfig("ai_server.api.summary_path"),
+		config.GetString("ai_server.url"),
+		config.GetString("ai_server.api.summary_path"),
 	)
 
 	req, err := http.NewRequest("POST", url, reader)

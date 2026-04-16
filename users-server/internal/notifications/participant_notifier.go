@@ -19,7 +19,7 @@ type ParticipantNotifierStruct struct {
 func (m *ParticipantNotifierStruct) Init(participantID uint, parentCtx context.Context) {
 	m.ID = participantID
 	m.ctx, m.cancel = context.WithCancel(parentCtx)
-	m.channel = make(chan ParticipantNotification, config.GetIntFromConfig("notifications.channel_buffer_size"))
+	m.channel = make(chan ParticipantNotification, config.GetInt("notifications.channel_buffer_size"))
 }
 
 func (m *ParticipantNotifierStruct) Close() {

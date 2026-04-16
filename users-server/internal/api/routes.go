@@ -16,10 +16,10 @@ var wsUpgrader websocket.Upgrader
 
 func InitWsUpgrader() {
 	wsUpgrader = websocket.Upgrader{
-		ReadBufferSize:  config.GetIntFromConfig("websocket.read_buffer_size"),
-		WriteBufferSize: config.GetIntFromConfig("websocket.write_buffer_size"),
+		ReadBufferSize:  config.GetInt("websocket.read_buffer_size"),
+		WriteBufferSize: config.GetInt("websocket.write_buffer_size"),
 		CheckOrigin: func(r *http.Request) bool {
-			return r.Header.Get("Origin") == config.GetStringFromConfig("server.frontend_addr")
+			return r.Header.Get("Origin") == config.GetString("server.frontend_addr")
 		},
 	}
 }
@@ -29,7 +29,7 @@ func InitRouter() {
 
 	router.Use(
 		cors.New(cors.Config{
-			AllowOrigins:     []string{config.GetStringFromConfig("server.frontend_addr")},
+			AllowOrigins:     []string{config.GetString("server.frontend_addr")},
 			AllowMethods:     []string{"POST", "GET", "OPTIONS", "PUT", "DELETE"},
 			AllowHeaders:     []string{"Content-Type"},
 			AllowCredentials: true,
@@ -37,26 +37,26 @@ func InitRouter() {
 		RequireSameOrigin,
 	)
 
-	router.GET(config.GetStringFromConfig("server.api.check_login_path"), RequireAuthentication)
-	router.GET(config.GetStringFromConfig("server.api.check_admin_path"), RequireAuthentication, RequireAdmin)
-	router.GET(config.GetStringFromConfig("server.api.get_call_notifications_path"), RequireAuthentication, meeting.HandleGetCallNotifications)
-	router.GET(config.GetStringFromConfig("server.api.is_able_to_join_meeting_path"), RequireAuthentication, RequireMeetingExists, RequireNotBanned)
-	router.GET(config.GetStringFromConfig("server.api.get_meeting_infos_path"), RequireAuthentication, RequireAdmin, meeting.HandleGetMeetingInfos)
-	router.GET(config.GetStringFromConfig("server.api.get_transcript_path"), RequireAuthentication, RequireAdmin, meeting.HandleGetTranscript)
-	router.GET(config.GetStringFromConfig("server.api.get_all_meeting_participants_path"), RequireAuthentication, RequireAdmin, meeting.HandleGetAllMeetingParticipants)
-	router.GET(config.GetStringFromConfig("server.api.get_summary_path"), RequireAuthentication, RequireAdmin, meeting.HandleTranscriptSummaryRequest)
+	router.GET(config.GetString("server.api.check_login_path"), RequireAuthentication)
+	router.GET(config.GetString("server.api.check_admin_path"), RequireAuthentication, RequireAdmin)
+	router.GET(config.GetString("server.api.get_call_notifications_path"), RequireAuthentication, meeting.HandleGetCallNotifications)
+	router.GET(config.GetString("server.api.is_able_to_join_meeting_path"), RequireAuthentication, RequireMeetingExists, RequireNotBanned)
+	router.GET(config.GetString("server.api.get_meeting_infos_path"), RequireAuthentication, RequireAdmin, meeting.HandleGetMeetingsInfo)
+	router.GET(config.GetString("server.api.get_transcript_path"), RequireAuthentication, RequireAdmin, meeting.HandleGetTranscript)
+	router.GET(config.GetString("server.api.get_all_meeting_participants_path"), RequireAuthentication, RequireAdmin, meeting.HandleGetAllMeetingParticipants)
+	router.GET(config.GetString("server.api.get_summary_path"), RequireAuthentication, RequireAdmin, meeting.HandleTranscriptSummaryRequest)
 
-	router.POST(config.GetStringFromConfig("server.api.signup_path"), login.HandleSignup)
-	router.POST(config.GetStringFromConfig("server.api.login_path"), login.HandleLogin)
-	router.POST(config.GetStringFromConfig("server.api.logout_path"), RequireAuthentication, login.HandleLogout)
-	router.POST(config.GetStringFromConfig("server.api.create_meeting_path"), RequireAuthentication, meeting.HandleCreateMeeting)
-	router.POST(config.GetStringFromConfig("server.api.join_meeting_path"), RequireAuthentication, RequireMeetingExists, RequireNotBanned, meeting.HandleJoinMeeting)
-	router.POST(config.GetStringFromConfig("server.api.leave_meeting_path"), RequireAuthentication, meeting.HandleLeaveMeeting)
-	router.POST(config.GetStringFromConfig("server.api.keep_alive_path"), RequireAuthentication, RequireKeepAliveToken, RequireFaceDetection, meeting.HandleKeepAlive)
-	router.POST(config.GetStringFromConfig("server.api.kick_participant_path"), RequireAuthentication, RequireKeepAliveToken, RequireHost, meeting.HandleKickParticipant)
+	router.POST(config.GetString("server.api.signup_path"), login.HandleSignup)
+	router.POST(config.GetString("server.api.login_path"), login.HandleLogin)
+	router.POST(config.GetString("server.api.logout_path"), RequireAuthentication, login.HandleLogout)
+	router.POST(config.GetString("server.api.create_meeting_path"), RequireAuthentication, meeting.HandleCreateMeeting)
+	router.POST(config.GetString("server.api.join_meeting_path"), RequireAuthentication, RequireMeetingExists, RequireNotBanned, meeting.HandleJoinMeeting)
+	router.POST(config.GetString("server.api.leave_meeting_path"), RequireAuthentication, meeting.HandleLeaveMeeting)
+	router.POST(config.GetString("server.api.keep_alive_path"), RequireAuthentication, RequireKeepAliveToken, RequireFaceDetection, meeting.HandleKeepAlive)
+	router.POST(config.GetString("server.api.kick_participant_path"), RequireAuthentication, RequireKeepAliveToken, RequireHost, meeting.HandleKickParticipant)
 
 	router.RunTLS(
-		config.GetStringFromConfig("server.listen_addr"),
+		config.GetString("server.listen_addr"),
 		os.Getenv("TLS_CERT_PATH"),
 		os.Getenv("TLS_KEY_PATH"),
 	)

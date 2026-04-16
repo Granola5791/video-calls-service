@@ -21,7 +21,7 @@ type MeetingNotifierStruct struct {
 func (m *MeetingNotifierStruct) Init(id uuid.UUID) {
 	m.ID = id
 	m.participants = make(map[uint]*ParticipantNotifierStruct)
-	m.notificationChanIn = make(chan ParticipantNotification, config.GetIntFromConfig("notifications.channel_buffer_size"))
+	m.notificationChanIn = make(chan ParticipantNotification, config.GetInt("notifications.channel_buffer_size"))
 	m.ctx, m.cancel = context.WithCancel(context.Background())
 }
 

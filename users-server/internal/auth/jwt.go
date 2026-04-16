@@ -15,26 +15,26 @@ func GenerateJwtToken(claims jwt.MapClaims, jwtKey []byte) (string, error) {
 
 func GenerateMeetingToken(meetingID uuid.UUID, jwtKey []byte, expTimeSec int) (string, error) {
 	claims := jwt.MapClaims{
-		config.GetStringFromConfig("meeting.meeting_id_name"): meetingID,
-		config.GetStringFromConfig("jwt.exp_name"):            time.Now().Add(time.Second * time.Duration(expTimeSec)).Unix(),
+		config.GetString("meeting.meeting_id_name"): meetingID,
+		config.GetString("jwt.exp_name"):            time.Now().Add(time.Second * time.Duration(expTimeSec)).Unix(),
 	}
 	return GenerateJwtToken(claims, jwtKey)
 }
 
 func GenerateLoginToken(userID uint, username string, role string, jwtKey []byte, expTimeSec int) (string, error) {
 	claims := jwt.MapClaims{
-		config.GetStringFromConfig("jwt.user_id_name"): userID,
-		config.GetStringFromConfig("jwt.username_name"): username,
-		config.GetStringFromConfig("jwt.role_name"):    role,
-		config.GetStringFromConfig("jwt.exp_name"):     time.Now().Add(time.Second * time.Duration(expTimeSec)).Unix(),
+		config.GetString("jwt.user_id_name"):  userID,
+		config.GetString("jwt.username_name"): username,
+		config.GetString("jwt.role_name"):     role,
+		config.GetString("jwt.exp_name"):      time.Now().Add(time.Second * time.Duration(expTimeSec)).Unix(),
 	}
 	return GenerateJwtToken(claims, jwtKey)
 }
 
 func GenerateKeepAliveToken(jwtKey []byte, meetingID uuid.UUID, expTimeSec int) (string, error) {
 	claims := jwt.MapClaims{
-		config.GetStringFromConfig("jwt.meeting_id_name"): meetingID.String(),
-		config.GetStringFromConfig("jwt.exp_name"):        time.Now().Add(time.Second * time.Duration(expTimeSec)).Unix(),
+		config.GetString("jwt.meeting_id_name"): meetingID.String(),
+		config.GetString("jwt.exp_name"):        time.Now().Add(time.Second * time.Duration(expTimeSec)).Unix(),
 	}
 	return GenerateJwtToken(claims, jwtKey)
 }

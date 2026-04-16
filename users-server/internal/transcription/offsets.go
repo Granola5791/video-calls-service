@@ -10,13 +10,13 @@ import (
 func GetOffsetsOfUsers(meetingID uuid.UUID, participants []uint) ([][]Offset, error) {
 	offsets := make([][]Offset, len(participants))
 	for i := range participants {
-		cnt, err := db.CountStartChunksFromDB(meetingID, participants[i])
+		cnt, err := db.CountStartChunks(meetingID, participants[i])
 		if err != nil {
 			return [][]Offset{}, err
 		}
 		offsets[i] = make([]Offset, int(cnt))
 		for j := 0; j < int(cnt); j++ {
-			firstChunk, err := db.GetKthStartChunkFromDB(meetingID, participants[i], j)
+			firstChunk, err := db.GetKthStartChunk(meetingID, participants[i], j)
 			if err != nil {
 				return [][]Offset{}, err
 			}

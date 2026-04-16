@@ -13,8 +13,8 @@ import (
 )
 
 func HandleGetAllMeetingParticipants(c *gin.Context) {
-	meetingID := uuid.MustParse(c.Param(config.GetStringFromConfig("server.api.params.meeting_id_name")))
-	meetingParticipants, err := db.GetAllMeetingParticipantIDsFromDB(meetingID)
+	meetingID := uuid.MustParse(c.Param(config.GetString("server.api.params.meeting_id_name")))
+	meetingParticipants, err := db.GetAllMeetingParticipantIDs(meetingID)
 	if err != nil {
 		log.Println(err)
 		c.AbortWithStatus(http.StatusInternalServerError)
@@ -24,9 +24,9 @@ func HandleGetAllMeetingParticipants(c *gin.Context) {
 }
 
 func HandleTranscriptSummaryRequest(c *gin.Context) {
-	meetingID := uuid.MustParse(c.Param(config.GetStringFromConfig("server.api.params.meeting_id_name")))
+	meetingID := uuid.MustParse(c.Param(config.GetString("server.api.params.meeting_id_name")))
 
-	summary, err := db.GetSummaryFromDB(meetingID)
+	summary, err := db.GetSummary(meetingID)
 	if err != nil {
 		log.Println(err)
 		c.AbortWithStatus(http.StatusInternalServerError)
@@ -36,10 +36,10 @@ func HandleTranscriptSummaryRequest(c *gin.Context) {
 	c.JSON(http.StatusOK, summary)
 }
 
-func HandleGetMeetingInfos(c *gin.Context) {
+func HandleGetMeetingsInfo(c *gin.Context) {
 	from, err := time.Parse(
 		time.RFC3339,
-		c.Query(config.GetStringFromConfig("server.api.query_params.from_name")),
+		c.Query(config.GetString("server.api.query_params.from_name")),
 	)
 	if err != nil {
 		log.Println(err)
@@ -48,17 +48,17 @@ func HandleGetMeetingInfos(c *gin.Context) {
 	}
 	to, err := time.Parse(
 		time.RFC3339,
-		c.Query(config.GetStringFromConfig("server.api.query_params.to_name")),
+		c.Query(config.GetString("server.api.query_params.to_name")),
 	)
 	if err != nil {
 		log.Println(err)
 		c.AbortWithStatus(http.StatusBadRequest)
 		return
 	}
-	hostName := c.Query(config.GetStringFromConfig("server.api.query_params.host_name"))
-	meetingName := c.Query(config.GetStringFromConfig("server.api.query_params.meeting_name"))
+	hostName := c.Query(config.GetString("server.api.query_params.host_name"))
+	meetingName := c.Query(config.GetString("server.api.query_params.meeting_name"))
 
-	meetingIDs, err := db.GetMeetingInfosFromDB(from, to, hostName, meetingName)
+	meetingIDs, err := db.GetMeetingsInfo(from, to, hostName, meetingName)
 	if err != nil {
 		log.Println(err)
 		c.AbortWithStatus(http.StatusInternalServerError)
@@ -68,26 +68,26 @@ func HandleGetMeetingInfos(c *gin.Context) {
 }
 
 func HandleGetTranscript(c *gin.Context) {
-	meetingID := uuid.MustParse(c.Param(config.GetStringFromConfig("server.api.params.meeting_id_name")))
-	participantID, err := strconv.Atoi(c.Param(config.GetStringFromConfig("server.api.params.participant_id_name")))
+	meetingID := uuid.MustParse(c.Param(config.GetString("server.api.params.meeting_id_name")))
+	participantID, err := strconv.Atoi(c.Param(config.GetString("server.api.params.participant_id_name")))
 	if err != nil {
 		log.Println(err)
 		c.AbortWithStatus(http.StatusBadRequest)
 		return
 	}
-	username, err := db.GetUsernameFromDB(uint(participantID))
+	username, err := db.GetUsername(uint(participantID))
 	if err != nil {
 		log.Println(err)
 		c.AbortWithStatus(http.StatusInternalServerError)
 		return
 	}
-	transcript, err := db.GetTranscriptFromDB(meetingID, uint(participantID))
+	transcript, err := db.GetTranscript(meetingID, uint(participantID))
 	if err != nil {
 		log.Println(err)
 		c.AbortWithStatus(http.StatusInternalServerError)
 		return
 	}
-	usernameJsonName := config.GetStringFromConfig("json.username_name")
-	transcriptJsonName := config.GetStringFromConfig("json.transcript_name")
+	usernameJsonName := config.GetString("json.username_name")
+	transcriptJsonName := config.GetString("json.transcript_name")
 	c.JSON(http.StatusOK, gin.H{usernameJsonName: username, transcriptJsonName: transcript})
 }

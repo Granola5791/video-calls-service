@@ -28,8 +28,8 @@ func (m *MeetingKeepAliveStruct) Init(id uuid.UUID) {
 }
 
 func (m *MeetingKeepAliveStruct) SetNewToken() {
-	exp := config.GetIntFromConfig("keep_alive.token_exp")
-	timerInterval := config.GetIntFromConfig("keep_alive.token_regen_interval")
+	exp := config.GetInt("keep_alive.token_exp")
+	timerInterval := config.GetInt("keep_alive.token_regen_interval")
 	token, err := auth.GenerateKeepAliveToken([]byte(os.Getenv("KEEP_ALIVE_JWT_SECRET")), m.ID, exp)
 	if err != nil {
 		log.Println(err)
@@ -46,7 +46,7 @@ func (m *MeetingKeepAliveStruct) SetNewToken() {
 }
 
 func (m *MeetingKeepAliveStruct) AddParticipant(participantID uint, onEnd func()) {
-	exp := config.GetIntFromConfig("keep_alive.token_exp")
+	exp := config.GetInt("keep_alive.token_exp")
 	m.mutex.Lock()
 	defer m.mutex.Unlock()
 	m.Participants[participantID] = time.AfterFunc(time.Duration(exp)*time.Second, onEnd)
@@ -70,7 +70,7 @@ func (m *MeetingKeepAliveStruct) Close() {
 }
 
 func (m *MeetingKeepAliveStruct) RefreshParticipantTimer(participantID uint) (stillAlive bool) {
-	exp := config.GetIntFromConfig("keep_alive.token_exp")
+	exp := config.GetInt("keep_alive.token_exp")
 	participantTimer := m.Participants[participantID]
 	if participantTimer == nil {
 		return false
@@ -88,7 +88,7 @@ func (m *MeetingKeepAliveStruct) GetTokenStartTime() time.Time {
 }
 
 func (m *MeetingKeepAliveStruct) GetTokenExpTime() time.Time {
-	return m.TokenTimerStartTime.Add(time.Duration(config.GetIntFromConfig("keep_alive.token_exp")) * time.Second)
+	return m.TokenTimerStartTime.Add(time.Duration(config.GetInt("keep_alive.token_exp")) * time.Second)
 }
 
 func (m *MeetingKeepAliveStruct) GetTokenRemainingTime() time.Duration {

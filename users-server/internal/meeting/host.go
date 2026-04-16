@@ -14,8 +14,8 @@ import (
 )
 
 func HandleKickParticipant(c *gin.Context) {
-	meetingID := uuid.MustParse(c.Param(config.GetStringFromConfig("server.api.params.meeting_id_name")))
-	userToKick := c.Param(config.GetStringFromConfig("server.api.params.user_to_kick_name"))
+	meetingID := uuid.MustParse(c.Param(config.GetString("server.api.params.meeting_id_name")))
+	userToKick := c.Param(config.GetString("server.api.params.user_to_kick_name"))
 	userToKickInt, err := strconv.Atoi(userToKick)
 	if err != nil {
 		c.AbortWithStatus(http.StatusBadRequest)
@@ -29,7 +29,7 @@ func HandleKickParticipant(c *gin.Context) {
 		return
 	}
 
-	db.LogEventToDB(meetingID, uint(userToKickInt), config.GetStringFromConfig("database.meeting_events.participant_kicked_by_host"))
+	db.LogEvent(meetingID, uint(userToKickInt), config.GetString("database.meeting_events.participant_kicked_by_host"))
 
 	SendDangerPeriodNotification(meetingID, uint(userToKickInt))
 
@@ -37,7 +37,7 @@ func HandleKickParticipant(c *gin.Context) {
 }
 
 func KickParticipantFromMeeting(meetingID uuid.UUID, userToKick uint) error {
-	err := db.BanUserFromMeetingInDB(meetingID, userToKick)
+	err := db.BanUserFromMeeting(meetingID, userToKick)
 	if err != nil {
 		return err
 	}
