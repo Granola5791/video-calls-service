@@ -1,10 +1,11 @@
-package main
+package notifications
 
 import (
 	"sync"
 
 	"context"
 
+	"github.com/Granola5791/video-calls-service/internal/config"
 	"github.com/google/uuid"
 )
 
@@ -20,7 +21,7 @@ type MeetingNotifierStruct struct {
 func (m *MeetingNotifierStruct) Init(id uuid.UUID) {
 	m.ID = id
 	m.participants = make(map[uint]*ParticipantNotifierStruct)
-	m.notificationChanIn = make(chan ParticipantNotification, GetIntFromConfig("notifications.channel_buffer_size"))
+	m.notificationChanIn = make(chan ParticipantNotification, config.GetIntFromConfig("notifications.channel_buffer_size"))
 	m.ctx, m.cancel = context.WithCancel(context.Background())
 }
 

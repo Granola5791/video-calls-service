@@ -1,4 +1,4 @@
-package main
+package db
 
 import (
 	"fmt"
@@ -10,76 +10,8 @@ import (
 	"github.com/google/uuid"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"github.com/Granola5791/video-calls-service/internal/config"
 )
-
-type UuidModel struct {
-	ID        uuid.UUID      `gorm:"type:uuid;default:gen_random_uuid();primaryKey" json:"id"`
-	CreatedAt time.Time      `json:"created_at"`
-	UpdatedAt time.Time      `json:"updated_at"`
-	DeletedAt gorm.DeletedAt `gorm:"index" json:"deleted_at"`
-}
-
-type User struct {
-	gorm.Model
-	Username       string `gorm:"uniqueIndex;not null"`
-	Role           string `gorm:"not null;default:user"`
-	HashedPassword string `gorm:"not null"`
-	Salt           string `gorm:"not null"`
-}
-
-type Meeting struct {
-	UuidModel
-	HostID                  uint   `gorm:"not null" json:"host_id"`
-	IsFaceDetectionRequired bool   `gorm:"not null;default:false" json:"is_face_detection_required"`
-	BannedUsers             []User `gorm:"many2many:meeting_banned_users;" json:"banned_users"`
-	Summary                 string `gorm:"not null;default:''" json:"summary"`
-	Name                    string `gorm:"not null;default:'none'" json:"name"`
-}
-
-type MeetingParticipant struct {
-	gorm.Model
-	UserID    uint      `gorm:"not null; uniqueIndex:idx_user_meeting"`
-	User      User      `gorm:"foreignKey:UserID"`
-	MeetingID uuid.UUID `gorm:"not null; uniqueIndex:idx_user_meeting"`
-	Meeting   Meeting   `gorm:"foreignKey:MeetingID"`
-}
-
-type MeetingEvent struct {
-	gorm.Model
-	MeetingID uuid.UUID `gorm:"not null"`
-	UserID    uint      `gorm:"not null"`
-	Event     string    `gorm:"not null"`
-}
-
-type UserAuth struct {
-	HashedPassword string `gorm:"not null"`
-	Salt           string `gorm:"not null"`
-}
-
-type UserRole struct {
-	ID   uint
-	Role string `gorm:"not null"`
-}
-
-type UserVideoChunk struct {
-	gorm.Model
-	UserID      uint      `gorm:"not null"`
-	User        User      `gorm:"foreignKey:UserID"`
-	MeetingID   uuid.UUID `gorm:"not null"`
-	Meeting     Meeting   `gorm:"foreignKey:MeetingID"`
-	Chunk       []byte    `gorm:"not null"`
-	ChunkNumber uint      `gorm:"not null"`
-	Visited     bool      `gorm:"not null"`
-}
-
-type ParticipantTranscription struct {
-	gorm.Model
-	UserID     uint      `gorm:"not null; uniqueIndex:idx_user_meeting"`
-	User       User      `gorm:"foreignKey:UserID"`
-	MeetingID  uuid.UUID `gorm:"not null; uniqueIndex:idx_user_meeting"`
-	Meeting    Meeting   `gorm:"foreignKey:MeetingID"`
-	Transcript string    `gorm:"not null"`
-}
 
 type ParticipantInfo struct {
 	UserID   uint   `json:"user_id"`
@@ -110,8 +42,8 @@ func InitDatabaseConnection() error {
 		os.Getenv("DB_PASSWORD"),
 		os.Getenv("DB_NAME"),
 		os.Getenv("DB_PORT"),
-		GetStringFromConfig("database.sslmode"),
-		GetStringFromConfig("database.timezone"),
+		config.GetStringFromConfig("database.sslmode"),
+		config.GetStringFromConfig("database.timezone"),
 	)
 
 	db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
@@ -378,7 +310,7 @@ func CountStartChunksFromDB(meetingID uuid.UUID, userID uint) (int64, error) {
 	return count, err
 }
 
-func isFaceDetectionRequiredInDB(meetingID uuid.UUID) (bool, error) {
+func IsFaceDetectionRequiredInDB(meetingID uuid.UUID) (bool, error) {
 	var count int64
 	err := db.Model(&Meeting{}).
 		Where("id = ?", meetingID).
@@ -425,7 +357,7 @@ func PipeUserVideoChunksBetweenFromDB(meetingID uuid.UUID, userID uint, minTime 
 // including participants who left the meeting
 func GetAllMeetingParticipantIDsFromDB(meetingID uuid.UUID) ([]uint, error) {
 	var meetingParticipants []uint
-	participantJoinedEvent := GetStringFromConfig("database.meeting_events.participant_joined")
+	participantJoinedEvent := config.GetStringFromConfig("database.meeting_events.participant_joined")
 	err := db.
 		Model(&MeetingEvent{}).
 		Where("meeting_id = ? AND event = ?", meetingID, participantJoinedEvent).

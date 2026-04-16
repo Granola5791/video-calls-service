@@ -1,10 +1,11 @@
-package main
+package notifications
 
 import (
 	"context"
 
 	"log"
 
+	"github.com/Granola5791/video-calls-service/internal/config"
 	"github.com/gorilla/websocket"
 )
 
@@ -18,7 +19,7 @@ type ParticipantNotifierStruct struct {
 func (m *ParticipantNotifierStruct) Init(participantID uint, parentCtx context.Context) {
 	m.ID = participantID
 	m.ctx, m.cancel = context.WithCancel(parentCtx)
-	m.channel = make(chan ParticipantNotification, GetIntFromConfig("notifications.channel_buffer_size"))
+	m.channel = make(chan ParticipantNotification, config.GetIntFromConfig("notifications.channel_buffer_size"))
 }
 
 func (m *ParticipantNotifierStruct) Close() {

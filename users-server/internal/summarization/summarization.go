@@ -1,4 +1,4 @@
-package main
+package summarization
 
 import (
 	"encoding/json"
@@ -7,7 +7,8 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/gin-gonic/gin"
+	"github.com/Granola5791/video-calls-service/internal/config"
+	"github.com/Granola5791/video-calls-service/internal/db"
 	"github.com/google/uuid"
 )
 
@@ -18,7 +19,7 @@ type SummaryResponse struct {
 
 func HandleTranscriptSummary(meetingID uuid.UUID) {
 
-	transcripts, err := GetMeetingTranscriptsFromDB(meetingID)
+	transcripts, err := db.GetMeetingTranscriptsFromDB(meetingID)
 	if err != nil {
 		log.Println(err)
 		return
@@ -30,20 +31,20 @@ func HandleTranscriptSummary(meetingID uuid.UUID) {
 		return
 	}
 
-	err = UpdateMeetingNameToDB(meetingID, response.MeetingName)
+	err = db.UpdateMeetingNameToDB(meetingID, response.MeetingName)
 	if err != nil {
 		log.Println(err)
 		return
 	}
 
-	err = UpdateSummaryToDB(meetingID, response.Summary)
+	err = db.UpdateSummaryToDB(meetingID, response.Summary)
 	if err != nil {
 		log.Println(err)
 		return
 	}
 }
 
-func GetSummary(transcriptions []ParticipantTranscription) (SummaryResponse, error) {
+func GetSummary(transcriptions []db.ParticipantTranscription) (SummaryResponse, error) {
 	reader, writer := io.Pipe()
 
 	go func() {
@@ -54,8 +55,8 @@ func GetSummary(transcriptions []ParticipantTranscription) (SummaryResponse, err
 	}()
 
 	url := fmt.Sprintf("%s%s",
-		GetStringFromConfig("ai_server.url"),
-		GetStringFromConfig("ai_server.api.summary_path"),
+		config.GetStringFromConfig("ai_server.url"),
+		config.GetStringFromConfig("ai_server.api.summary_path"),
 	)
 
 	req, err := http.NewRequest("POST", url, reader)
@@ -83,17 +84,4 @@ func GetSummary(transcriptions []ParticipantTranscription) (SummaryResponse, err
 	}
 
 	return ret, nil
-}
-
-func HandleTranscriptSummaryRequest(c *gin.Context) {
-	meetingID := uuid.MustParse(c.Param(GetStringFromConfig("server.api.params.meeting_id_name")))
-
-	summary, err := GetSummaryFromDB(meetingID)
-	if err != nil {
-		log.Println(err)
-		c.AbortWithStatus(http.StatusInternalServerError)
-		return
-	}
-
-	c.JSON(http.StatusOK, summary)
 }

@@ -1,4 +1,4 @@
-package main
+package notifications
 
 type Event int
 

@@ -1,4 +1,4 @@
-package main
+package keep_alive
 
 import (
 	"log"
@@ -6,21 +6,18 @@ import (
 	"sync"
 	"time"
 
+	"github.com/Granola5791/video-calls-service/internal/auth"
+	"github.com/Granola5791/video-calls-service/internal/config"
 	"github.com/google/uuid"
 )
 
-var (
-	meetingKeepAliveMap   = make(map[uuid.UUID]*MeetingKeepAliveStruct)
-	meetingKeepAliveMutex sync.Mutex
-)
-
 type MeetingKeepAliveStruct struct {
-	ID           uuid.UUID
-	mutex        sync.Mutex
-	CurrToken    string
-	TokenTimer   *time.Timer
+	ID                  uuid.UUID
+	mutex               sync.Mutex
+	CurrToken           string
+	TokenTimer          *time.Timer
 	TokenTimerStartTime time.Time
-	Participants map[uint]*time.Timer
+	Participants        map[uint]*time.Timer
 }
 
 func (m *MeetingKeepAliveStruct) Init(id uuid.UUID) {
@@ -31,9 +28,9 @@ func (m *MeetingKeepAliveStruct) Init(id uuid.UUID) {
 }
 
 func (m *MeetingKeepAliveStruct) SetNewToken() {
-	exp := GetIntFromConfig("keep_alive.token_exp")
-	timerInterval := GetIntFromConfig("keep_alive.token_regen_interval")
-	token, err := GenerateKeepAliveToken([]byte(os.Getenv("KEEP_ALIVE_JWT_SECRET")), m.ID, exp)
+	exp := config.GetIntFromConfig("keep_alive.token_exp")
+	timerInterval := config.GetIntFromConfig("keep_alive.token_regen_interval")
+	token, err := auth.GenerateKeepAliveToken([]byte(os.Getenv("KEEP_ALIVE_JWT_SECRET")), m.ID, exp)
 	if err != nil {
 		log.Println(err)
 		return
@@ -48,14 +45,11 @@ func (m *MeetingKeepAliveStruct) SetNewToken() {
 	m.TokenTimerStartTime = time.Now()
 }
 
-func (m *MeetingKeepAliveStruct) AddParticipant(participantID uint) {
-	exp := GetIntFromConfig("keep_alive.token_exp")
+func (m *MeetingKeepAliveStruct) AddParticipant(participantID uint, onEnd func()) {
+	exp := config.GetIntFromConfig("keep_alive.token_exp")
 	m.mutex.Lock()
 	defer m.mutex.Unlock()
-	m.Participants[participantID] = time.AfterFunc(time.Duration(exp)*time.Second, func() {
-		LogEventToDB(m.ID, participantID, GetStringFromConfig("database.meeting_events.participant_timeout"))
-		LeaveMeeting(m.ID, participantID)
-	})
+	m.Participants[participantID] = time.AfterFunc(time.Duration(exp)*time.Second, onEnd)
 }
 
 func (m *MeetingKeepAliveStruct) RemoveParticipant(participantID uint) {
@@ -76,7 +70,7 @@ func (m *MeetingKeepAliveStruct) Close() {
 }
 
 func (m *MeetingKeepAliveStruct) RefreshParticipantTimer(participantID uint) (stillAlive bool) {
-	exp := GetIntFromConfig("keep_alive.token_exp")
+	exp := config.GetIntFromConfig("keep_alive.token_exp")
 	participantTimer := m.Participants[participantID]
 	if participantTimer == nil {
 		return false
@@ -94,7 +88,7 @@ func (m *MeetingKeepAliveStruct) GetTokenStartTime() time.Time {
 }
 
 func (m *MeetingKeepAliveStruct) GetTokenExpTime() time.Time {
-	return m.TokenTimerStartTime.Add(time.Duration(GetIntFromConfig("keep_alive.token_exp")) * time.Second)
+	return m.TokenTimerStartTime.Add(time.Duration(config.GetIntFromConfig("keep_alive.token_exp")) * time.Second)
 }
 
 func (m *MeetingKeepAliveStruct) GetTokenRemainingTime() time.Duration {
@@ -107,23 +101,4 @@ func (m *MeetingKeepAliveStruct) CloseAllParticipants() {
 	for _, timer := range m.Participants {
 		timer.Stop()
 	}
-}
-
-func RemoveMeetingKeepAlive(meetingID uuid.UUID) {
-	meetingKeepAliveMutex.Lock()
-	defer meetingKeepAliveMutex.Unlock()
-	meeting := meetingKeepAliveMap[meetingID]
-	if meeting != nil {
-		meeting.Close()
-	}
-	delete(meetingKeepAliveMap, meetingID)
-}
-
-func AddMeetingKeepAlive(meetingID uuid.UUID) *MeetingKeepAliveStruct {
-	meeting := &MeetingKeepAliveStruct{}
-	meeting.Init(meetingID)
-	meetingKeepAliveMutex.Lock()
-	meetingKeepAliveMap[meetingID] = meeting
-	meetingKeepAliveMutex.Unlock()
-	return meeting
 }

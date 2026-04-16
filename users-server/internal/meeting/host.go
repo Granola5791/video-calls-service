@@ -1,17 +1,21 @@
-package main
+package meeting
 
 import (
 	"log"
 	"net/http"
 	"strconv"
 
+	"github.com/Granola5791/video-calls-service/internal/config"
+	"github.com/Granola5791/video-calls-service/internal/db"
+	"github.com/Granola5791/video-calls-service/internal/keep_alive"
+	"github.com/Granola5791/video-calls-service/internal/notifications"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 )
 
 func HandleKickParticipant(c *gin.Context) {
-	meetingID := uuid.MustParse(c.Param(GetStringFromConfig("server.api.params.meeting_id_name")))
-	userToKick := c.Param(GetStringFromConfig("server.api.params.user_to_kick_name"))
+	meetingID := uuid.MustParse(c.Param(config.GetStringFromConfig("server.api.params.meeting_id_name")))
+	userToKick := c.Param(config.GetStringFromConfig("server.api.params.user_to_kick_name"))
 	userToKickInt, err := strconv.Atoi(userToKick)
 	if err != nil {
 		c.AbortWithStatus(http.StatusBadRequest)
@@ -25,15 +29,15 @@ func HandleKickParticipant(c *gin.Context) {
 		return
 	}
 
-	LogEventToDB(meetingID, uint(userToKickInt), GetStringFromConfig("database.meeting_events.participant_kicked_by_host"))
+	db.LogEventToDB(meetingID, uint(userToKickInt), config.GetStringFromConfig("database.meeting_events.participant_kicked_by_host"))
 
 	SendDangerPeriodNotification(meetingID, uint(userToKickInt))
-	
+
 	c.Status(http.StatusOK)
 }
 
 func KickParticipantFromMeeting(meetingID uuid.UUID, userToKick uint) error {
-	err := BanUserFromMeetingInDB(meetingID, userToKick)
+	err := db.BanUserFromMeetingInDB(meetingID, userToKick)
 	if err != nil {
 		return err
 	}
@@ -43,13 +47,13 @@ func KickParticipantFromMeeting(meetingID uuid.UUID, userToKick uint) error {
 }
 
 func SendDangerPeriodNotification(meetingID uuid.UUID, participantID uint) {
-	meetingNotifier := meetingNotifiers[meetingID]
-	meetingKeepAlive := meetingKeepAliveMap[meetingID]
+	meetingNotifier := notifications.MeetingNotifiers[meetingID]
+	meetingKeepAlive := keep_alive.MeetingKeepAliveMap[meetingID]
 
 	dangerPeriod := meetingKeepAlive.GetTokenRemainingTime() // this is the time left before the token expires and the player is kicked for certain.
-	meetingNotifier.NotifyParticipants(ParticipantNotification{
+	meetingNotifier.NotifyParticipants(notifications.ParticipantNotification{
 		ParticipantID: participantID,
-		Event:         ParticipantKickedByHost,
+		Event:         notifications.ParticipantKickedByHost,
 		Value:         dangerPeriod.Seconds(),
 	})
 }

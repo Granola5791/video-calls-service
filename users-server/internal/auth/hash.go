@@ -1,9 +1,10 @@
-package main
+package auth
 
 import (
 	"crypto/rand"
 	"encoding/base64"
 
+	"github.com/Granola5791/video-calls-service/internal/config"
 	"golang.org/x/crypto/argon2"
 )
 
@@ -11,16 +12,16 @@ func HashPassword(password string, salt string) string {
 	hash := argon2.IDKey(
 		[]byte(password),
 		[]byte(salt),
-		GetUint32FromConfig("hash.time"),
-		GetUint32FromConfig("hash.memory"),
-		GetUint8FromConfig("hash.threads"),
-		GetUint32FromConfig("hash.keyLen"),
+		config.GetUint32FromConfig("hash.time"),
+		config.GetUint32FromConfig("hash.memory"),
+		config.GetUint8FromConfig("hash.threads"),
+		config.GetUint32FromConfig("hash.keyLen"),
 	)
 	return base64.RawStdEncoding.EncodeToString(hash)
 }
 
 func GenerateSalt() (string, error) {
-	salt := make([]byte, GetIntFromConfig("hash.saltLen"))
+	salt := make([]byte, config.GetIntFromConfig("hash.saltLen"))
 	_, err := rand.Read(salt)
 	if err != nil {
 		return "", err

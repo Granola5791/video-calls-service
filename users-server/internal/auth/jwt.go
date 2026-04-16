@@ -1,8 +1,9 @@
-package main
+package auth
 
 import (
 	"time"
 
+	"github.com/Granola5791/video-calls-service/internal/config"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 )
@@ -14,26 +15,26 @@ func GenerateJwtToken(claims jwt.MapClaims, jwtKey []byte) (string, error) {
 
 func GenerateMeetingToken(meetingID uuid.UUID, jwtKey []byte, expTimeSec int) (string, error) {
 	claims := jwt.MapClaims{
-		GetStringFromConfig("meeting.meeting_id_name"): meetingID,
-		GetStringFromConfig("jwt.exp_name"):            time.Now().Add(time.Second * time.Duration(expTimeSec)).Unix(),
+		config.GetStringFromConfig("meeting.meeting_id_name"): meetingID,
+		config.GetStringFromConfig("jwt.exp_name"):            time.Now().Add(time.Second * time.Duration(expTimeSec)).Unix(),
 	}
 	return GenerateJwtToken(claims, jwtKey)
 }
 
 func GenerateLoginToken(userID uint, username string, role string, jwtKey []byte, expTimeSec int) (string, error) {
 	claims := jwt.MapClaims{
-		GetStringFromConfig("jwt.user_id_name"): userID,
-		GetStringFromConfig("jwt.username_name"): username,
-		GetStringFromConfig("jwt.role_name"):    role,
-		GetStringFromConfig("jwt.exp_name"):     time.Now().Add(time.Second * time.Duration(expTimeSec)).Unix(),
+		config.GetStringFromConfig("jwt.user_id_name"): userID,
+		config.GetStringFromConfig("jwt.username_name"): username,
+		config.GetStringFromConfig("jwt.role_name"):    role,
+		config.GetStringFromConfig("jwt.exp_name"):     time.Now().Add(time.Second * time.Duration(expTimeSec)).Unix(),
 	}
 	return GenerateJwtToken(claims, jwtKey)
 }
 
 func GenerateKeepAliveToken(jwtKey []byte, meetingID uuid.UUID, expTimeSec int) (string, error) {
 	claims := jwt.MapClaims{
-		GetStringFromConfig("jwt.meeting_id_name"): meetingID.String(),
-		GetStringFromConfig("jwt.exp_name"):        time.Now().Add(time.Second * time.Duration(expTimeSec)).Unix(),
+		config.GetStringFromConfig("jwt.meeting_id_name"): meetingID.String(),
+		config.GetStringFromConfig("jwt.exp_name"):        time.Now().Add(time.Second * time.Duration(expTimeSec)).Unix(),
 	}
 	return GenerateJwtToken(claims, jwtKey)
 }
