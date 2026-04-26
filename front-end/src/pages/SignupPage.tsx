@@ -61,7 +61,7 @@ const SignupPage = () => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username, password })
             })
-            setIsLoading(true);
+            setIsLoading(false);
             switch (res.status) {
                 case HttpStatusCodes.Created:
                     setResponse('');
