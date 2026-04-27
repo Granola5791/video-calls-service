@@ -105,17 +105,6 @@ func GetParticipantsInMeeting(meetingID uuid.UUID, usersToIgnore ...uint) ([]Par
 	return results, nil
 }
 
-func MeetingExists(meetingID uuid.UUID) (bool, error) {
-	var count int64
-	err := db.Model(&Meeting{}).
-		Where("id = ?", meetingID).
-		Count(&count).Error
-	if err != nil {
-		return false, err
-	}
-	return count > 0, nil
-}
-
 func GetParticipantCountInMeeting(meetingID uuid.UUID) (int64, error) {
 	var count int64
 	err := db.Model(&MeetingParticipant{}).

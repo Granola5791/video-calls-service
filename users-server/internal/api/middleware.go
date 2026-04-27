@@ -11,6 +11,7 @@ import (
 	"github.com/Granola5791/video-calls-service/internal/config"
 	"github.com/Granola5791/video-calls-service/internal/db"
 	"github.com/Granola5791/video-calls-service/internal/face_detection"
+	"github.com/Granola5791/video-calls-service/internal/keep_alive"
 	"github.com/Granola5791/video-calls-service/internal/meeting"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
@@ -142,18 +143,13 @@ func RequireNotBanned(c *gin.Context) {
 	}
 }
 
-// TODO: Add a check that the meeting is active.
 func RequireMeetingExists(c *gin.Context) {
 	meetingID, err := uuid.Parse(c.Param(config.GetString("server.api.params.meeting_id_name")))
 	if err != nil {
 		c.AbortWithStatus(http.StatusNotFound)
 		return
 	}
-	exists, err := db.MeetingExists(meetingID)
-	if err != nil {
-		c.AbortWithStatus(http.StatusInternalServerError)
-		return
-	}
+	_, exists := keep_alive.MeetingKeepAliveMap[meetingID]
 	if !exists {
 		c.AbortWithStatus(http.StatusNotFound)
 		return
