@@ -55,19 +55,18 @@ const MeetingPage = () => {
             method: 'GET',
             credentials: 'include',
         });
-        // TODO: Should call LeaveMeetingFrontend when not able to join.
         switch (res.status) {
             case HttpStatusCodes.OK:
                 setMeetingState(MeetingConfig.meetingState.none);
                 break;
             case HttpStatusCodes.NotFound:
-                setMeetingState(MeetingConfig.meetingState.wrongID);
+                LeaveMeetingFrontend(MeetingConfig.meetingState.wrongID);
                 break;
             case HttpStatusCodes.Unauthorized:
-                setMeetingState(MeetingConfig.meetingState.banned);
+                LeaveMeetingFrontend(MeetingConfig.meetingState.banned);
                 break;
             default:
-                setMeetingState(MeetingConfig.meetingState.error);
+                LeaveMeetingFrontend(MeetingConfig.meetingState.error);
                 break;
         }
     }
@@ -244,8 +243,8 @@ const MeetingPage = () => {
     const LeaveMeetingFrontend = async (state: number) => {
         setMeetingState(state);
         StopStream();
-        const timeOutId = setTimeout(() => { goToHome() }, MeetingConfig.exitWaitTimeMs)
-        leaveMeetingTimeoutIDRef.current = timeOutId
+        const timeOutId = setTimeout(() => { goToHome() }, MeetingConfig.exitWaitTimeMs);
+        leaveMeetingTimeoutIDRef.current = timeOutId;
     }
 
     const LeaveMeeting = async () => {

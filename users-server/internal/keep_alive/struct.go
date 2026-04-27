@@ -69,7 +69,6 @@ func (m *MeetingKeepAliveStruct) Close() {
 	}
 }
 
-// TODO: maybe use ok value when getting participant from map.
 func (m *MeetingKeepAliveStruct) RefreshParticipantTimer(participantID uint) (stillAlive bool) {
 	exp := config.GetInt("keep_alive.token_exp")
 	participantTimer := m.Participants[participantID]
