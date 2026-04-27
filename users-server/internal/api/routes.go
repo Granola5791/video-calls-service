@@ -37,6 +37,8 @@ func InitRouter() {
 		RequireSameOrigin,
 	)
 
+	// TODO: add middlewares:
+	// call notifications: keep alive
 	router.GET(config.GetString("server.api.check_login_path"), RequireAuthentication)
 	router.GET(config.GetString("server.api.check_admin_path"), RequireAuthentication, RequireAdmin)
 	router.GET(config.GetString("server.api.get_call_notifications_path"), RequireAuthentication, meeting.HandleGetCallNotifications)

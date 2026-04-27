@@ -142,6 +142,7 @@ func RequireNotBanned(c *gin.Context) {
 	}
 }
 
+// TODO: Add a check that the meeting is active.
 func RequireMeetingExists(c *gin.Context) {
 	meetingID, err := uuid.Parse(c.Param(config.GetString("server.api.params.meeting_id_name")))
 	if err != nil {

@@ -55,6 +55,7 @@ const MeetingPage = () => {
             method: 'GET',
             credentials: 'include',
         });
+        // TODO: Should call LeaveMeetingFrontend when not able to join.
         switch (res.status) {
             case HttpStatusCodes.OK:
                 setMeetingState(MeetingConfig.meetingState.none);
