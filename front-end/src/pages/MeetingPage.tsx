@@ -2,16 +2,15 @@ import React, { useEffect } from 'react'
 import { useParams } from 'react-router-dom';
 import { DasherServer, UsersServer, CallEventTypes, HttpStatusCodes, SetUrlParams } from '../constants/backend-constants';
 import DashPlayer from '../components/DashPlayer';
-import { CenteredColumn, StyledMeetingGrid } from '../styled-components/StyledBoxes';
+import { StyledMeetingGrid } from '../styled-components/StyledBoxes';
 import { StyledMeetingGridTile, StyledVideo } from '../styled-components/StyledVideos';
-import OneButtonPopUp from '../components/OneButtonPopUp';
 import { useNavigation } from '../utils/navigation';
-import { LocalStorage, MeetingConfig, StreamConfig } from '../constants/general-contants';
-import { HostOptions, MeetingExitText, StartMeetingText } from '../constants/hebrew-constants';
+import { MeetingConfig, StreamConfig } from '../constants/general-contants';
+import { HostOptions } from '../constants/hebrew-constants';
 import { StyledMeetingFooter } from '../styled-components/StyledFooters';
-import { LongButtonFilled } from '../styled-components/StyledButtons';
-import { StyledTitle } from '../styled-components/StyledText';
 import { NormalizeArray } from '../utils/array';
+import MeetingPreparationPage from './MeetingPreparationPage';
+import MeetingEndPage from './MeetingEndPage';
 
 type Participant = {
     id: string;
@@ -19,13 +18,9 @@ type Participant = {
 }
 
 const MeetingPage = () => {
-
-    const ID = localStorage.getItem(LocalStorage.id);
     const { meetingID } = useParams();
     const streamWsRef = React.useRef<WebSocket | null>(null);
     const notificationsWsRef = React.useRef<WebSocket | null>(null);
-    const [previewOn, setPreviewOn] = React.useState(false);
-    const previewVideoRef = React.useRef<HTMLVideoElement>(null);
     const clientVideoRef = React.useRef<HTMLVideoElement>(null);
     const toCleanUpRef = React.useRef<MediaStream[]>([]); // Store streams that need to be cleaned up
     const recorderRef = React.useRef<MediaRecorder | null>(null);
@@ -33,7 +28,6 @@ const MeetingPage = () => {
     const [meetingState, setMeetingState] = React.useState(MeetingConfig.meetingState.none);
     const keepAliveIntervalIDRef = React.useRef(0);
     const leaveMeetingTimeoutIDRef = React.useRef(0);
-    const [isHost, setIsHost] = React.useState(false);
     const [dangerSignOn, setDangerSignOn] = React.useState(false);
     const [hostOptions, setHostOptions] = React.useState<{ label: string, onClick: (userID: string) => void }[]>([]);
     const {
@@ -46,7 +40,6 @@ const MeetingPage = () => {
             return;
         }
         CheckIfAbleToJoinMeeting(meetingID);
-        ShowPreview();
 
         return () => {
             CloseNotificationsConnection();
@@ -62,6 +55,7 @@ const MeetingPage = () => {
             method: 'GET',
             credentials: 'include',
         });
+        // TODO: Should call LeaveMeetingFrontend when not able to join.
         switch (res.status) {
             case HttpStatusCodes.OK:
                 setMeetingState(MeetingConfig.meetingState.none);
@@ -75,20 +69,6 @@ const MeetingPage = () => {
             default:
                 setMeetingState(MeetingConfig.meetingState.error);
                 break;
-        }
-    }
-
-    const ShowPreview = async () => {
-        try {
-            const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-            toCleanUpRef.current.push(stream);
-            if (previewVideoRef.current) {
-                previewVideoRef.current.srcObject = stream;
-                await previewVideoRef.current.play();
-            }
-            setPreviewOn(true);
-        } catch (error) {
-            setPreviewOn(false);
         }
     }
 
@@ -178,7 +158,6 @@ const MeetingPage = () => {
             }));
             const is_host = data.is_host
             setParticipants(participants);
-            setIsHost(is_host);
             if (is_host) {
                 ActivateHostOptions();
             }
@@ -304,72 +283,18 @@ const MeetingPage = () => {
         }
     };
 
-    const GetExitText = () => {
-        let title = '';
-        switch (meetingState) {
-            case MeetingConfig.meetingState.left:
-                title = MeetingExitText.popUpTitles.left;
-                break;
-            case MeetingConfig.meetingState.kicked:
-                title = MeetingExitText.popUpTitles.kicked;
-                break;
-            case MeetingConfig.meetingState.ended:
-                title = MeetingExitText.popUpTitles.ended;
-                break;
-            case MeetingConfig.meetingState.wrongID:
-                title = MeetingExitText.popUpTitles.wrongID;
-                break;
-            case MeetingConfig.meetingState.error:
-                title = MeetingExitText.popUpTitles.error;
-                break;
-            case MeetingConfig.meetingState.banned:
-                title = MeetingExitText.popUpTitles.banned;
-                break;
-            default:
-                title = MeetingExitText.popUpTitles.default;
-                break;
-        }
-        return title
-    }
-
     if (meetingState === MeetingConfig.meetingState.none) {
         return (
-            <CenteredColumn>
-                <StyledTitle>{StartMeetingText.title}</StyledTitle>
-                {!previewOn && <h4>{StartMeetingText.allowCameraAccess}</h4>}
-                <video
-                    ref={previewVideoRef}
-                    autoPlay
-                    playsInline
-                    muted
-                    width="40%"
-                />
-                <LongButtonFilled
-                    onClick={EnterMeeting}
-                    disabled={!previewOn}
-                >
-                    {StartMeetingText.enterMeetingButton}
-                </LongButtonFilled>
-            </CenteredColumn>
+            <MeetingPreparationPage onEnterMeeting={EnterMeeting} />
         )
     }
 
     if (meetingState !== MeetingConfig.meetingState.active && meetingState !== MeetingConfig.meetingState.none) {
-
-        const title = GetExitText();
         return (
-            <OneButtonPopUp
-                open={true}
-                theme='success'
-                title={title}
-                buttonText={MeetingExitText.popUpButton}
-                onButtonClick={() => {
-                    clearTimeout(leaveMeetingTimeoutIDRef.current);
-                    goToHome();
-                }}
-            >
-                {MeetingExitText.popUpSubtitle}
-            </OneButtonPopUp>
+            <MeetingEndPage meetingState={meetingState} onExit={() => {
+                clearTimeout(leaveMeetingTimeoutIDRef.current);
+                goToHome();
+            }} />
         )
     }
     return (
