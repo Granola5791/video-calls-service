@@ -4,13 +4,13 @@ import { DasherServer, UsersServer, CallEventTypes, HttpStatusCodes, SetUrlParam
 import DashPlayer from '../components/DashPlayer';
 import { StyledMeetingGrid } from '../styled-components/StyledBoxes';
 import { StyledMeetingGridTile, StyledVideo } from '../styled-components/StyledVideos';
-import OneButtonPopUp from '../components/OneButtonPopUp';
 import { useNavigation } from '../utils/navigation';
 import { MeetingConfig, StreamConfig } from '../constants/general-contants';
-import { HostOptions, MeetingExitText } from '../constants/hebrew-constants';
+import { HostOptions } from '../constants/hebrew-constants';
 import { StyledMeetingFooter } from '../styled-components/StyledFooters';
 import { NormalizeArray } from '../utils/array';
 import MeetingPreparationPage from './MeetingPreparationPage';
+import MeetingEndPage from './MeetingEndPage';
 
 type Participant = {
     id: string;
@@ -282,34 +282,6 @@ const MeetingPage = () => {
         }
     };
 
-    const GetExitText = () => {
-        let title = '';
-        switch (meetingState) {
-            case MeetingConfig.meetingState.left:
-                title = MeetingExitText.popUpTitles.left;
-                break;
-            case MeetingConfig.meetingState.kicked:
-                title = MeetingExitText.popUpTitles.kicked;
-                break;
-            case MeetingConfig.meetingState.ended:
-                title = MeetingExitText.popUpTitles.ended;
-                break;
-            case MeetingConfig.meetingState.wrongID:
-                title = MeetingExitText.popUpTitles.wrongID;
-                break;
-            case MeetingConfig.meetingState.error:
-                title = MeetingExitText.popUpTitles.error;
-                break;
-            case MeetingConfig.meetingState.banned:
-                title = MeetingExitText.popUpTitles.banned;
-                break;
-            default:
-                title = MeetingExitText.popUpTitles.default;
-                break;
-        }
-        return title
-    }
-
     if (meetingState === MeetingConfig.meetingState.none) {
         return (
             <MeetingPreparationPage onEnterMeeting={EnterMeeting} />
@@ -317,21 +289,11 @@ const MeetingPage = () => {
     }
 
     if (meetingState !== MeetingConfig.meetingState.active && meetingState !== MeetingConfig.meetingState.none) {
-
-        const title = GetExitText();
         return (
-            <OneButtonPopUp
-                open={true}
-                theme='success'
-                title={title}
-                buttonText={MeetingExitText.popUpButton}
-                onButtonClick={() => {
-                    clearTimeout(leaveMeetingTimeoutIDRef.current);
-                    goToHome();
-                }}
-            >
-                {MeetingExitText.popUpSubtitle}
-            </OneButtonPopUp>
+            <MeetingEndPage meetingState={meetingState} onExit={() => {
+                clearTimeout(leaveMeetingTimeoutIDRef.current);
+                goToHome();
+            }} />
         )
     }
     return (
