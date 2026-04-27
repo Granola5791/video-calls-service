@@ -51,11 +51,6 @@ type UserAuth struct {
 	Salt           string `gorm:"not null"`
 }
 
-type UserRole struct {
-	ID   uint
-	Role string `gorm:"not null"`
-}
-
 type UserVideoChunk struct {
 	gorm.Model
 	UserID      uint      `gorm:"not null"`

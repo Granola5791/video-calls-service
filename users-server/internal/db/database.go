@@ -11,7 +11,6 @@ import (
 
 var db *gorm.DB
 
-// TODO: probably should remove UserAuth and UserRole.
 func InitDatabaseConnection() error {
 	var err error
 	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=%s TimeZone=%s",
@@ -34,8 +33,6 @@ func InitDatabaseConnection() error {
 		&Meeting{},
 		&MeetingParticipant{},
 		&MeetingEvent{},
-		&UserAuth{},
-		&UserRole{},
 		&UserVideoChunk{},
 		&ParticipantTranscription{},
 	)
