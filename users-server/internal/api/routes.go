@@ -41,7 +41,7 @@ func InitRouter() {
 	// call notifications: keep alive
 	router.GET(config.GetString("server.api.check_login_path"), RequireAuthentication)
 	router.GET(config.GetString("server.api.check_admin_path"), RequireAuthentication, RequireAdmin)
-	router.GET(config.GetString("server.api.get_call_notifications_path"), RequireAuthentication, meeting.HandleGetCallNotifications)
+	router.GET(config.GetString("server.api.get_call_notifications_path"), RequireAuthentication, RequireKeepAliveToken, meeting.HandleGetCallNotifications)
 	router.GET(config.GetString("server.api.is_able_to_join_meeting_path"), RequireAuthentication, RequireMeetingExists, RequireNotBanned)
 	router.GET(config.GetString("server.api.get_meeting_infos_path"), RequireAuthentication, RequireAdmin, meeting.HandleGetMeetingsInfo)
 	router.GET(config.GetString("server.api.get_transcript_path"), RequireAuthentication, RequireAdmin, meeting.HandleGetTranscript)
